@@ -10,6 +10,7 @@ public class PostRepository(SocialMediaDbContext _db) : IPostRepository
         => await _db.Posts
             .AsNoTracking()
             .Include(x => x.Comments)
+            .Include(p => p.Likes)
             .ToListAsync();
 
     public async Task<Post?> GetByIdAsync(Guid id)
@@ -23,6 +24,7 @@ public class PostRepository(SocialMediaDbContext _db) : IPostRepository
     public async Task<Post?> GetByIdWithCommentsAsync(Guid id)
         => await _db.Posts
             .AsNoTracking()
+            .Include(x => x.Likes)
             .Include(x => x.Comments)
                 .ThenInclude(c => c.Replies)
             .FirstOrDefaultAsync(x => x.Id == id);
