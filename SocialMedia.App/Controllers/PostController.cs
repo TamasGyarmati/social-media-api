@@ -15,7 +15,7 @@ public class PostController(
     IPostRepository _repo, 
     IImageValidator _imageValidator) : ControllerBase
 {
-    [HttpGet]
+    [HttpGet("all/")]
     public async Task<ActionResult<List<ResponsePostDto>>> GetAllPosts()
     {
         var posts = await _repo.GetAllAsync();
