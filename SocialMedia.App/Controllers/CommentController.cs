@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SocialMedia.Data.Repository;
 using SocialMedia.Domain.Dtos;
+using SocialMedia.Domain.Entities;
 
 namespace SocialMedia.App.Controllers;
 
@@ -10,7 +11,7 @@ namespace SocialMedia.App.Controllers;
 [Route("api/[controller]")]
 public class CommentController(ICommentRepository _repo) : ControllerBase
 {
-    [HttpGet("all/{id:guid}")]
+    [HttpGet("all/{postId:guid}")]
     public async Task<ActionResult<List<CommentResponseShorterDto>>> GetAllCommentFromPostAsync(Guid id)
     {
         var comments = await _repo.GetAllFromPostAsync(id);
@@ -50,6 +51,41 @@ public class CommentController(ICommentRepository _repo) : ControllerBase
         var response = await _repo.CreateAsync(comment);
         
         return Ok(response.Id);
+    }
+    
+    [HttpPost("{id:guid}/like")]
+    [Authorize]
+    public async Task<ActionResult> CreateCommentLikeAsync(Guid id)
+    {
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (currentUserId is null)
+        {
+            return Unauthorized();
+        }
+        
+        var existingComment = await _repo.GetByIdAsync(id);
+        if (existingComment is null)
+        {
+            return NotFound("Comment not found.");
+        }
+        
+        var existingLike = await _repo.GetLikeByIdAsync(existingComment.Id, currentUserId);
+
+        if (existingLike is not null)
+        {
+            await _repo.DeleteLikeAsync(existingLike);
+            return Ok("Post unliked.");
+        }
+
+        var like = new CommentLike
+        {
+            CommentId = id,
+            UserId = currentUserId
+        };
+
+        await _repo.CreateLikeAsync(like);
+        
+        return Ok("Post liked.");
     }
 
     [HttpPut("{id:guid}")]

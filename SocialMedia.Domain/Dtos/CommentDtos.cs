@@ -10,6 +10,7 @@ public record CommentResponseShorterDto(
     DateTime? DeletedAtUtc,
     Guid? ParentCommentId,
     string CreatedById,
+    int Likes,
     int ReplyCount
 );
     
@@ -22,6 +23,7 @@ public record CommentResponseDto(
     Guid PostId,
     Guid? ParentCommentId,
     string CreatedById,
+    int Likes,
     int ReplyCount
 );
 
@@ -54,6 +56,7 @@ public static class CommentMappingExtensions
             comment.DeletedAtUtc,
             comment.ParentCommentId,
             comment.CreatedById,
+            comment.Likes.Count,
             comment.Replies.Count
         );
     }
@@ -69,6 +72,7 @@ public static class CommentMappingExtensions
             comment.PostId,
             comment.ParentCommentId,
             comment.CreatedById,
+            comment.Likes.Count,
             comment.Replies.Count
         );
     }

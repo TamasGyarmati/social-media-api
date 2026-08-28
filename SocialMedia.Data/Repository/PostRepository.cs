@@ -8,7 +8,8 @@ public class PostRepository(SocialMediaDbContext _db) : IPostRepository
 {
     public async Task<List<Post>> GetAllAsync()
         => await _db.Posts
-            .AsNoTracking()
+            .AsNoTracking() // Useful when not using SaveChanges (Get), turns off tracking
+            .AsSplitQuery()
             .Include(x => x.Comments)
             .Include(p => p.Likes)
             .ToListAsync();
@@ -24,6 +25,7 @@ public class PostRepository(SocialMediaDbContext _db) : IPostRepository
     public async Task<Post?> GetByIdWithCommentsAsync(Guid id)
         => await _db.Posts
             .AsNoTracking()
+            .AsSplitQuery() // More, faster SELECT instead of one big JOIN
             .Include(x => x.Likes)
             .Include(x => x.Comments)
                 .ThenInclude(c => c.Replies)
