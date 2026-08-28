@@ -12,8 +12,8 @@ using SocialMedia.Data.Database;
 namespace SocialMedia.Data.Migrations
 {
     [DbContext(typeof(SocialMediaDbContext))]
-    [Migration("20260828163253_RefreshToken")]
-    partial class RefreshToken
+    [Migration("20260828211917_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -253,9 +253,6 @@ namespace SocialMedia.Data.Migrations
                     b.Property<DateTime?>("DeletedAtUtc")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Likes")
-                        .HasColumnType("int");
-
                     b.Property<Guid?>("ParentCommentId")
                         .HasColumnType("uniqueidentifier");
 
@@ -274,6 +271,32 @@ namespace SocialMedia.Data.Migrations
                     b.HasIndex("PostId");
 
                     b.ToTable("Comments");
+                });
+
+            modelBuilder.Entity("SocialMedia.Domain.Entities.CommentLike", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CommentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("CommentId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("CommentLikes");
                 });
 
             modelBuilder.Entity("SocialMedia.Domain.Entities.Post", b =>
@@ -298,9 +321,6 @@ namespace SocialMedia.Data.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<int>("Likes")
-                        .HasColumnType("int");
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -311,6 +331,32 @@ namespace SocialMedia.Data.Migrations
                     b.HasIndex("CreatedById");
 
                     b.ToTable("Posts");
+                });
+
+            modelBuilder.Entity("SocialMedia.Domain.Entities.PostLike", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("PostId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("PostId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("PostLikes");
                 });
 
             modelBuilder.Entity("SocialMedia.Domain.Entities.AppUser", b =>
@@ -411,6 +457,25 @@ namespace SocialMedia.Data.Migrations
                     b.Navigation("Post");
                 });
 
+            modelBuilder.Entity("SocialMedia.Domain.Entities.CommentLike", b =>
+                {
+                    b.HasOne("SocialMedia.Domain.Entities.Comment", "Comment")
+                        .WithMany("Likes")
+                        .HasForeignKey("CommentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SocialMedia.Domain.Entities.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Comment");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("SocialMedia.Domain.Entities.Post", b =>
                 {
                     b.HasOne("SocialMedia.Domain.Entities.AppUser", "Creator")
@@ -422,14 +487,37 @@ namespace SocialMedia.Data.Migrations
                     b.Navigation("Creator");
                 });
 
+            modelBuilder.Entity("SocialMedia.Domain.Entities.PostLike", b =>
+                {
+                    b.HasOne("SocialMedia.Domain.Entities.Post", "Post")
+                        .WithMany("Likes")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SocialMedia.Domain.Entities.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("SocialMedia.Domain.Entities.Comment", b =>
                 {
+                    b.Navigation("Likes");
+
                     b.Navigation("Replies");
                 });
 
             modelBuilder.Entity("SocialMedia.Domain.Entities.Post", b =>
                 {
                     b.Navigation("Comments");
+
+                    b.Navigation("Likes");
                 });
 #pragma warning restore 612, 618
         }

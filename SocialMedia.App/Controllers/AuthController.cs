@@ -125,11 +125,8 @@ public class AuthController(
     }
     
     [HttpPost("refresh")]
-    public async Task<IActionResult> Refresh(TokenApiDto? tokenApiDto)
+    public async Task<IActionResult> Refresh(TokenApiDto tokenApiDto)
     {
-        if (tokenApiDto is null)
-            return BadRequest("Invalid client request");
-        
         string accessToken = tokenApiDto.AccessToken;
         string refreshToken = tokenApiDto.RefreshToken;
         

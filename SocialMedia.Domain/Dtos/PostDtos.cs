@@ -10,6 +10,7 @@ public record ResponsePostDto(
     string? ImageUrl,
     DateTime CreatedAtUtc,
     string CreatorById,
+    int Likes,
     int CommentsCount
 );
     
@@ -19,6 +20,7 @@ public record PostWithCommentsDto(
     string? ImageUrl,
     DateTime CreatedAtUtc,
     string CreatorById,
+    int Likes,
     List<CommentShortDto> Comments
 );
     
@@ -45,6 +47,7 @@ public static class PostMappingExtensions
             post.ImageUrl,
             post.CreatedAtUtc,
             post.CreatedById,
+            post.Likes.Count,
             post.Comments.Count
         );
     }
@@ -57,6 +60,7 @@ public static class PostMappingExtensions
             post.ImageUrl,
             post.CreatedAtUtc,
             post.CreatedById,
+            post.Likes.Count,
             post.Comments.Select(x => new CommentShortDto(x.Content, x.CreatedAtUtc, x.CreatedById, x.Replies.Count)).ToList()
         );
     }

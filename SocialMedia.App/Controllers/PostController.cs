@@ -5,6 +5,7 @@ using SocialMedia.App.Exceptions;
 using SocialMedia.App.Helpers;
 using SocialMedia.Data.Repository;
 using SocialMedia.Domain.Dtos;
+using SocialMedia.Domain.Entities;
 
 namespace SocialMedia.App.Controllers;
 
@@ -63,6 +64,41 @@ public class PostController(
         var response = await _repo.CreateAsync(post);
         
         return Ok(response.Id);
+    }
+
+    [HttpPost("{id:guid}/like")]
+    [Authorize]
+    public async Task<ActionResult> CreatePostLikeAsync(Guid id)
+    {
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (currentUserId is null)
+        {
+            return Unauthorized();
+        }
+        
+        var existingPost = await _repo.GetByIdAsync(id);
+        if (existingPost is null)
+        {
+            return NotFound("Post not found.");
+        }
+        
+        var existingLike = await _repo.GetLikeByIdAsync(existingPost.Id, currentUserId);
+
+        if (existingLike is not null)
+        {
+            await _repo.DeleteLikeAsync(existingLike);
+            return Ok("Post unliked.");
+        }
+
+        var like = new PostLike
+        {
+            PostId = id,
+            UserId = currentUserId
+        };
+
+        await _repo.CreateLikeAsync(like);
+        
+        return Ok("Post liked.");
     }
 
     [HttpPut("{id:guid}")]

@@ -7,7 +7,9 @@ namespace SocialMedia.Data.Database;
 public class SocialMediaDbContext(DbContextOptions<SocialMediaDbContext> options) : IdentityDbContext(options)
 {
     public DbSet<Post> Posts { get; set; }
+    public DbSet<PostLike> PostLikes { get; set; }
     public DbSet<Comment> Comments { get; set; }
+    public DbSet<CommentLike> CommentLikes { get; set; }
     public DbSet<AppUser> AppUsers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -37,6 +39,23 @@ public class SocialMediaDbContext(DbContextOptions<SocialMediaDbContext> options
                 .HasMaxLength(500);
         });
 
+        modelBuilder.Entity<PostLike>(entity =>
+        {
+            entity.HasKey(pl => pl.Id);
+            
+            entity.HasIndex(pl => new { pl.PostId, pl.UserId }).IsUnique();
+
+            entity.HasOne(pl => pl.Post)
+                .WithMany(p => p.Likes)
+                .HasForeignKey(pl => pl.PostId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(pl => pl.User)
+                .WithMany()
+                .HasForeignKey(pl => pl.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+        });
+
         modelBuilder.Entity<Comment>(entity =>
         {
             entity.HasKey(e => e.Id);
@@ -45,7 +64,7 @@ public class SocialMediaDbContext(DbContextOptions<SocialMediaDbContext> options
                 .WithMany()
                 .HasForeignKey(e => e.CreatedById)
                 .IsRequired()
-                .OnDelete(DeleteBehavior.Restrict); // Cascade : Deletes all comment made by the creator
+                .OnDelete(DeleteBehavior.Restrict);
 
             entity.Property(e => e.Content)
                 .IsRequired()
@@ -60,6 +79,23 @@ public class SocialMediaDbContext(DbContextOptions<SocialMediaDbContext> options
                 .WithMany(c => c.Replies)
                 .HasForeignKey(e => e.ParentCommentId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+        
+        modelBuilder.Entity<CommentLike>(entity =>
+        {
+            entity.HasKey(cl => cl.Id);
+            
+            entity.HasIndex(cl => new { cl.CommentId, cl.UserId }).IsUnique();
+
+            entity.HasOne(cl => cl.Comment)
+                .WithMany(c => c.Likes)
+                .HasForeignKey(cl => cl.CommentId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(cl => cl.User)
+                .WithMany()
+                .HasForeignKey(cl => cl.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
         });
 
         modelBuilder.Entity<AppUser>(entity =>
