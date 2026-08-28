@@ -23,6 +23,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\SocialMedia.Data\SocialMedia.Data.csproj" />
+      <ProjectReference Include="..\SocialMedia.Logic\SocialMedia.Logic.csproj" />
     </ItemGroup>
 
 </Project>

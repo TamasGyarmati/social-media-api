@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using SocialMedia.Domain.Entities;
+using SocialMedia.Domain.Enums;
 
 namespace SocialMedia.Domain.Dtos;
 
@@ -36,6 +37,18 @@ public record UpdatePostDto(
     IFormFile? Image
 );
 
+public record PostResult(PostStatus Status, Guid? PostId = null)
+{
+    public static PostResult Success(Guid? id) => new(PostStatus.Success, id);
+    public static PostResult NotFound() => new(PostStatus.NotFound);
+    public static PostResult Forbidden() => new(PostStatus.Forbidden);
+}
+
+public record LikeToggleResultDto(
+    bool isLiked, 
+    string message
+);
+
 public static class PostMappingExtensions
 {
     public static ResponsePostDto FromDomainToResponsePostDto(this Post post)
@@ -52,7 +65,7 @@ public static class PostMappingExtensions
         );
     }
     
-    public static PostWithCommentsDto FromDomainToPostWithComments(this Post post)
+    public static PostWithCommentsDto FromDomainToPostWithCommentsDto(this Post post)
     {
         return new PostWithCommentsDto(
             post.Title,

@@ -16,7 +16,7 @@ public class CommentController(ICommentRepository _repo) : ControllerBase
     {
         var comments = await _repo.GetAllFromPostAsync(id);
 
-        var responseDtos = comments.Select(x => x.FromDomainToCommentResponseShorter()).ToList();
+        var responseDtos = comments.Select(x => x.FromDomainToCommentResponseShorterDto()).ToList();
             
         return Ok(responseDtos);
     }
@@ -31,7 +31,7 @@ public class CommentController(ICommentRepository _repo) : ControllerBase
             return NotFound("The comment was not found!");
         }
 
-        var response = comment.FromDomainToCommentResponse();
+        var response = comment.FromDomainToCommentResponseDto();
         
         return Ok(response);
     }

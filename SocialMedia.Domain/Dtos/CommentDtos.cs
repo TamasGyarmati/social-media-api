@@ -46,7 +46,7 @@ public record CreateCommentDto(
 
 public static class CommentMappingExtensions
 {
-    public static CommentResponseShorterDto FromDomainToCommentResponseShorter(this Comment comment)
+    public static CommentResponseShorterDto FromDomainToCommentResponseShorterDto(this Comment comment)
     {
         return new CommentResponseShorterDto(
             comment.Id,
@@ -61,7 +61,7 @@ public static class CommentMappingExtensions
         );
     }
     
-    public static CommentResponseDto FromDomainToCommentResponse(this Comment comment)
+    public static CommentResponseDto FromDomainToCommentResponseDto(this Comment comment)
     {
         return new CommentResponseDto(
             comment.Id,

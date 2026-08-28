@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using SocialMedia.Domain.Entities;
 
-namespace SocialMedia.App.Helpers;
+namespace SocialMedia.App.Services;
 
 public interface ITokenGenerator
 {

@@ -5,10 +5,12 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
-using SocialMedia.App.Helpers;
+using SocialMedia.App.Services;
 using SocialMedia.Data.Database;
 using SocialMedia.Data.Repository;
 using SocialMedia.Domain.Entities;
+using SocialMedia.Logic.Logics;
+using SocialMedia.Logic.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +23,7 @@ builder.Services.AddDbContext<SocialMediaDbContext>(opt =>
 // Repositories
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IPostRepository, PostRepository>();
+builder.Services.AddScoped<IPostLogic, PostLogic>();
 
 // Services
 builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();

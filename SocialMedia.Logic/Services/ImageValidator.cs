@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using SocialMedia.App.Exceptions;
 
-namespace SocialMedia.App.Helpers;
+namespace SocialMedia.Logic.Services;
 
 public interface IImageValidator
 {

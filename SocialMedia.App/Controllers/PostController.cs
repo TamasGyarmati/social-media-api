@@ -2,40 +2,26 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SocialMedia.App.Exceptions;
-using SocialMedia.App.Helpers;
-using SocialMedia.Data.Repository;
 using SocialMedia.Domain.Dtos;
-using SocialMedia.Domain.Entities;
+using SocialMedia.Domain.Enums;
+using SocialMedia.Logic.Logics;
 
 namespace SocialMedia.App.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class PostController(
-    IPostRepository _repo, 
-    IImageValidator _imageValidator) : ControllerBase
+public class PostController(IPostLogic _logic) : ControllerBase
 {
     [HttpGet("all/")]
     public async Task<ActionResult<List<ResponsePostDto>>> GetAllPosts()
-    {
-        var posts = await _repo.GetAllAsync();
-
-        return posts.Select(x => x.FromDomainToResponsePostDto()).ToList();
-    }
+        => Ok(await _logic.ReadAll());
     
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<PostWithCommentsDto>> GetPostWithCommentsByIdAsync(Guid id)
     {
-        var post = await _repo.GetByIdWithCommentsAsync(id);
-
-        if (post is null)
-        {
-            return NotFound("The post was not found!");
-        }
+        var post = await _logic.ReadWithCommentsByIdAsync(id);
         
-        var response = post.FromDomainToPostWithComments();
-        
-        return Ok(response);
+        return post is null ? NotFound("Post was not found") : Ok(post);
     }
     
     [HttpPost]
@@ -48,22 +34,16 @@ public class PostController(
         {
             return Unauthorized();
         }
-        
-        string? relativePath;
+
         try
         {
-            relativePath = await _imageValidator.ValidateImageAsync(dto.Image);
+            var id = await _logic.CreateAsync(dto, currentUserId);
+            return Ok(id);
         }
-        catch (NotAllowedExtensionException e)
+        catch (NotAllowedExtensionException ex)
         {
-            return BadRequest(e.Message);
+            return BadRequest(ex.Message);
         }
-        
-        var post = dto.FromCreatePostToDomain(relativePath, currentUserId);
-
-        var response = await _repo.CreateAsync(post);
-        
-        return Ok(response.Id);
     }
 
     [HttpPost("{id:guid}/like")]
@@ -76,29 +56,9 @@ public class PostController(
             return Unauthorized();
         }
         
-        var existingPost = await _repo.GetByIdAsync(id);
-        if (existingPost is null)
-        {
-            return NotFound("Post not found.");
-        }
+        var message = await _logic.CreateLikeAsync(id, currentUserId);
         
-        var existingLike = await _repo.GetLikeByIdAsync(existingPost.Id, currentUserId);
-
-        if (existingLike is not null)
-        {
-            await _repo.DeleteLikeAsync(existingLike);
-            return Ok("Post unliked.");
-        }
-
-        var like = new PostLike
-        {
-            PostId = id,
-            UserId = currentUserId
-        };
-
-        await _repo.CreateLikeAsync(like);
-        
-        return Ok("Post liked.");
+        return message is null ? NotFound("The post was not found.") : Ok(message);
     }
 
     [HttpPut("{id:guid}")]
@@ -112,37 +72,19 @@ public class PostController(
             return Unauthorized();
         }
         
-        var existingPost = await _repo.GetByIdAsync(id);
-        
-        string? relativePath;
-        try
-        {
-            relativePath = await _imageValidator.ValidateImageAsync(dto.Image);
-        }
-        catch (NotAllowedExtensionException e)
-        {
-            return BadRequest(e.Message);
-        }
-        
-        if (existingPost is not null)
-        {
-            if (existingPost.CreatedById != currentUserId)
-            {
-                return Unauthorized();
-            }
-            
-            existingPost.UpdateFromDto(dto, relativePath);
-            
-            await _repo.UpdateAsync(existingPost);
+        var result = await _logic.UpdateAsync(id, dto, currentUserId);
 
-            return Ok(existingPost);
-        }
-            
-        return NotFound("The post was not found!");
+        return result.Status switch
+        {
+            PostStatus.NotFound => NotFound("The post was not found."),
+            PostStatus.Forbidden => Forbid(),
+            PostStatus.Success => Ok(id),
+            _ => BadRequest()
+        };
     }
 
     [HttpDelete("{id:guid}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     public async Task<ActionResult> DeletePostAsync(Guid id)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -151,20 +93,14 @@ public class PostController(
             return Unauthorized();
         }
         
-        var post = await _repo.GetByIdAsync(id);
+        var result = await _logic.DeleteAsync(id, currentUserId);
 
-        if (post is not null)
+        return result.Status switch
         {
-            if (post.CreatedById != currentUserId)
-            {
-                return Unauthorized();
-            }
-            
-            await _repo.DeleteAsync(post);
-
-            return NoContent();
-        }
-        
-        return NotFound("The post was not found!");
+            PostStatus.NotFound => NotFound("The post was not found."),
+            PostStatus.Forbidden => Forbid(),
+            PostStatus.Success => NoContent(),
+            _ => BadRequest()
+        };
     }
 }
