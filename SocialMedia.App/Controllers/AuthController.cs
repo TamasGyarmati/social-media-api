@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
-using SocialMedia.App.Services;
 using SocialMedia.Domain.Dtos;
 using SocialMedia.Domain.Entities;
+using SocialMedia.Logic.Services;
 
 namespace SocialMedia.App.Controllers;
 

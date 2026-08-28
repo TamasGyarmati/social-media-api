@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
-using SocialMedia.App.Services;
 using SocialMedia.Data.Database;
 using SocialMedia.Data.Repository;
 using SocialMedia.Domain.Entities;

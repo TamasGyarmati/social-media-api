@@ -1,8 +1,9 @@
 using MailKit.Net.Smtp;
 using MailKit.Security;
+using Microsoft.Extensions.Configuration;
 using MimeKit;
 
-namespace SocialMedia.App.Services;
+namespace SocialMedia.Logic.Services;
 
 public class SmtpEmailSender(IConfiguration config) : Microsoft.AspNetCore.Identity.UI.Services.IEmailSender
 {

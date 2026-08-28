@@ -3,10 +3,11 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using SocialMedia.Domain.Entities;
 
-namespace SocialMedia.App.Services;
+namespace SocialMedia.Logic.Services;
 
 public interface ITokenGenerator
 {
