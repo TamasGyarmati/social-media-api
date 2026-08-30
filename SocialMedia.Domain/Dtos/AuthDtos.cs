@@ -24,3 +24,10 @@ public record TokenApiDto(
     string AccessToken,
     string RefreshToken
 );
+
+public record AuthResponseDto(
+    string AccessToken,
+    string RefreshToken,
+    DateTime AccessTokenExpiration,
+    DateTime RefreshTokenExpiration
+);

@@ -21,7 +21,7 @@ public class PostController(IPostLogic _logic) : ControllerBase
     {
         var post = await _logic.ReadWithCommentsByIdAsync(id);
         
-        return post is null ? NotFound("Post was not found") : Ok(post);
+        return post is null ? NotFound("Post was not found.") : Ok(post);
     }
     
     [HttpPost]
