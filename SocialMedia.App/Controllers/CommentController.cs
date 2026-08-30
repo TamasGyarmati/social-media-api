@@ -4,36 +4,24 @@ using Microsoft.AspNetCore.Mvc;
 using SocialMedia.Data.Repository;
 using SocialMedia.Domain.Dtos;
 using SocialMedia.Domain.Entities;
+using SocialMedia.Domain.Enums;
+using SocialMedia.Logic.Logics;
 
 namespace SocialMedia.App.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class CommentController(ICommentRepository _repo) : ControllerBase
+public class CommentController(ICommentLogic _logic) : ControllerBase
 {
     [HttpGet("all/{postId:guid}")]
     public async Task<ActionResult<List<CommentResponseShorterDto>>> GetAllCommentFromPostAsync(Guid id)
-    {
-        var comments = await _repo.GetAllFromPostAsync(id);
-
-        var responseDtos = comments.Select(x => x.FromDomainToCommentResponseShorterDto()).ToList();
-            
-        return Ok(responseDtos);
-    }
+        => Ok(await _logic.ReadAllFromPostAsync(id));
     
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<CommentResponseDto>> GetCommentByIdAsync(Guid id)
     {
-        var comment = await _repo.GetByIdAsync(id);
-        
-        if (comment is null)
-        {
-            return NotFound("The comment was not found!");
-        }
-
-        var response = comment.FromDomainToCommentResponseDto();
-        
-        return Ok(response);
+        var comment = await _logic.GetByIdAsync(id);
+        return comment is null ? NotFound("Comment was not found.") : Ok(comment);
     }
 
     [HttpPost]
@@ -45,12 +33,10 @@ public class CommentController(ICommentRepository _repo) : ControllerBase
         {
             return Unauthorized();
         }
+
+        var commentId = await _logic.CreateAsync(dto, currentUserId);
         
-        var comment = dto.FromCreateCommentToDomain(currentUserId);
-        
-        var response = await _repo.CreateAsync(comment);
-        
-        return Ok(response.Id);
+        return Ok(commentId);
     }
     
     [HttpPost("{id:guid}/like")]
@@ -63,29 +49,9 @@ public class CommentController(ICommentRepository _repo) : ControllerBase
             return Unauthorized();
         }
         
-        var existingComment = await _repo.GetByIdAsync(id);
-        if (existingComment is null)
-        {
-            return NotFound("Comment not found.");
-        }
+        var message = await _logic.CreateLikeAsync(id, currentUserId);
         
-        var existingLike = await _repo.GetLikeByIdAsync(existingComment.Id, currentUserId);
-
-        if (existingLike is not null)
-        {
-            await _repo.DeleteLikeAsync(existingLike);
-            return Ok("Post unliked.");
-        }
-
-        var like = new CommentLike
-        {
-            CommentId = id,
-            UserId = currentUserId
-        };
-
-        await _repo.CreateLikeAsync(like);
-        
-        return Ok("Post liked.");
+        return message is null ? NotFound("The comment was not found.") : Ok(message);
     }
 
     [HttpPut("{id:guid}")]
@@ -97,24 +63,16 @@ public class CommentController(ICommentRepository _repo) : ControllerBase
         {
             return Unauthorized();
         }
-        
-        var existingComment = await _repo.GetByIdAsync(id);
 
-        if (existingComment is not null)
+        var result = await _logic.UpdateAsync(id, dto, currentUserId);
+
+        return result.Status switch
         {
-            if (existingComment.CreatedById != currentUserId)
-            {
-                return Unauthorized();
-            }
-            
-            existingComment.UpdateFromDto(dto);
-            
-            await _repo.UpdateAsync(existingComment);
-            
-            return Ok(existingComment.Id);
-        }
-        
-        return NotFound("The comment was not found!");
+            CommentStatus.NotFound => NotFound("The comment was not found."),
+            CommentStatus.Forbidden => Forbid(),
+            CommentStatus.Success => Ok(result.CommentId),
+            _ => BadRequest()
+        };
     }
 
     [HttpDelete("{id:guid}")]
@@ -126,30 +84,15 @@ public class CommentController(ICommentRepository _repo) : ControllerBase
         {
             return Unauthorized();
         }
-        
-        var comment = await _repo.GetByIdAsync(id);
 
-        if (comment is null)
-        {
-            return NotFound("The comment was not found!");
-        }
+        var result = await _logic.DeleteAsync(id, currentUserId);
 
-        if (comment.CreatedById != currentUserId)
+        return result.Status switch
         {
-            return Unauthorized();
-        }
-
-        if (comment.Replies.Count > 0)
-        {
-            comment.Content = "[This comment was removed by the Author.]";
-            comment.DeletedAtUtc = DateTime.UtcNow;
-            await _repo.UpdateAsync(comment);
-        }
-        else
-        {
-            await _repo.DeleteAsync(comment);
-        }
-        
-        return NoContent();
+            CommentStatus.NotFound => NotFound("The comment was not found."),
+            CommentStatus.Forbidden => Forbid(),
+            CommentStatus.Success => NoContent(),
+            _ => BadRequest()
+        };
     }
 }

@@ -44,11 +44,6 @@ public record PostResult(PostStatus Status, Guid? PostId = null)
     public static PostResult Forbidden() => new(PostStatus.Forbidden);
 }
 
-public record LikeToggleResultDto(
-    bool isLiked, 
-    string message
-);
-
 public static class PostMappingExtensions
 {
     public static ResponsePostDto FromDomainToResponsePostDto(this Post post)
