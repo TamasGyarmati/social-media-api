@@ -23,7 +23,7 @@ public interface IAuthLogic
 public class AuthLogic(UserManager<AppUser> _userManager, 
     RoleManager<IdentityRole> _roleManager,
     ITokenGenerator _tokenGenerator,
-    IEmailSender _emailSender)
+    IEmailSender _emailSender) : IAuthLogic
 {
     public async Task<RegisterResult> RegisterAsync(UserCreateDto dto)
     {

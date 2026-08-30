@@ -1,8 +1,4 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.WebUtilities;
 using SocialMedia.Domain.Dtos;
 using SocialMedia.Logic.Helpers;
 using SocialMedia.Logic.Logics;
