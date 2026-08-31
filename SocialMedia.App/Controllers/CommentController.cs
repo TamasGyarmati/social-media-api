@@ -12,8 +12,8 @@ namespace SocialMedia.App.Controllers;
 public class CommentController(ICommentLogic _logic) : ControllerBase
 {
     [HttpGet("all/{postId:guid}")]
-    public async Task<ActionResult<List<CommentResponseShorterDto>>> GetAllCommentFromPostAsync(Guid id)
-        => Ok(await _logic.ReadAllFromPostAsync(id));
+    public async Task<ActionResult<List<CommentResponseShorterDto>>> GetAllCommentFromPostAsync(Guid postId)
+        => Ok(await _logic.ReadAllFromPostAsync(postId));
     
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<CommentResponseDto>> GetCommentByIdAsync(Guid id)
