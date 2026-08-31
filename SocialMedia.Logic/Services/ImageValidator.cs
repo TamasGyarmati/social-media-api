@@ -54,7 +54,7 @@ public class ImageValidator(IWebHostEnvironment _env) : IImageValidator
         {
             var uniqueFileName = $"{Guid.NewGuid()}.webp";
     
-            var rootPath = _env.WebRootPath ?? Path.Combine(_env.ContentRootPath, "wwwroot");
+            var rootPath = _env.WebRootPath;
             var uploadsFolder = Path.Combine(rootPath, "images", subFolder);
             Directory.CreateDirectory(uploadsFolder);
     
