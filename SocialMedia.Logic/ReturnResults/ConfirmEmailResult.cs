@@ -1,4 +1,4 @@
-namespace SocialMedia.Logic.Helpers;
+namespace SocialMedia.Logic.ReturnResults;
 
 public abstract record ConfirmEmailResult
 {

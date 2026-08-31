@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SocialMedia.Domain.Dtos;
-using SocialMedia.Logic.Helpers;
 using SocialMedia.Logic.Logics;
+using SocialMedia.Logic.ReturnResults;
 
 namespace SocialMedia.App.Controllers;
 

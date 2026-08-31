@@ -1,6 +1,6 @@
 using SocialMedia.Domain.Enums;
 
-namespace SocialMedia.Logic.Helpers;
+namespace SocialMedia.Logic.ReturnResults;
 
 public record PostResult(PostStatus Status, Guid? PostId = null)
 {

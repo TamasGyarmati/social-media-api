@@ -1,4 +1,4 @@
-namespace SocialMedia.Logic.Helpers;
+namespace SocialMedia.Logic.ReturnResults;
 
 public record LikeToggleResult(
     bool isLiked, 

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using SocialMedia.Domain.Entities;
 
-namespace SocialMedia.Logic.Helpers;
+namespace SocialMedia.Logic.ReturnResults;
 
 public abstract record RegisterResult
 {

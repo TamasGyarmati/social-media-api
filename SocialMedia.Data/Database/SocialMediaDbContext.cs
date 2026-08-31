@@ -107,6 +107,9 @@ public class SocialMediaDbContext(DbContextOptions<SocialMediaDbContext> options
             entity.Property(e => e.LastName)
                 .IsRequired()
                 .HasMaxLength(100);
+
+            entity.Property(e => e.AvatarUrl)
+                .HasMaxLength(200);
         });
     }
 }
