@@ -35,7 +35,7 @@ public class PostLogic(
     
     public async Task<Guid> CreateAsync(CreatePostDto dto, string currentUserId)
     {
-        var relativePath = await _imageValidator.ValidateImageAsync(dto.Image);
+        var relativePath = await _imageValidator.ProcessAndSavePostImageAsync(dto.Image);
         
         var post = dto.FromCreatePostToDomain(relativePath, currentUserId);
         var response = await _repo.CreateAsync(post);
@@ -83,7 +83,7 @@ public class PostLogic(
             return PostResult.Forbidden();
         }
         
-        string? relativePath = await _imageValidator.ValidateImageAsync(dto.Image);
+        string? relativePath = await _imageValidator.ProcessAndSavePostImageAsync(dto.Image);
             
         existingPost.UpdateFromDto(dto, relativePath);
         await _repo.UpdateAsync(existingPost);

@@ -15,7 +15,7 @@ public class UserLogic(
 {
     public async Task<string?> UploadAsync(UploadAvatarDto dto, string currentUserId)
     {
-        var relativePath = await _imageValidator.ValidateImageAsync(dto.Image);
+        var relativePath = await _imageValidator.ProcessAndSaveAvatarAsync(dto.Image);
 
         if (relativePath is null)
         {

@@ -23,6 +23,7 @@
     <ItemGroup>
       <PackageReference Include="MailKit" Version="4.17.0" />
       <PackageReference Include="MimeKit" Version="4.17.0" />
+      <PackageReference Include="SixLabors.ImageSharp" Version="4.1.1" />
     </ItemGroup>
 
 </Project>
