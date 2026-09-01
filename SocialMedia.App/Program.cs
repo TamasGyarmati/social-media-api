@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
+using SocialMedia.App.Middlewares;
 using SocialMedia.Data.Database;
 using SocialMedia.Data.Repository;
 using SocialMedia.Domain.Entities;
@@ -29,6 +30,7 @@ builder.Services.AddScoped<IAuthLogic, AuthLogic>();
 builder.Services.AddScoped<IUserLogic, UserLogic>();
 
 // Services
+builder.Services.AddSingleton<IFileLogger, FileLogger>();
 builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
 builder.Services.AddTransient<ITokenGenerator, TokenGenerator>();
 builder.Services.AddTransient<IImageValidator, ImageValidator>();
@@ -122,6 +124,9 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Middlewares
+app.UseMiddleware<RequestLoggingMiddleware>();
 
 app.MapControllers();
 
