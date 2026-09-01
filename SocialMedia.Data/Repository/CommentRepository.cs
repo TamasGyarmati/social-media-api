@@ -25,6 +25,7 @@ public class CommentRepository(SocialMediaDbContext _db) : ICommentRepository
             .Where(x => x.PostId == id)
             .Include(x => x.Likes)
             .Include(x => x.Replies)
+            .Include(x => x.Creator)
             .ToListAsync();
     
     public async Task<Comment?> GetByIdAsync(Guid id)

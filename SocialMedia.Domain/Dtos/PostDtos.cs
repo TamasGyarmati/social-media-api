@@ -16,6 +16,7 @@ public record ResponsePostDto(
 );
     
 public record PostWithCommentsDto(
+    Guid Id,
     string Title,
     string Description,
     string? ImageUrl,
@@ -56,6 +57,7 @@ public static class PostMappingExtensions
     public static PostWithCommentsDto FromDomainToPostWithCommentsDto(this Post post)
     {
         return new PostWithCommentsDto(
+            post.Id,
             post.Title,
             post.Description,
             post.ImageUrl,
