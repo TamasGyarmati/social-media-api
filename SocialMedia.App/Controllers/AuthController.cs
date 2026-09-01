@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SocialMedia.Domain.Dtos;
 using SocialMedia.Logic.Logics;
@@ -65,6 +66,7 @@ public class AuthController(
     }
 
     [HttpGet("confirm-email")]
+    [AllowAnonymous]
     public async Task<IActionResult> ConfirmEmail(string userId, string token)
     {
         var result = await _logic.ConfirmEmailAsync(userId, token);

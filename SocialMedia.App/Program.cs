@@ -23,7 +23,7 @@ builder.Services.AddDbContext<SocialMediaDbContext>(opt =>
 // Repositories
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IPostRepository, PostRepository>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
+//builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPostLogic, PostLogic>();
 builder.Services.AddScoped<ICommentLogic, CommentLogic>();
 builder.Services.AddScoped<IAuthLogic, AuthLogic>();
@@ -33,7 +33,7 @@ builder.Services.AddScoped<IUserLogic, UserLogic>();
 builder.Services.AddSingleton<IFileLogger, FileLogger>();
 builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
 builder.Services.AddTransient<ITokenGenerator, TokenGenerator>();
-builder.Services.AddTransient<IImageValidator, ImageValidator>();
+builder.Services.AddTransient<IImageProcessor, ImageProcessor>();
 
 // Identity configuration
 builder.Services.AddIdentity<AppUser, IdentityRole>(opt =>

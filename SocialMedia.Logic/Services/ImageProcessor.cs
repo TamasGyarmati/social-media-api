@@ -6,13 +6,13 @@ using SocialMedia.App.Exceptions;
 
 namespace SocialMedia.Logic.Services;
 
-public interface IImageValidator
+public interface IImageProcessor
 {
     public Task<string?> ProcessAndSaveAvatarAsync(IFormFile? file);
     public Task<string?> ProcessAndSavePostImageAsync(IFormFile? file);
 }
 
-public class ImageValidator(IWebHostEnvironment _env) : IImageValidator
+public class ImageProcessor(IWebHostEnvironment _env) : IImageProcessor
 {
     readonly string[] ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp"];
     

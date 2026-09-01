@@ -11,3 +11,8 @@
 [2026-09-01 12:08:29.474] POST /api/Auth/login -> Status: 200 (125ms) | User: 2e59e43c-8f7a-4127-b775-fd1bdbfff042 | UserName: tamasgy | IP: ::1
 [2026-09-01 12:08:40.646] POST /api/Auth/login -> Status: 200 (84ms) | User: 2e59e43c-8f7a-4127-b775-fd1bdbfff042 | UserName: tamasgy | IP: ::1
 [2026-09-01 12:08:52.988] POST /api/Auth/login -> Status: 200 (116ms) | User: ba4f7cc0-b4ab-4322-92fa-d93ecd981c13 | UserName: szonja | IP: ::1
+[2026-09-01 14:14:20.720] GET /openapi/v1.json -> Status: 200 (257ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-09-01 14:14:30.846] POST /api/Auth/login -> Status: 200 (1682ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-09-01 14:15:28.463] PUT /User -> Status: 200 (721ms) | User: 2e59e43c-8f7a-4127-b775-fd1bdbfff042 | UserName: tamasgy | IP: ::1
+[2026-09-01 14:16:10.144] PUT /User -> Status: 200 (341ms) | User: 2e59e43c-8f7a-4127-b775-fd1bdbfff042 | UserName: tamasgy | IP: ::1
+[2026-09-01 14:16:22.975] PUT /User -> Status: 200 (343ms) | User: 2e59e43c-8f7a-4127-b775-fd1bdbfff042 | UserName: tamasgy | IP: ::1
