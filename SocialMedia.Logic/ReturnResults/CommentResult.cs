@@ -1,10 +1,8 @@
-using SocialMedia.Domain.Enums;
-
 namespace SocialMedia.Logic.ReturnResults;
 
-public record CommentResult(CommentStatus Status, Guid? CommentId = null)
+public abstract record CommentResult
 {
-    public static CommentResult Success(Guid? id) => new(CommentStatus.Success, id);
-    public static CommentResult NotFound() => new(CommentStatus.NotFound);
-    public static CommentResult Forbidden() => new(CommentStatus.Forbidden);
+    public sealed record Success(Guid? Id) : CommentResult;
+    public sealed record NotFound(string Message) : CommentResult;
+    public sealed record Forbidden(string Message) : CommentResult;
 }

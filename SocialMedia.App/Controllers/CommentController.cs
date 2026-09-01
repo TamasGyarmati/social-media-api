@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using SocialMedia.Domain.Dtos;
 using SocialMedia.Domain.Enums;
 using SocialMedia.Logic.Logics;
+using SocialMedia.Logic.ReturnResults;
 
 namespace SocialMedia.App.Controllers;
 
@@ -39,7 +40,7 @@ public class CommentController(ICommentLogic _logic) : ControllerBase
     
     [HttpPost("{id:guid}/like")]
     [Authorize]
-    public async Task<ActionResult> CreateCommentLikeAsync(Guid id)
+    public async Task<ActionResult<LikeToggleResult>> CreateCommentLikeAsync(Guid id)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (currentUserId is null)
@@ -64,11 +65,11 @@ public class CommentController(ICommentLogic _logic) : ControllerBase
 
         var result = await _logic.UpdateAsync(id, dto, currentUserId);
 
-        return result.Status switch
+        return result switch
         {
-            CommentStatus.NotFound => NotFound("The comment was not found."),
-            CommentStatus.Forbidden => Forbid(),
-            CommentStatus.Success => Ok(result.CommentId),
+            CommentResult.NotFound error => NotFound(error.Message),
+            CommentResult.Forbidden error => Forbid(error.Message),
+            CommentResult.Success response => Ok(response.Id),
             _ => BadRequest()
         };
     }
@@ -85,11 +86,11 @@ public class CommentController(ICommentLogic _logic) : ControllerBase
 
         var result = await _logic.DeleteAsync(id, currentUserId);
 
-        return result.Status switch
+        return result switch
         {
-            CommentStatus.NotFound => NotFound("The comment was not found."),
-            CommentStatus.Forbidden => Forbid(),
-            CommentStatus.Success => NoContent(),
+            CommentResult.NotFound error => NotFound(error.Message),
+            CommentResult.Forbidden error => Forbid(error.Message),
+            CommentResult.Success response => Ok(response.Id),
             _ => BadRequest()
         };
     }

@@ -75,12 +75,12 @@ public class PostLogic(
         var existingPost = await _repo.GetByIdAsync(id);
         if (existingPost is null)
         {
-            return PostResult.NotFound();
+            return new PostResult.NotFound("The post was not found.");
         }
         
         if (existingPost.CreatedById != currentUserId)
         {
-            return PostResult.Forbidden();
+            return new PostResult.Forbidden("Forbidden.");
         }
         
         string? relativePath = await _imageProcessor.ProcessAndSavePostImageAsync(dto.Image);
@@ -88,7 +88,7 @@ public class PostLogic(
         existingPost.UpdateFromDto(dto, relativePath);
         await _repo.UpdateAsync(existingPost);
 
-        return PostResult.Success(existingPost.Id);
+        return new PostResult.Success(existingPost.Id);
     }
     
     public async Task<PostResult> DeleteAsync(Guid id, string currentUserId)
@@ -97,14 +97,14 @@ public class PostLogic(
 
         if (post is null)
         {
-            return PostResult.NotFound();
+            return new PostResult.NotFound("The post was not found.");
         }
 
         var oldImage = post.ImageUrl;
         
         if (post.CreatedById != currentUserId)
         {
-            return PostResult.Forbidden();
+            return new PostResult.Forbidden("Forbidden.");
         }
         
         await _repo.DeleteAsync(post);
@@ -114,10 +114,10 @@ public class PostLogic(
             var result = _imageProcessor.DeleteImage(oldImage);
             if (!result)
             {
-                return PostResult.FailedToDeleteImage();
+                return new PostResult.FailedToDeleteImage("Failed to delete image.");
             }
         }
 
-        return PostResult.Success(null);
+        return new PostResult.Success(null);
     }
 }

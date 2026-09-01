@@ -1,11 +1,9 @@
-using SocialMedia.Domain.Enums;
-
 namespace SocialMedia.Logic.ReturnResults;
 
-public record PostResult(PostStatus Status, Guid? PostId = null)
+public abstract record PostResult
 {
-    public static PostResult Success(Guid? id) => new(PostStatus.Success, id);
-    public static PostResult NotFound() => new(PostStatus.NotFound);
-    public static PostResult Forbidden() => new(PostStatus.Forbidden);
-    public static PostResult FailedToDeleteImage() => new(PostStatus.Failed);
+    public sealed record Success(Guid? Id) : PostResult;
+    public sealed record NotFound(string Message) : PostResult;
+    public sealed record FailedToDeleteImage(string Message) : PostResult;
+    public sealed record Forbidden(string Message) : PostResult;
 }

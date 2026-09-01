@@ -71,19 +71,19 @@ public class CommentLogic(ICommentRepository _repo) : ICommentLogic
 
         if (existingComment is null)
         {
-            return CommentResult.NotFound();
+            return new CommentResult.NotFound("The comment was not found.");
         }
         
         if (existingComment.CreatedById != currentUserId)
         {
-            return CommentResult.Forbidden();
+            return new CommentResult.Forbidden("Forbidden.");
         }
             
         existingComment.UpdateFromDto(dto);
             
         await _repo.UpdateAsync(existingComment);
             
-        return CommentResult.Success(existingComment.Id);
+        return new CommentResult.Success(existingComment.Id);
     }
     
     public async Task<CommentResult> DeleteAsync(Guid id, string currentUserId)
@@ -92,12 +92,12 @@ public class CommentLogic(ICommentRepository _repo) : ICommentLogic
 
         if (comment is null)
         {
-            return CommentResult.NotFound();
+            return new CommentResult.NotFound("The comment was not found.");
         }
 
         if (comment.CreatedById != currentUserId)
         {
-            return CommentResult.Forbidden();
+            return new CommentResult.Forbidden("Forbidden.");
         }
 
         if (comment.Replies.Count > 0)
@@ -111,6 +111,6 @@ public class CommentLogic(ICommentRepository _repo) : ICommentLogic
             await _repo.DeleteAsync(comment);
         }
         
-        return CommentResult.Success(null);
+        return new CommentResult.Success(null);
     }
 }

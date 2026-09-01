@@ -5,6 +5,7 @@ using SocialMedia.App.Exceptions;
 using SocialMedia.Domain.Dtos;
 using SocialMedia.Domain.Enums;
 using SocialMedia.Logic.Logics;
+using SocialMedia.Logic.ReturnResults;
 
 namespace SocialMedia.App.Controllers;
 
@@ -74,11 +75,11 @@ public class PostController(IPostLogic _logic) : ControllerBase
         
         var result = await _logic.UpdateAsync(id, dto, currentUserId);
 
-        return result.Status switch
+        return result switch
         {
-            PostStatus.NotFound => NotFound("The post was not found."),
-            PostStatus.Forbidden => Forbid(),
-            PostStatus.Success => Ok(id),
+            PostResult.NotFound error => NotFound(error.Message),
+            PostResult.Forbidden error => Forbid(error.Message),
+            PostResult.Success response => Ok(response.Id),
             _ => BadRequest()
         };
     }
@@ -95,12 +96,12 @@ public class PostController(IPostLogic _logic) : ControllerBase
         
         var result = await _logic.DeleteAsync(id, currentUserId);
 
-        return result.Status switch
+        return result switch
         {
-            PostStatus.NotFound => NotFound("The post was not found."),
-            PostStatus.Forbidden => Forbid(),
-            PostStatus.Success => NoContent(),
-            PostStatus.Failed => BadRequest("Failed to delete image."),
+            PostResult.NotFound error => NotFound(error.Message),
+            PostResult.Forbidden error => Forbid(error.Message),
+            PostResult.FailedToDeleteImage error => BadRequest(error.Message),
+            PostResult.Success response => Ok(response.Id),
             _ => BadRequest()
         };
     }
