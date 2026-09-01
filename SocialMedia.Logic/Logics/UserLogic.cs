@@ -33,8 +33,11 @@ public class UserLogic(
     public async Task<GetUserResult> GetUserByIdAsync(string userId)
     {
         var user = await _userManager.Users
+            .AsSplitQuery()
             .Include(u => u.Followers)
                 .ThenInclude(f => f.Follower)
+            .Include(u => u.Following)
+                .ThenInclude(f => f.Followed)
             .FirstOrDefaultAsync(u => u.Id == userId);
         
         if (user is null)

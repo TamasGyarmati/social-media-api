@@ -10,8 +10,10 @@ public record GetUserDto(
     string UserName,
     string Email,
     string? AvatarUrl,
-    int FollowCount,
-    List<string> FollowerUsernames
+    int FollowerCount,
+    int FollowingCount,
+    List<string> FollowerUsernames,
+    List<string> FollowingUsernames
 );
 
 public record UploadAvatarDto(
@@ -51,9 +53,14 @@ public static class UserMappingExtensions
             user.UserName ?? string.Empty,
             user.Email ?? string.Empty,
             user.AvatarUrl,
-            user.Followers.Count, 
+            user.Followers.Count,
+            user.Following.Count,
             user.Followers
                 .Select(x => x.Follower.UserName ?? string.Empty)
+                .Where(u => !string.IsNullOrWhiteSpace(u))
+                .ToList(),
+            user.Following
+                .Select(x => x.Followed.UserName ?? string.Empty)
                 .Where(u => !string.IsNullOrWhiteSpace(u))
                 .ToList()
         );
