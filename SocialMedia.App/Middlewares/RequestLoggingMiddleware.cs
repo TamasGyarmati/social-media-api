@@ -27,6 +27,7 @@ public class RequestLoggingMiddleware(RequestDelegate _next) // RequestDelegate:
                 ElapsedMilliseconds: stopwatch.ElapsedMilliseconds,
                 StatusCode: _context.Response.StatusCode,
                 UserId: _context.User.FindFirstValue(ClaimTypes.NameIdentifier),
+                UserName: _context.User.FindFirstValue(ClaimTypes.Name),
                 IpAddress: _context.Connection.RemoteIpAddress?.ToString()
             );
 

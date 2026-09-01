@@ -10,6 +10,7 @@ public record RequestLogEntry(
     int StatusCode,
     long ElapsedMilliseconds,
     string? UserId,
+    string? UserName,
     string? IpAddress
 );
 
@@ -38,6 +39,7 @@ public class FileLogger : IFileLogger
                       $"{entry.HttpMethod} {entry.Path}{entry.QueryString} " +
                       $"-> Status: {entry.StatusCode} ({entry.ElapsedMilliseconds}ms) " +
                       $"| User: {entry.UserId ?? "Anonymous"} " +
+                      $"| UserName: {entry.UserName ?? "Anonymous"} " +
                       $"| IP: {entry.IpAddress ?? "Unknown"}{Environment.NewLine}";
 
         await _lock.WaitAsync();

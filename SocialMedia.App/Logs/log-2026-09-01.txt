@@ -1,0 +1,13 @@
+[2026-09-01 12:03:26.192] GET /openapi/v1.json -> Status: 200 (213ms) | User: Anonymous | IP: ::1
+[2026-09-01 12:03:37.953] POST /api/Auth/login -> Status: 200 (1545ms) | User: Anonymous | IP: ::1
+[2026-09-01 12:04:00.574] GET /api/Post/all -> Status: 200 (184ms) | User: 2e59e43c-8f7a-4127-b775-fd1bdbfff042 | IP: ::1
+[2026-09-01 12:04:10.067] POST /api/Auth/login -> Status: 200 (117ms) | User: 2e59e43c-8f7a-4127-b775-fd1bdbfff042 | IP: ::1
+[2026-09-01 12:04:20.538] GET /api/Post/all -> Status: 200 (37ms) | User: ba4f7cc0-b4ab-4322-92fa-d93ecd981c13 | IP: ::1
+[2026-09-01 12:04:39.165] POST /api/Comment/4b3eac1e-6183-4abd-b042-0ed72bf6f072/like -> Status: 404 (50ms) | User: ba4f7cc0-b4ab-4322-92fa-d93ecd981c13 | IP: ::1
+[2026-09-01 12:05:00.628] POST /api/Comment -> Status: 200 (129ms) | User: ba4f7cc0-b4ab-4322-92fa-d93ecd981c13 | IP: ::1
+[2026-09-01 12:07:50.446] GET /openapi/v1.json -> Status: 200 (332ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-09-01 12:07:59.658] POST /api/Auth/login -> Status: 200 (1654ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-09-01 12:08:09.084] GET /api/Post/all -> Status: 200 (179ms) | User: 2e59e43c-8f7a-4127-b775-fd1bdbfff042 | UserName: tamasgy | IP: ::1
+[2026-09-01 12:08:29.474] POST /api/Auth/login -> Status: 200 (125ms) | User: 2e59e43c-8f7a-4127-b775-fd1bdbfff042 | UserName: tamasgy | IP: ::1
+[2026-09-01 12:08:40.646] POST /api/Auth/login -> Status: 200 (84ms) | User: 2e59e43c-8f7a-4127-b775-fd1bdbfff042 | UserName: tamasgy | IP: ::1
+[2026-09-01 12:08:52.988] POST /api/Auth/login -> Status: 200 (116ms) | User: ba4f7cc0-b4ab-4322-92fa-d93ecd981c13 | UserName: szonja | IP: ::1
