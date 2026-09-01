@@ -23,7 +23,7 @@ builder.Services.AddDbContext<SocialMediaDbContext>(opt =>
 // Repositories
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IPostRepository, PostRepository>();
-//builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPostLogic, PostLogic>();
 builder.Services.AddScoped<ICommentLogic, CommentLogic>();
 builder.Services.AddScoped<IAuthLogic, AuthLogic>();

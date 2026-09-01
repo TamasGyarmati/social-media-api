@@ -12,6 +12,25 @@ namespace SocialMedia.App.Controllers;
 [Route("[controller]")]
 public class UserController(IUserLogic _logic) : ControllerBase 
 {
+    [HttpGet]
+    public async Task<ActionResult<GetUserDto>> GetUser(string id)
+    {
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (currentUserId is null)
+        {
+            return Unauthorized();
+        }
+        
+        var result = await _logic.GetUserByIdAsync(id);
+
+        return result switch
+        {
+            GetUserResult.UserNotFound error => NotFound(error.Message),
+            GetUserResult.Success response => Ok(response),
+            _ => StatusCode(500)
+        };
+    }
+    
     [HttpPost("avatar")]
     [Consumes("multipart/form-data")]
     [Authorize]
@@ -136,8 +155,23 @@ public class UserController(IUserLogic _logic) : ControllerBase
     }
 
     [HttpPost("follow")]
-    public async Task<IActionResult> FollowUser(Guid id)
+    public async Task<IActionResult> FollowUser(string id)
     {
-        throw new NotImplementedException();
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (currentUserId is null)
+        {
+            return Unauthorized();
+        }
+
+        var result = await _logic.CreateFollowAsync(id, currentUserId);
+
+        return result switch
+        {
+            FollowResult.AlreadyFollowing error => BadRequest(error.Message),
+            FollowResult.CannotFollowSelf error => BadRequest(error.Message),
+            FollowResult.TargetUserNotFound error => BadRequest(error.Message),
+            FollowResult.Success => Ok(new { Message = "Follow was successful!", FollowedId = id }),
+            _ => StatusCode(500)
+        };
     }
 }

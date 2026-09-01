@@ -2,8 +2,11 @@ using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
+using SocialMedia.Data.Repository;
 using SocialMedia.Domain.Dtos;
 using SocialMedia.Domain.Entities;
+using SocialMedia.Domain.Enums;
 using SocialMedia.Logic.ReturnResults;
 using SocialMedia.Logic.Services;
 
@@ -11,19 +14,39 @@ namespace SocialMedia.Logic.Logics;
 
 public interface IUserLogic
 {
+    public Task<GetUserResult> GetUserByIdAsync(string userId);
     public Task<UploadAvatarResult> UploadAsync(UploadAvatarDto dto, string currentUserId);
     public Task<bool> UpdateAsync(UpdateUserDto dto, string currentUserId);
     public Task<bool> UpdatePasswordAsync(UpdatePasswordDto dto, string currentUserId);
     public Task<string?> GenerateEmailChangeTokenAsync(RequestEmailChangeDto dto, string currentUserId);
     public Task<bool> SendEmailChangeConfirmationAsync(string email, string confirmationLink);
     public Task<bool> ConfirmEmailChangeAsync(string userId, string newEmail, string token);
+    public Task<FollowResult> CreateFollowAsync(string targerUserId, string currentUserId);
 }
 
 public class UserLogic(
     IImageProcessor _imageProcessor,
     IEmailSender _emailSender,
+    IUserRepository _repo,
     UserManager<AppUser> _userManager) : IUserLogic
 {
+    public async Task<GetUserResult> GetUserByIdAsync(string userId)
+    {
+        var user = await _userManager.Users
+            .Include(u => u.Followers)
+                .ThenInclude(f => f.Follower)
+            .FirstOrDefaultAsync(u => u.Id == userId);
+        
+        if (user is null)
+        {
+            return new GetUserResult.UserNotFound("The user was not found.");
+        }
+        
+        var response = user.FromDomainToGetUserDto();
+        
+        return new GetUserResult.Success(response);
+    }
+    
     public async Task<UploadAvatarResult> UploadAsync(UploadAvatarDto dto, string currentUserId)
     {
         var user = await _userManager.FindByIdAsync(currentUserId);
@@ -224,5 +247,23 @@ public class UserLogic(
         {
             return false;
         }
+    }
+
+    public async Task<FollowResult> CreateFollowAsync(string targerUserId, string currentUserId)
+    {
+        if (string.Equals(targerUserId, currentUserId, StringComparison.OrdinalIgnoreCase))
+        {
+            return new FollowResult.CannotFollowSelf("Cannot follow self.");
+        }
+        
+        var dbStatus = await _repo.CreateFollowAsync(targerUserId, currentUserId);
+        
+        return dbStatus switch
+        {
+            FollowDbStatus.Success => new FollowResult.Success(),
+            FollowDbStatus.TargetNotFound => new FollowResult.TargetUserNotFound("Target user not found."),
+            FollowDbStatus.AlreadyFollowing => new FollowResult.AlreadyFollowing("Already following."),
+            _ => throw new InvalidOperationException("Unhandled DB follow status.")
+        };
     }
 }

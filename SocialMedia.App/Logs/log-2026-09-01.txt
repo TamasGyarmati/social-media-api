@@ -61,3 +61,10 @@
 [2026-09-01 16:48:07.472] PUT /User -> Status: 200 (314ms) | User: 2e59e43c-8f7a-4127-b775-fd1bdbfff042 | UserName: tamasgy | IP: ::1
 [2026-09-01 16:55:03.787] GET /openapi/v1.json -> Status: 200 (332ms) | User: Anonymous | UserName: Anonymous | IP: ::1
 [2026-09-01 16:55:22.587] POST /User/avatar -> Status: 200 (2453ms) | User: 2e59e43c-8f7a-4127-b775-fd1bdbfff042 | UserName: tamasgy | IP: ::1
+[2026-09-01 17:41:49.398] GET /openapi/v1.json -> Status: 200 (186ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-09-01 17:42:07.228] GET /User?id=ba4f7cc0-b4ab-4322-92fa-d93ecd981c13 -> Status: 200 (1397ms) | User: 2e59e43c-8f7a-4127-b775-fd1bdbfff042 | UserName: tamasgy | IP: ::1
+[2026-09-01 17:42:23.258] POST /User/follow?id=ba4f7cc0-b4ab-4322-92fa-d93ecd981c13 -> Status: 200 (233ms) | User: 2e59e43c-8f7a-4127-b775-fd1bdbfff042 | UserName: tamasgy | IP: ::1
+[2026-09-01 17:42:32.007] GET /User?id=ba4f7cc0-b4ab-4322-92fa-d93ecd981c13 -> Status: 200 (48ms) | User: 2e59e43c-8f7a-4127-b775-fd1bdbfff042 | UserName: tamasgy | IP: ::1
+[2026-09-01 17:42:45.801] GET /User?id=ba4f7cc0-b4ab-4322-92fa-d93ecd981c13 -> Status: 200 (12ms) | User: 2e59e43c-8f7a-4127-b775-fd1bdbfff042 | UserName: tamasgy | IP: ::1
+[2026-09-01 17:47:08.431] GET /openapi/v1.json -> Status: 200 (243ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-09-01 17:47:51.470] GET /User?id=ba4f7cc0-b4ab-4322-92fa-d93ecd981c13 -> Status: 200 (1471ms) | User: 2e59e43c-8f7a-4127-b775-fd1bdbfff042 | UserName: tamasgy | IP: ::1
