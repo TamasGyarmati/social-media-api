@@ -8,4 +8,7 @@ public class AppUser : IdentityUser
     public required string LastName { get; set; }
     public required string RefreshToken { get; set; }
     public string? AvatarUrl { get; set; }
+    
+    public ICollection<UserFollow> Followers { get; set; } = new List<UserFollow>(); 
+    public ICollection<UserFollow> Following { get; set; } = new List<UserFollow>();
 }

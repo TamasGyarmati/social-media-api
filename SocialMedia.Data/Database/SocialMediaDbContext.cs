@@ -11,6 +11,7 @@ public class SocialMediaDbContext(DbContextOptions<SocialMediaDbContext> options
     public DbSet<Comment> Comments { get; set; }
     public DbSet<CommentLike> CommentLikes { get; set; }
     public DbSet<AppUser> AppUsers { get; set; }
+    public DbSet<UserFollow> UserFollows { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -110,6 +111,21 @@ public class SocialMediaDbContext(DbContextOptions<SocialMediaDbContext> options
 
             entity.Property(e => e.AvatarUrl)
                 .HasMaxLength(200);
+        });
+
+        modelBuilder.Entity<UserFollow>(entity =>
+        {
+            entity.HasKey(uf => new { uf.FollowerId, uf.FollowedId });
+
+            entity.HasOne(uf => uf.Follower)
+                .WithMany(u => u.Following)
+                .HasForeignKey(uf => uf.FollowerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(uf => uf.Followed)
+                .WithMany(u => u.Followers)
+                .HasForeignKey(uf => uf.FollowedId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

@@ -59,3 +59,5 @@
 [2026-09-01 16:47:10.164] PUT /User -> Status: 200 (683ms) | User: 2e59e43c-8f7a-4127-b775-fd1bdbfff042 | UserName: tamasgy | IP: ::1
 [2026-09-01 16:47:25.100] POST /User/avatar -> Status: 200 (926ms) | User: 2e59e43c-8f7a-4127-b775-fd1bdbfff042 | UserName: tamasgy | IP: ::1
 [2026-09-01 16:48:07.472] PUT /User -> Status: 200 (314ms) | User: 2e59e43c-8f7a-4127-b775-fd1bdbfff042 | UserName: tamasgy | IP: ::1
+[2026-09-01 16:55:03.787] GET /openapi/v1.json -> Status: 200 (332ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-09-01 16:55:22.587] POST /User/avatar -> Status: 200 (2453ms) | User: 2e59e43c-8f7a-4127-b775-fd1bdbfff042 | UserName: tamasgy | IP: ::1

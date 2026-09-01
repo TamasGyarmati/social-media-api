@@ -134,4 +134,10 @@ public class UserController(IUserLogic _logic) : ControllerBase
 
         return Ok("Email changed successfully. You can now user your email.");
     }
+
+    [HttpPost("follow")]
+    public async Task<IActionResult> FollowUser(Guid id)
+    {
+        throw new NotImplementedException();
+    }
 }
