@@ -14,7 +14,7 @@ namespace SocialMedia.Logic.Logics;
 public interface IAuthLogic
 {
     public Task<RegisterResult> RegisterAsync(UserCreateDto dto);
-    public Task SendConfirmationEmailAsync(string email, string confirmationLink);
+    public Task<bool> SendConfirmationEmailAsync(string email, string confirmationLink);
     public Task<LoginResult> LoginAsync(UserLoginDto dto);
     public Task<RefreshResult> RefreshAsync(TokenApiDto tokenApiDto);
     public Task<ConfirmEmailResult> ConfirmEmailAsync(string userId, string token);
@@ -63,21 +63,39 @@ public class AuthLogic(UserManager<AppUser> _userManager,
         return new RegisterResult.Success(user, encodedToken);
     }
 
-    public async Task SendConfirmationEmailAsync(string email, string confirmationLink)
-        => await _emailSender.SendEmailAsync(
+    public async Task<bool> SendConfirmationEmailAsync(string email, string confirmationLink)
+    {
+        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(confirmationLink))
+        {
+            return false;
+        }
+
+        await _emailSender.SendEmailAsync(
             email: email,
             subject: "Confirm your account",
             htmlMessage: $"""
-                          <h2>Hey, welcome to our website!</h2>
-                          <p>Please click the button below to activate your account:</p>
-                          <p>
-                              <a href='{confirmationLink}' 
-                                 style='display:inline-block; padding:10px 20px; background-color:#007bff; color:#ffffff; text-decoration:none; border-radius:5px; font-weight:bold;'>
-                                 Activate Account
-                              </a>
-                          </p>
+                          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+                              <h2 style="color: #333; margin-top: 0;">Welcome to our Community!</h2>
+                              <p style="color: #555; line-height: 1.5;">Thanks for signing up! We're excited to have you on board. Please confirm your email address to activate your account and start exploring.</p>
+                              
+                              <div style="text-align: center; margin: 30px 0;">
+                                  <a href="{confirmationLink}" 
+                                     style="background-color: #007bff; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;">
+                                      Activate Account
+                                  </a>
+                              </div>
+                              
+                              <p style="color: #666; font-size: 13px; line-height: 1.4;">If the button above does not work, copy and paste this link into your browser:</p>
+                              <p style="word-break: break-all; font-size: 12px; color: #007bff;">{confirmationLink}</p>
+                              
+                              <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+                              <p style="color: #999; font-size: 12px; margin-bottom: 0;">If you did not create an account with us, please safely ignore this email.</p>
+                          </div>
                           """
         );
+
+        return true;
+    }
     
     public async Task<LoginResult> LoginAsync(UserLoginDto dto)
     {

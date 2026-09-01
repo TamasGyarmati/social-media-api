@@ -10,11 +10,44 @@ public interface IImageProcessor
 {
     public Task<string?> ProcessAndSaveAvatarAsync(IFormFile? file);
     public Task<string?> ProcessAndSavePostImageAsync(IFormFile? file);
+    public bool DeleteImage(string imageUrl);
 }
 
 public class ImageProcessor(IWebHostEnvironment _env) : IImageProcessor
 {
     readonly string[] ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp"];
+
+    public bool DeleteImage(string imageUrl)
+    {
+        if (string.IsNullOrWhiteSpace(imageUrl))
+        {
+            return false;
+        }
+
+        try
+        {
+            var relativePath = imageUrl.TrimStart('/', '\\');
+            var fullFilePath = Path.Combine(_env.WebRootPath, relativePath);
+            var imagesRoot = Path.GetFullPath(Path.Combine(_env.WebRootPath, "images"));
+            var targetFile = Path.GetFullPath(fullFilePath);
+
+            if (!targetFile.StartsWith(imagesRoot, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            if (File.Exists(targetFile))
+            {
+                File.Delete(targetFile);
+            }
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+        
+        return true;
+    }
     
     public async Task<string?> ProcessAndSaveAvatarAsync(IFormFile? file)
     {

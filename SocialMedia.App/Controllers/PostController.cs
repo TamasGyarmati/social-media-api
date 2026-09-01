@@ -100,6 +100,7 @@ public class PostController(IPostLogic _logic) : ControllerBase
             PostStatus.NotFound => NotFound("The post was not found."),
             PostStatus.Forbidden => Forbid(),
             PostStatus.Success => NoContent(),
+            PostStatus.Failed => BadRequest("Failed to delete image."),
             _ => BadRequest()
         };
     }

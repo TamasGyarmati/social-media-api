@@ -4,5 +4,6 @@ public enum PostStatus
 {
     Success,
     NotFound,
+    Failed,
     Forbidden
 }

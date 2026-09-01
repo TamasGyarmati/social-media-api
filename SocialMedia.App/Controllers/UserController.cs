@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using SocialMedia.App.Exceptions;
 using SocialMedia.Domain.Dtos;
 using SocialMedia.Logic.Logics;
+using SocialMedia.Logic.ReturnResults;
 
 namespace SocialMedia.App.Controllers;
 
@@ -24,11 +25,17 @@ public class UserController(IUserLogic _logic) : ControllerBase
         
         try
         {
-            var avatarUrl = await _logic.UploadAsync(dto, currentUserId);
+            var result = await _logic.UploadAsync(dto, currentUserId);
             
-            return avatarUrl is not null 
-                ? Ok(new { AvatarUrl = avatarUrl }) 
-                : BadRequest("Failed to upload avatar.");
+            return result switch
+            {
+                UploadAvatarResult.UserNotFound error => NotFound(error.Message),
+                UploadAvatarResult.FailedToUpdateAvatar error => BadRequest(error.Message),
+                UploadAvatarResult.ImageProcessingError error => BadRequest(error.Message),
+                UploadAvatarResult.ExistingAvatarDeleteFailed error => BadRequest(error.Message),
+                UploadAvatarResult.Success response => Ok(new { AvatarUrl = response.RelativePath }),
+                _ => StatusCode(500)
+            };
         }
         catch (NotAllowedExtensionException ex)
         {

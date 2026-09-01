@@ -24,13 +24,17 @@ public class AuthController(
         if (result is RegisterResult.Success success)
         {
             var confirmationLink = Url.Action(
-                action: nameof(ConfirmEmail), // When clicking this URL, the following API endpoint get's called
+                action: nameof(ConfirmEmail),
                 controller: "Auth",
                 values: new { userId = success.User.Id, token = success.EncodedToken },
                 protocol: Request.Scheme
             );
 
-            await _logic.SendConfirmationEmailAsync(success.User.Email!, confirmationLink!);
+            var response = await _logic.SendConfirmationEmailAsync(success.User.Email!, confirmationLink!);
+            if (!response)
+            {
+                return BadRequest("An error occurred while sending the confirmation.");
+            }
 
             return Ok("Register successful. Check your inbox and activate your account.");
         }
@@ -45,9 +49,9 @@ public class AuthController(
 
         return result switch
         {
-            LoginResult.EmailUnconfirmed unconfirmed => Unauthorized(unconfirmed.Message),
-            LoginResult.UserOrPasswordNotExist dontExist => BadRequest(dontExist.Message),
-            LoginResult.Success success => Ok(success.TokenWithExpiryDate),
+            LoginResult.EmailUnconfirmed error => Unauthorized(error.Message),
+            LoginResult.UserOrPasswordNotExist error => BadRequest(error.Message),
+            LoginResult.Success response => Ok(response.TokenWithExpiryDate),
             _ => StatusCode(500)
         };
     }
@@ -59,8 +63,8 @@ public class AuthController(
         
         return result switch
         {
-            RefreshResult.Invalid invalid => BadRequest(invalid.Message),
-            RefreshResult.Success success => Ok(success.Response),
+            RefreshResult.Invalid error => BadRequest(error.Message),
+            RefreshResult.Success response => Ok(response.Response),
             _ => StatusCode(500)
         };
     }
@@ -73,11 +77,11 @@ public class AuthController(
         
         return result switch
         {
-            ConfirmEmailResult.InvalidEmailRequest invalidEmail => BadRequest(invalidEmail.Message),
-            ConfirmEmailResult.InvalidTokenFormat invalidTokenFormat => BadRequest(invalidTokenFormat.Message),
-            ConfirmEmailResult.InvalidTokenOrExpired invalidTokenOrExpired => BadRequest(invalidTokenOrExpired.Message),
-            ConfirmEmailResult.UserNotFound userNotFound => NotFound(userNotFound.Message),
-            ConfirmEmailResult.Success success => Ok(success.Message),
+            ConfirmEmailResult.InvalidEmailRequest error => BadRequest(error.Message),
+            ConfirmEmailResult.InvalidTokenFormat error => BadRequest(error.Message),
+            ConfirmEmailResult.InvalidTokenOrExpired error => BadRequest(error.Message),
+            ConfirmEmailResult.UserNotFound error => NotFound(error.Message),
+            ConfirmEmailResult.Success response => Ok(response.Message),
             _ => StatusCode(500)
         };
     }

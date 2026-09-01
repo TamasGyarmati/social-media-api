@@ -1,20 +1,17 @@
-using System.Data;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
-using Microsoft.Extensions.WebEncoders;
-using SocialMedia.Data.Repository;
 using SocialMedia.Domain.Dtos;
 using SocialMedia.Domain.Entities;
+using SocialMedia.Logic.ReturnResults;
 using SocialMedia.Logic.Services;
 
 namespace SocialMedia.Logic.Logics;
 
 public interface IUserLogic
 {
-    public Task<string?> UploadAsync(UploadAvatarDto dto, string currentUserId);
+    public Task<UploadAvatarResult> UploadAsync(UploadAvatarDto dto, string currentUserId);
     public Task<bool> UpdateAsync(UpdateUserDto dto, string currentUserId);
     public Task<bool> UpdatePasswordAsync(UpdatePasswordDto dto, string currentUserId);
     public Task<string?> GenerateEmailChangeTokenAsync(RequestEmailChangeDto dto, string currentUserId);
@@ -27,25 +24,37 @@ public class UserLogic(
     IEmailSender _emailSender,
     UserManager<AppUser> _userManager) : IUserLogic
 {
-    public async Task<string?> UploadAsync(UploadAvatarDto dto, string currentUserId)
+    public async Task<UploadAvatarResult> UploadAsync(UploadAvatarDto dto, string currentUserId)
     {
         var user = await _userManager.FindByIdAsync(currentUserId);
         if (user is null)
         {
-            return null;
+            return new UploadAvatarResult.UserNotFound("User was not found.");
+        }
+
+        var existingAvatar = user.AvatarUrl;
+        if (existingAvatar is not null)
+        {
+            var response = _imageProcessor.DeleteImage(existingAvatar);
+            if (!response)
+            {
+                return new UploadAvatarResult.ExistingAvatarDeleteFailed("Failed to delete existing avatar.");
+            }
         }
         
         var relativePath = await _imageProcessor.ProcessAndSaveAvatarAsync(dto.Image);
         if (relativePath is null)
         {
-            return null;
+            return new UploadAvatarResult.ImageProcessingError("Failed to upload avatar.");
         }
         
         user.AvatarUrl = relativePath;
 
         var result = await _userManager.UpdateAsync(user);
         
-        return !result.Succeeded ? null : relativePath;
+        return result.Succeeded 
+            ? new UploadAvatarResult.Success(relativePath) 
+            : new UploadAvatarResult.FailedToUpdateAvatar("Failed to upload avatar.");
     }
 
     public async Task<bool> UpdateAsync(UpdateUserDto dto, string currentUserId)
@@ -55,6 +64,8 @@ public class UserLogic(
         {
             return false;
         }
+        
+        var oldAvatarUrl = user.AvatarUrl;
 
         if (!string.IsNullOrWhiteSpace(dto.FirstName))
         {
@@ -81,6 +92,16 @@ public class UserLogic(
             if (avatarUrl is not null)
             {
                 user.AvatarUrl = avatarUrl;
+                
+            }
+        }
+        
+        if (!string.IsNullOrWhiteSpace(oldAvatarUrl))
+        {
+            var result = _imageProcessor.DeleteImage(oldAvatarUrl);
+            if (!result)
+            {
+                return false;
             }
         }
 
@@ -110,7 +131,7 @@ public class UserLogic(
     public async Task<string?> GenerateEmailChangeTokenAsync(RequestEmailChangeDto dto, string currentUserId)
     {
         var (found, user) = await ValidateEmailChangeAsync(dto, currentUserId);
-        if (!found)
+        if (!found || user is null)
         {
             return null;
         }
@@ -136,8 +157,8 @@ public class UserLogic(
 
         var existingUser = await _userManager.FindByEmailAsync(dto.NewEmail);
         
-        return existingUser is not null 
-            ? (true, user) 
+        return existingUser is null 
+            ? (true, user)
             : (false, null);
     }
 

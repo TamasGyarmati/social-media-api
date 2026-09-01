@@ -98,8 +98,9 @@ public class PostLogic(
         if (post is null)
         {
             return PostResult.NotFound();
-
         }
+
+        var oldImage = post.ImageUrl;
         
         if (post.CreatedById != currentUserId)
         {
@@ -107,6 +108,15 @@ public class PostLogic(
         }
         
         await _repo.DeleteAsync(post);
+
+        if (!string.IsNullOrWhiteSpace(oldImage))
+        {
+            var result = _imageProcessor.DeleteImage(oldImage);
+            if (!result)
+            {
+                return PostResult.FailedToDeleteImage();
+            }
+        }
 
         return PostResult.Success(null);
     }
