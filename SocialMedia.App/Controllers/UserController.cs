@@ -5,6 +5,7 @@ using SocialMedia.App.Exceptions;
 using SocialMedia.Domain.Dtos;
 using SocialMedia.Logic.Logics;
 using SocialMedia.Logic.ReturnResults;
+using SocialMedia.Logic.ReturnResults.UserResults;
 
 namespace SocialMedia.App.Controllers;
 

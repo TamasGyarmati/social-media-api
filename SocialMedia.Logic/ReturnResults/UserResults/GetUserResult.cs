@@ -1,6 +1,6 @@
 using SocialMedia.Domain.Dtos;
 
-namespace SocialMedia.Logic.ReturnResults;
+namespace SocialMedia.Logic.ReturnResults.UserResults;
 
 public abstract record GetUserResult
 {

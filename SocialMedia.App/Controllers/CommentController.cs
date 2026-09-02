@@ -49,9 +49,9 @@ public class CommentController(ICommentLogic _logic) : ControllerBase
             return Unauthorized();
         }
         
-        var message = await _logic.CreateLikeAsync(id, currentUserId);
+        var result = await _logic.CreateLikeAsync(id, currentUserId);
         
-        return message is null ? NotFound("The comment was not found.") : Ok(message);
+        return result is null ? NotFound("The comment was not found.") : Ok(result);
     }
 
     [HttpPut("{id:guid}")]
@@ -69,7 +69,7 @@ public class CommentController(ICommentLogic _logic) : ControllerBase
         return result switch
         {
             CommentResult.NotFound error => NotFound(error.Message),
-            CommentResult.Forbidden error => Forbid(error.Message),
+            CommentResult.Forbidden error => StatusCode(StatusCodes.Status403Forbidden, error.Message),
             CommentResult.Success response => Ok(response.Id),
             _ => BadRequest()
         };
@@ -90,7 +90,7 @@ public class CommentController(ICommentLogic _logic) : ControllerBase
         return result switch
         {
             CommentResult.NotFound error => NotFound(error.Message),
-            CommentResult.Forbidden error => Forbid(error.Message),
+            CommentResult.Forbidden error => StatusCode(StatusCodes.Status403Forbidden, error.Message),
             CommentResult.Success response => Ok(response.Id),
             _ => BadRequest()
         };

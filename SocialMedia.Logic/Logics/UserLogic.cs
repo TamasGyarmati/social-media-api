@@ -8,6 +8,7 @@ using SocialMedia.Domain.Dtos;
 using SocialMedia.Domain.Entities;
 using SocialMedia.Domain.Enums;
 using SocialMedia.Logic.ReturnResults;
+using SocialMedia.Logic.ReturnResults.UserResults;
 using SocialMedia.Logic.Services;
 
 namespace SocialMedia.Logic.Logics;

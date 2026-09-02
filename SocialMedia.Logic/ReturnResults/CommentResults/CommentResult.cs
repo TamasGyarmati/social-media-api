@@ -1,4 +1,4 @@
-namespace SocialMedia.Logic.ReturnResults;
+namespace SocialMedia.Logic.ReturnResults.CommentResults;
 
 public abstract record CommentResult
 {

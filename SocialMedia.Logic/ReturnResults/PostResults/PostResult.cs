@@ -1,4 +1,4 @@
-namespace SocialMedia.Logic.ReturnResults;
+namespace SocialMedia.Logic.ReturnResults.PostResults;
 
 public abstract record PostResult
 {

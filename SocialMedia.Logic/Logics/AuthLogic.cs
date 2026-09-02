@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using SocialMedia.Domain.Dtos;
 using SocialMedia.Domain.Entities;
 using SocialMedia.Logic.ReturnResults;
+using SocialMedia.Logic.ReturnResults.AuthResults;
 using SocialMedia.Logic.Services;
 
 namespace SocialMedia.Logic.Logics;

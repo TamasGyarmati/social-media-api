@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SocialMedia.Domain.Dtos;
 using SocialMedia.Logic.Logics;
 using SocialMedia.Logic.ReturnResults;
+using SocialMedia.Logic.ReturnResults.AuthResults;
 
 namespace SocialMedia.App.Controllers;
 

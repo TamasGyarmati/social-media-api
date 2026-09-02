@@ -1,6 +1,6 @@
 using SocialMedia.Domain.Entities;
 
-namespace SocialMedia.Logic.ReturnResults;
+namespace SocialMedia.Logic.ReturnResults.UserResults;
 
 public abstract record ValidateEmailResult
 {
