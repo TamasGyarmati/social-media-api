@@ -36,12 +36,6 @@ public record RequestEmailChangeDto(
     string NewEmail
 );
 
-public record ConfirmEmailChangeDto(
-    string UserId,
-    string NewEmail,
-    string Token
-);
-
 public static class UserMappingExtensions
 {
     public static GetUserDto FromDomainToGetUserDto(this AppUser user)
