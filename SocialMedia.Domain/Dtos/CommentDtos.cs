@@ -3,19 +3,6 @@ using SocialMedia.Domain.Enums;
 
 namespace SocialMedia.Domain.Dtos;
 
-public record CommentResponseShorterDto(
-    Guid Id,
-    string Content,
-    DateTime CreatedAtUnc,
-    DateTime? UpdatedAtUtc,
-    DateTime? DeletedAtUtc,
-    Guid? ParentCommentId,
-    string CreatedById,
-    string UserName,
-    int Likes,
-    int ReplyCount
-);
-    
 public record CommentResponseDto(
     Guid Id,
     string Content,
@@ -25,6 +12,7 @@ public record CommentResponseDto(
     Guid PostId,
     Guid? ParentCommentId,
     string CreatedById,
+    string UserName,
     int Likes,
     int ReplyCount
 );
@@ -48,22 +36,6 @@ public record CreateCommentDto(
 
 public static class CommentMappingExtensions
 {
-    public static CommentResponseShorterDto FromDomainToCommentResponseShorterDto(this Comment comment)
-    {
-        return new CommentResponseShorterDto(
-            comment.Id,
-            comment.Content,
-            comment.CreatedAtUtc,
-            comment.UpdatedAtUtc,
-            comment.DeletedAtUtc,
-            comment.ParentCommentId,
-            comment.CreatedById,
-            comment.Creator?.UserName ?? string.Empty,
-            comment.Likes.Count,
-            comment.Replies.Count
-        );
-    }
-    
     public static CommentResponseDto FromDomainToCommentResponseDto(this Comment comment)
     {
         return new CommentResponseDto(
@@ -75,6 +47,7 @@ public static class CommentMappingExtensions
             comment.PostId,
             comment.ParentCommentId,
             comment.CreatedById,
+            comment.Creator?.UserName ?? string.Empty,
             comment.Likes.Count,
             comment.Replies.Count
         );

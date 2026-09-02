@@ -8,7 +8,7 @@ namespace SocialMedia.Logic.Logics;
 
 public interface ICommentLogic
 {
-    public Task<List<CommentResponseShorterDto>> ReadAllFromPostAsync(Guid id);
+    public Task<List<CommentResponseDto>> ReadAllFromPostAsync(Guid id);
     public Task<CommentResponseDto?> GetByIdAsync(Guid id);
     public Task<Guid> CreateAsync(CreateCommentDto dto, string currentUserId);
     public Task<CommentLikeToggleResult?> CreateLikeAsync(Guid id, string currentUserId);
@@ -18,10 +18,10 @@ public interface ICommentLogic
 
 public class CommentLogic(ICommentRepository _repo) : ICommentLogic
 {
-    public async Task<List<CommentResponseShorterDto>> ReadAllFromPostAsync(Guid id)
+    public async Task<List<CommentResponseDto>> ReadAllFromPostAsync(Guid id)
     {
         var comments = await _repo.GetAllFromPostAsync(id);
-        var responseDtos = comments.Select(x => x.FromDomainToCommentResponseShorterDto()).ToList();
+        var responseDtos = comments.Select(x => x.FromDomainToCommentResponseDto()).ToList();
         return responseDtos;
     }
     

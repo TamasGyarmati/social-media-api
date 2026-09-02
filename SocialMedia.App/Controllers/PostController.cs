@@ -3,9 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SocialMedia.App.Exceptions;
 using SocialMedia.Domain.Dtos;
-using SocialMedia.Domain.Enums;
 using SocialMedia.Logic.Logics;
-using SocialMedia.Logic.ReturnResults;
 using SocialMedia.Logic.ReturnResults.PostResults;
 
 namespace SocialMedia.App.Controllers;
@@ -16,7 +14,7 @@ public class PostController(IPostLogic _logic) : ControllerBase
 {
     [HttpGet("all/")]
     [ProducesResponseType(typeof(List<ResponsePostDto>), StatusCodes.Status200OK)]
-    [EndpointSummary("Fetches all the posts available.")]
+    [EndpointSummary("Fetches all the posts.")]
     public async Task<ActionResult<List<ResponsePostDto>>> GetAllPosts()
         => Ok(await _logic.ReadAll());
     
@@ -28,17 +26,20 @@ public class PostController(IPostLogic _logic) : ControllerBase
     {
         var post = await _logic.ReadWithCommentsByIdAsync(id);
         
-        return post is null ? NotFound("Post was not found.") : Ok(post);
+        return post is null 
+            ? NotFound(new { Message = "Post was not found." }) 
+            : Ok(post);
     }
     
     [HttpPost]
     [Authorize]
-    [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IActionResult), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Consumes("multipart/form-data")]
-    [EndpointSummary("Creates the post from the provided DTO object. Returns the created entity's ID back.")]
-    public async Task<ActionResult<Guid>> CreatePostAsync([FromForm] CreatePostDto dto)
+    [EndpointSummary("Creates the post from the provided DTO object.")]
+    [EndpointDescription("Returns the created entity's ID back.")]
+    public async Task<IActionResult> CreatePostAsync([FromForm] CreatePostDto dto)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (currentUserId is null)
@@ -49,7 +50,7 @@ public class PostController(IPostLogic _logic) : ControllerBase
         try
         {
             var id = await _logic.CreateAsync(dto, currentUserId);
-            return Ok(id);
+            return Ok(new { Id = id });
         }
         catch (NotAllowedExtensionException ex)
         {
@@ -73,19 +74,21 @@ public class PostController(IPostLogic _logic) : ControllerBase
         
         var result = await _logic.CreateLikeAsync(id, currentUserId);
         
-        return result is null ? NotFound("The post was not found.") : Ok(result);
+        return result is null 
+            ? NotFound(new { Message = "The post was not found." }) 
+            : Ok(result);
     }
 
     [HttpPut("{id:guid}")]
     [Consumes("multipart/form-data")]
     [Authorize]
-    [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(IActionResult), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [EndpointSummary("Updates the provided post.")]
-    public async Task<ActionResult<Guid>> UpdatePostAsync(Guid id, [FromForm] UpdatePostDto dto)
+    public async Task<IActionResult> UpdatePostAsync(Guid id, [FromForm] UpdatePostDto dto)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (currentUserId is null)
@@ -97,9 +100,9 @@ public class PostController(IPostLogic _logic) : ControllerBase
 
         return result switch
         {
-            PostResult.NotFound error => NotFound(error.Message),
-            PostResult.Forbidden error => StatusCode(StatusCodes.Status403Forbidden, error.Message),
-            PostResult.Success response => Ok(response.Id),
+            PostResult.NotFound error => NotFound(new { error.Message }),
+            PostResult.Forbidden error => StatusCode(StatusCodes.Status403Forbidden, new { error.Message }),
+            PostResult.Success response => Ok(new { response.Id }),
             _ => StatusCode(500)
         };
     }
@@ -124,9 +127,9 @@ public class PostController(IPostLogic _logic) : ControllerBase
 
         return result switch
         {
-            PostResult.NotFound error => NotFound(error.Message),
-            PostResult.Forbidden error => StatusCode(StatusCodes.Status403Forbidden, error.Message),
-            PostResult.FailedToDeleteImage error => BadRequest(error.Message),
+            PostResult.NotFound error => NotFound(new { error.Message }),
+            PostResult.Forbidden error => StatusCode(StatusCodes.Status403Forbidden, new { error.Message }),
+            PostResult.FailedToDeleteImage error => BadRequest(new { error.Message }),
             PostResult.Success => NoContent(),
             _ => StatusCode(500)
         };
