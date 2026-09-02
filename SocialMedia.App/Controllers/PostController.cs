@@ -6,6 +6,7 @@ using SocialMedia.Domain.Dtos;
 using SocialMedia.Domain.Enums;
 using SocialMedia.Logic.Logics;
 using SocialMedia.Logic.ReturnResults;
+using SocialMedia.Logic.ReturnResults.PostResults;
 
 namespace SocialMedia.App.Controllers;
 
@@ -49,7 +50,7 @@ public class PostController(IPostLogic _logic) : ControllerBase
 
     [HttpPost("{id:guid}/like")]
     [Authorize]
-    public async Task<ActionResult> CreatePostLikeAsync(Guid id)
+    public async Task<ActionResult<PostLikeToggleResult>> CreatePostLikeAsync(Guid id)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (currentUserId is null)

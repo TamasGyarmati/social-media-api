@@ -5,6 +5,7 @@ using SocialMedia.Domain.Dtos;
 using SocialMedia.Domain.Enums;
 using SocialMedia.Logic.Logics;
 using SocialMedia.Logic.ReturnResults;
+using SocialMedia.Logic.ReturnResults.CommentResults;
 
 namespace SocialMedia.App.Controllers;
 
@@ -40,7 +41,7 @@ public class CommentController(ICommentLogic _logic) : ControllerBase
     
     [HttpPost("{id:guid}/like")]
     [Authorize]
-    public async Task<ActionResult<LikeToggleResult>> CreateCommentLikeAsync(Guid id)
+    public async Task<ActionResult<CommentLikeToggleResult>> CreateCommentLikeAsync(Guid id)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (currentUserId is null)

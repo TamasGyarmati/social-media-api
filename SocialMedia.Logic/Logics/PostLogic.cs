@@ -2,6 +2,7 @@ using SocialMedia.Data.Repository;
 using SocialMedia.Domain.Dtos;
 using SocialMedia.Domain.Entities;
 using SocialMedia.Logic.ReturnResults;
+using SocialMedia.Logic.ReturnResults.PostResults;
 using SocialMedia.Logic.Services;
 
 namespace SocialMedia.Logic.Logics;
@@ -11,7 +12,7 @@ public interface IPostLogic
     public Task<List<ResponsePostDto>> ReadAll();
     public Task<PostWithCommentsDto?> ReadWithCommentsByIdAsync(Guid id);
     public Task<Guid> CreateAsync(CreatePostDto dto, string currentUserId);
-    public Task<LikeToggleResult?> CreateLikeAsync(Guid id, string currentUserId);
+    public Task<PostLikeToggleResult?> CreateLikeAsync(Guid id, string currentUserId);
     public Task<PostResult> UpdateAsync(Guid id, UpdatePostDto dto, string currentUserId);
     public Task<PostResult> DeleteAsync(Guid id, string currentUserId);
 }
@@ -43,7 +44,7 @@ public class PostLogic(
         return response.Id;
     }
     
-    public async Task<LikeToggleResult?> CreateLikeAsync(Guid id, string currentUserId)
+    public async Task<PostLikeToggleResult?> CreateLikeAsync(Guid id, string currentUserId)
     {
         var existingPost = await _repo.GetByIdAsync(id);
         if (existingPost is null)
@@ -56,7 +57,7 @@ public class PostLogic(
         if (existingLike is not null)
         {
             await _repo.DeleteLikeAsync(existingLike);
-            return new LikeToggleResult(false, "Post unliked.");
+            return new PostLikeToggleResult(false, "Post unliked.");
         }
 
         var like = new PostLike
@@ -67,7 +68,7 @@ public class PostLogic(
 
         await _repo.CreateLikeAsync(like);
         
-        return new LikeToggleResult(true, "Post liked.");
+        return new PostLikeToggleResult(true, "Post liked.");
     }
     
     public async Task<PostResult> UpdateAsync(Guid id, UpdatePostDto dto, string currentUserId)

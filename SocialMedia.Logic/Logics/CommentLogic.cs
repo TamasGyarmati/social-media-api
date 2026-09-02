@@ -2,6 +2,7 @@ using SocialMedia.Data.Repository;
 using SocialMedia.Domain.Dtos;
 using SocialMedia.Domain.Entities;
 using SocialMedia.Logic.ReturnResults;
+using SocialMedia.Logic.ReturnResults.CommentResults;
 
 namespace SocialMedia.Logic.Logics;
 
@@ -10,7 +11,7 @@ public interface ICommentLogic
     public Task<List<CommentResponseShorterDto>> ReadAllFromPostAsync(Guid id);
     public Task<CommentResponseDto?> GetByIdAsync(Guid id);
     public Task<Guid> CreateAsync(CreateCommentDto dto, string currentUserId);
-    public Task<LikeToggleResult?> CreateLikeAsync(Guid id, string currentUserId);
+    public Task<CommentLikeToggleResult?> CreateLikeAsync(Guid id, string currentUserId);
     public Task<CommentResult> UpdateAsync(Guid id, UpdateCommentDto dto, string currentUserId);
     public Task<CommentResult> DeleteAsync(Guid id, string currentUserId);
 }
@@ -38,7 +39,7 @@ public class CommentLogic(ICommentRepository _repo) : ICommentLogic
         return response.Id;
     }
     
-    public async Task<LikeToggleResult?> CreateLikeAsync(Guid id, string currentUserId)
+    public async Task<CommentLikeToggleResult?> CreateLikeAsync(Guid id, string currentUserId)
     {
         var existingComment = await _repo.GetByIdAsync(id);
         if (existingComment is null)
@@ -51,7 +52,7 @@ public class CommentLogic(ICommentRepository _repo) : ICommentLogic
         if (existingLike is not null)
         {
             await _repo.DeleteLikeAsync(existingLike);
-            return new LikeToggleResult(false, "Comment unliked.");
+            return new CommentLikeToggleResult(false, "Comment unliked.");
         }
 
         var like = new CommentLike
@@ -62,7 +63,7 @@ public class CommentLogic(ICommentRepository _repo) : ICommentLogic
 
         await _repo.CreateLikeAsync(like);
         
-        return new LikeToggleResult(true, "Comment liked.");
+        return new CommentLikeToggleResult(true, "Comment liked.");
     }
     
     public async Task<CommentResult> UpdateAsync(Guid id, UpdateCommentDto dto, string currentUserId)

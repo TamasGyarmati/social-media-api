@@ -16,11 +16,11 @@ public interface IUserLogic
 {
     public Task<GetUserResult> GetUserByIdAsync(string userId);
     public Task<UploadAvatarResult> UploadAsync(UploadAvatarDto dto, string currentUserId);
-    public Task<bool> UpdateAsync(UpdateUserDto dto, string currentUserId);
-    public Task<bool> UpdatePasswordAsync(UpdatePasswordDto dto, string currentUserId);
-    public Task<string?> GenerateEmailChangeTokenAsync(RequestEmailChangeDto dto, string currentUserId);
-    public Task<bool> SendEmailChangeConfirmationAsync(string email, string confirmationLink);
-    public Task<bool> ConfirmEmailChangeAsync(string userId, string newEmail, string token);
+    public Task<UpdateUserResult> UpdateAsync(UpdateUserDto dto, string currentUserId);
+    public Task<UpdatePasswordResult> UpdatePasswordAsync(UpdatePasswordDto dto, string currentUserId);
+    public Task<GenerateEmailTokenResult> GenerateEmailChangeTokenAsync(RequestEmailChangeDto dto, string currentUserId);
+    public Task<SendEmailConfirmationResult> SendEmailChangeConfirmationAsync(string email, string confirmationLink);
+    public Task<ConfirmEmailChangeResult> ConfirmEmailChangeAsync(string userId, string newEmail, string token);
     public Task<FollowResult> CreateFollowAsync(string targerUserId, string currentUserId);
 }
 
@@ -83,12 +83,12 @@ public class UserLogic(
             : new UploadAvatarResult.FailedToUpdateAvatar("Failed to upload avatar.");
     }
 
-    public async Task<bool> UpdateAsync(UpdateUserDto dto, string currentUserId)
+    public async Task<UpdateUserResult> UpdateAsync(UpdateUserDto dto, string currentUserId)
     {
         var user = await _userManager.FindByIdAsync(currentUserId);
         if (user is null)
         {
-            return false;
+            return new UpdateUserResult.UserNotFound("The user was not found.");
         }
         
         var oldAvatarUrl = user.AvatarUrl;
@@ -108,7 +108,7 @@ public class UserLogic(
             var setUserNameResult = await _userManager.SetUserNameAsync(user, dto.UserName.Trim());
             if (!setUserNameResult.Succeeded)
             {
-                return false;
+                return new UpdateUserResult.UserNameChangeFailed("Failed to update username.");
             }
         }
 
@@ -127,72 +127,78 @@ public class UserLogic(
             var result = _imageProcessor.DeleteImage(oldAvatarUrl);
             if (!result)
             {
-                return false;
+                return new UpdateUserResult.AvatarDeletionFailed("Failed to delete avatar.");
             }
         }
 
         var updateResult = await _userManager.UpdateAsync(user);
 
-        return updateResult.Succeeded;
+        return updateResult.Succeeded 
+            ? new UpdateUserResult.Success("User updated.") 
+            : new UpdateUserResult.FailedToUpdateUser("Failed to update the user.");
     }
 
-    public async Task<bool> UpdatePasswordAsync(UpdatePasswordDto dto, string currentUserId)
+    public async Task<UpdatePasswordResult> UpdatePasswordAsync(UpdatePasswordDto dto, string currentUserId)
     {
         if (string.IsNullOrWhiteSpace(dto.OldPassword) || string.IsNullOrWhiteSpace(dto.NewPassword))
         {
-            return false;
+            return new UpdatePasswordResult.PasswordIsNullOrWhitespace("The old password and new password are required.");
         }
 
         var user = await _userManager.FindByIdAsync(currentUserId);
         if (user is null)
         {
-            return false;
+            return new UpdatePasswordResult.UserNotFound("The user was not found.");
         }
         
         var result = await _userManager.ChangePasswordAsync(user, dto.OldPassword, dto.NewPassword);
-        
-        return result.Succeeded;
+
+        return result.Succeeded
+            ? new UpdatePasswordResult.Success("Password updated.")
+            : new UpdatePasswordResult.PasswordChangeFailed("The change of password was unsuccessful");
     }
     
-    public async Task<string?> GenerateEmailChangeTokenAsync(RequestEmailChangeDto dto, string currentUserId)
+    public async Task<GenerateEmailTokenResult> GenerateEmailChangeTokenAsync(RequestEmailChangeDto dto, string currentUserId)
     {
-        var (found, user) = await ValidateEmailChangeAsync(dto, currentUserId);
-        if (!found || user is null)
+        var result = await ValidateEmailChangeAsync(dto, currentUserId);
+        if (result is ValidateEmailResult.Failure error)
         {
-            return null;
+            return new GenerateEmailTokenResult.EmailValidationFailed(error.Message);
         }
 
+        var user = ((ValidateEmailResult.Success)result).User;
+        
         var rawToken = await _userManager.GenerateChangeEmailTokenAsync(user, dto.NewEmail.Trim());
         var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(rawToken));
 
-        return encodedToken;
+        return new GenerateEmailTokenResult.Success(encodedToken);
     }
 
-    async Task<(bool, AppUser?)> ValidateEmailChangeAsync(RequestEmailChangeDto dto, string currentUserId)
+    async Task<ValidateEmailResult> ValidateEmailChangeAsync(RequestEmailChangeDto dto, string currentUserId)
     {
         if (string.IsNullOrWhiteSpace(dto.NewEmail))
         {
-            return (false, null);
+            return new ValidateEmailResult.NewEmailFailed("New email is required.");
         }
 
         var user = await _userManager.FindByIdAsync(currentUserId);
         if (user is null)
         {
-            return (false, null);
+            return new ValidateEmailResult.UserNotFound("The user was not found.");
         }
 
         var existingUser = await _userManager.FindByEmailAsync(dto.NewEmail);
         
         return existingUser is null 
-            ? (true, user)
-            : (false, null);
+            ? new ValidateEmailResult.Success(user)
+            : new ValidateEmailResult.UserWithEmailExist("User with email address already exists.");
     }
 
-    public async Task<bool> SendEmailChangeConfirmationAsync(string email, string confirmationLink)
+    public async Task<SendEmailConfirmationResult> SendEmailChangeConfirmationAsync(string email, string confirmationLink)
     {
         if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(confirmationLink))
         {
-            return false;
+            return new SendEmailConfirmationResult.EmailOrConfirmationLinkFailed("The email or the confirmation link is required.");
         }
 
         var subject = "Confirm Your New Email Address";
@@ -218,38 +224,34 @@ public class UserLogic(
         try
         {
             await _emailSender.SendEmailAsync(email, subject, htmlBody);
-            return true;
+            return new SendEmailConfirmationResult.Success("Your email address has been sent.");
         }
         catch
         {
-            return false;
+            return new SendEmailConfirmationResult.SendingEmailFailed("Something went wrong with sending the email.");
         }
     }
     
-    public async Task<bool> ConfirmEmailChangeAsync(string userId, string newEmail, string token)
+    public async Task<ConfirmEmailChangeResult> ConfirmEmailChangeAsync(string userId, string newEmail, string token)
     {
         if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(newEmail) ||
             string.IsNullOrWhiteSpace(token))
         {
-            return false;
+            return new ConfirmEmailChangeResult.ArgumentsRequired("The User ID, new Email or Token is required.");
         }
 
         var user = await _userManager.FindByIdAsync(userId);
         if (user is null)
         {
-            return false;
+            return new ConfirmEmailChangeResult.UserNotFound("The user was not found.");
         }
 
-        try
-        {
-            var rawToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(token));
-            var result = await _userManager.ChangeEmailAsync(user, newEmail, rawToken);
-            return result.Succeeded;
-        }
-        catch
-        {
-            return false;
-        }
+        var rawToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(token));
+        var result = await _userManager.ChangeEmailAsync(user, newEmail, rawToken);
+        
+        return result.Succeeded
+            ? new ConfirmEmailChangeResult.Success("The email was changed.")
+            : new ConfirmEmailChangeResult.EmailChangeFailed("The email change failed.");
     }
 
     public async Task<FollowResult> CreateFollowAsync(string targerUserId, string currentUserId)

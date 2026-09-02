@@ -62,7 +62,7 @@ public class UserController(IUserLogic _logic) : ControllerBase
         }
     }
 
-    [HttpPut]
+    [HttpPut("all")]
     [Consumes("multipart/form-data")]
     [Authorize]
     public async Task<IActionResult> UpdateUserAsync([FromForm] UpdateUserDto dto)
@@ -75,12 +75,15 @@ public class UserController(IUserLogic _logic) : ControllerBase
         
         var result = await _logic.UpdateAsync(dto, currentUserId);
 
-        if (!result)
+        return result switch
         {
-            return BadRequest("Failed to update user.");
-        } 
-        
-        return Ok("User updated.");
+            UpdateUserResult.AvatarDeletionFailed error => BadRequest(error.Message),
+            UpdateUserResult.FailedToUpdateUser error => BadRequest(error.Message),
+            UpdateUserResult.UserNameChangeFailed error => BadRequest(error.Message),
+            UpdateUserResult.UserNotFound error => NotFound(error.Message),
+            UpdateUserResult.Success response => Ok(response.Message),
+            _ => StatusCode(500)
+        };
     }
     
     [HttpPut("password")]
@@ -94,12 +97,15 @@ public class UserController(IUserLogic _logic) : ControllerBase
         }
         
         var result = await _logic.UpdatePasswordAsync(dto, currentUserId);
-        if (!result)
-        {
-            return BadRequest("Failed to update password.");
-        }
         
-        return Ok("Password updated.");
+        return result switch
+        {
+            UpdatePasswordResult.PasswordChangeFailed error => BadRequest(error.Message),
+            UpdatePasswordResult.PasswordIsNullOrWhitespace error => BadRequest(error.Message),
+            UpdatePasswordResult.UserNotFound error => BadRequest(error.Message),
+            UpdatePasswordResult.Success response => Ok(response.Message),
+            _ => StatusCode(500)
+        };
     }
     
     [HttpPut("email")]
@@ -112,7 +118,12 @@ public class UserController(IUserLogic _logic) : ControllerBase
             return Unauthorized();
         }
         
-        var generatedToken = await _logic.GenerateEmailChangeTokenAsync(dto, currentUserId);
+        var generatedTokenResult = await _logic.GenerateEmailChangeTokenAsync(dto, currentUserId);
+        if (generatedTokenResult is GenerateEmailTokenResult.EmailValidationFailed validationError)
+        {
+            return BadRequest(validationError.Message);
+        }
+        var generatedToken = ((GenerateEmailTokenResult.Success)generatedTokenResult).Token;
 
         var confirmationLink = Url.Action(
             action: nameof(ConfirmEmailChange),
@@ -126,16 +137,23 @@ public class UserController(IUserLogic _logic) : ControllerBase
             protocol: Request.Scheme
         );
 
+        SendEmailConfirmationResult result;
         if (confirmationLink is not null)
         {
-            await _logic.SendEmailChangeConfirmationAsync(dto.NewEmail, confirmationLink);  
+            result = await _logic.SendEmailChangeConfirmationAsync(dto.NewEmail, confirmationLink);  
         }
         else
         {
-            return BadRequest("Failed to request email change.");
+            return BadRequest("Failed when making the confirmation link.");
         }
 
-        return Ok("Confirmation email sent to you new address.");
+        return result switch
+        {
+            SendEmailConfirmationResult.EmailOrConfirmationLinkFailed error => BadRequest(error.Message),
+            SendEmailConfirmationResult.SendingEmailFailed error => BadRequest(error.Message),
+            SendEmailConfirmationResult.Success response => Ok(response.Message),
+            _ => StatusCode(500)
+        };
     }
 
     [HttpGet("confirm-email-change")]
@@ -146,15 +164,19 @@ public class UserController(IUserLogic _logic) : ControllerBase
         [FromQuery] string token)
     {
         var result = await _logic.ConfirmEmailChangeAsync(userId, newEmail, token);
-        if (!result)
+        
+        return result switch
         {
-            return BadRequest("Invalid or expired email change token.");
-        }
-
-        return Ok("Email changed successfully. You can now user your email.");
+            ConfirmEmailChangeResult.ArgumentsRequired error => BadRequest(error.Message),
+            ConfirmEmailChangeResult.EmailChangeFailed error => BadRequest(error.Message),
+            ConfirmEmailChangeResult.UserNotFound error => NotFound(error.Message),
+            ConfirmEmailChangeResult.Success response => Ok(response.Message),
+            _ => StatusCode(500)
+        };
     }
 
     [HttpPost("follow")]
+    [Authorize]
     public async Task<IActionResult> FollowUser(string id)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
