@@ -4,7 +4,7 @@ using SocialMedia.Domain.Enums;
 
 namespace SocialMedia.Domain.Dtos;
 
-public record ResponsePostDto(
+public record GetAllPostsResponseDto(
     Guid Id,
     string Title,
     string Description,
@@ -15,7 +15,7 @@ public record ResponsePostDto(
     int CommentsCount
 );
     
-public record PostWithCommentsDto(
+public record GetPostWithCommentsResponseDto(
     Guid Id,
     string Title,
     string Description,
@@ -26,23 +26,36 @@ public record PostWithCommentsDto(
     List<CommentShortDto> Comments
 );
     
-public record CreatePostDto(
+public record CreatePostRequestDto(
     string Title,
     string Description,
     IFormFile? Image
 );
 
-public record UpdatePostDto(
+public record UpdatePostRequestDto(
     string Title,
     string Description,
     IFormFile? Image
+);
+
+public record CreatePostResponseDto(
+    Guid Id
+);
+
+public record UpdatePostResponseDto(
+    Guid Id
+);
+
+public record CreatePostLikeResponseDto(
+    bool IsLiked, 
+    string Message
 );
 
 public static class PostMappingExtensions
 {
-    public static ResponsePostDto FromDomainToResponsePostDto(this Post post)
+    public static GetAllPostsResponseDto FromDomainToResponsePostDto(this Post post)
     {
-        return new ResponsePostDto(
+        return new GetAllPostsResponseDto(
             post.Id, 
             post.Title, 
             post.Description, 
@@ -54,9 +67,9 @@ public static class PostMappingExtensions
         );
     }
     
-    public static PostWithCommentsDto FromDomainToPostWithCommentsDto(this Post post)
+    public static GetPostWithCommentsResponseDto FromDomainToPostWithCommentsDto(this Post post)
     {
-        return new PostWithCommentsDto(
+        return new GetPostWithCommentsResponseDto(
             post.Id,
             post.Title,
             post.Description,
@@ -68,7 +81,7 @@ public static class PostMappingExtensions
         );
     }
     
-    public static Post FromCreatePostToDomain(this CreatePostDto dto, string? relativePath, string creatorId)
+    public static Post FromCreatePostToDomain(this CreatePostRequestDto dto, string? relativePath, string creatorId)
     {
         return new Post
         {
@@ -79,7 +92,7 @@ public static class PostMappingExtensions
         };
     }
     
-    public static void UpdateFromDto(this Post post, UpdatePostDto dto, string? relativePath)
+    public static void UpdateFromDto(this Post post, UpdatePostRequestDto dto, string? relativePath)
     {
         post.Title = dto.Title;
         post.Description = dto.Description;

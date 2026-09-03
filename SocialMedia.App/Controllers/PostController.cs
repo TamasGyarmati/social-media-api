@@ -13,16 +13,16 @@ namespace SocialMedia.App.Controllers;
 public class PostController(IPostLogic _logic) : ControllerBase
 {
     [HttpGet("all/")]
-    [ProducesResponseType(typeof(List<ResponsePostDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(List<GetAllPostsResponseDto>), StatusCodes.Status200OK)]
     [EndpointSummary("Fetches all the posts.")]
-    public async Task<ActionResult<List<ResponsePostDto>>> GetAllPosts()
+    public async Task<ActionResult<List<GetAllPostsResponseDto>>> GetAllPosts()
         => Ok(await _logic.ReadAll());
     
     [HttpGet("{id:guid}")]
-    [ProducesResponseType(typeof(PostWithCommentsDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(GetPostWithCommentsResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [EndpointSummary("Fetches the post by id with the comments included.")]
-    public async Task<ActionResult<PostWithCommentsDto>> GetPostWithCommentsByIdAsync(Guid id)
+    public async Task<ActionResult<GetPostWithCommentsResponseDto>> GetPostWithCommentsByIdAsync(Guid id)
     {
         var post = await _logic.ReadWithCommentsByIdAsync(id);
         
@@ -33,13 +33,13 @@ public class PostController(IPostLogic _logic) : ControllerBase
     
     [HttpPost]
     [Authorize]
-    [ProducesResponseType(typeof(IActionResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(CreatePostResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Consumes("multipart/form-data")]
     [EndpointSummary("Creates the post from the provided DTO object.")]
     [EndpointDescription("Returns the created entity's ID back.")]
-    public async Task<IActionResult> CreatePostAsync([FromForm] CreatePostDto dto)
+    public async Task<ActionResult<CreatePostResponseDto>> CreatePostAsync([FromForm] CreatePostRequestDto dto)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (currentUserId is null)
@@ -50,7 +50,7 @@ public class PostController(IPostLogic _logic) : ControllerBase
         try
         {
             var id = await _logic.CreateAsync(dto, currentUserId);
-            return Ok(new { Id = id });
+            return Ok(new CreatePostResponseDto(id));
         }
         catch (NotAllowedExtensionException ex)
         {
@@ -60,11 +60,11 @@ public class PostController(IPostLogic _logic) : ControllerBase
 
     [HttpPost("{id:guid}/like")]
     [Authorize]
-    [ProducesResponseType(typeof(PostLikeToggleResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(CreatePostLikeResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [EndpointSummary("Likes the provided post.")]
-    public async Task<ActionResult<PostLikeToggleResult>> CreatePostLikeAsync(Guid id)
+    public async Task<ActionResult<CreatePostLikeResponseDto>> CreatePostLikeAsync(Guid id)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (currentUserId is null)
@@ -76,19 +76,19 @@ public class PostController(IPostLogic _logic) : ControllerBase
         
         return result is null 
             ? NotFound(new { Message = "The post was not found." }) 
-            : Ok(result);
+            : Ok(new CreatePostLikeResponseDto(result.IsLiked, result.Message));
     }
 
     [HttpPut("{id:guid}")]
     [Consumes("multipart/form-data")]
     [Authorize]
-    [ProducesResponseType(typeof(IActionResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(UpdatePostResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [EndpointSummary("Updates the provided post.")]
-    public async Task<IActionResult> UpdatePostAsync(Guid id, [FromForm] UpdatePostDto dto)
+    public async Task<ActionResult<UpdatePostResponseDto>> UpdatePostAsync(Guid id, [FromForm] UpdatePostRequestDto dto)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (currentUserId is null)

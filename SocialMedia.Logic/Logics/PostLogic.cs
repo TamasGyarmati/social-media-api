@@ -9,11 +9,11 @@ namespace SocialMedia.Logic.Logics;
 
 public interface IPostLogic
 {
-    public Task<List<ResponsePostDto>> ReadAll();
-    public Task<PostWithCommentsDto?> ReadWithCommentsByIdAsync(Guid id);
-    public Task<Guid> CreateAsync(CreatePostDto dto, string currentUserId);
+    public Task<List<GetAllPostsResponseDto>> ReadAll();
+    public Task<GetPostWithCommentsResponseDto?> ReadWithCommentsByIdAsync(Guid id);
+    public Task<Guid> CreateAsync(CreatePostRequestDto dto, string currentUserId);
     public Task<PostLikeToggleResult?> CreateLikeAsync(Guid id, string currentUserId);
-    public Task<PostResult> UpdateAsync(Guid id, UpdatePostDto dto, string currentUserId);
+    public Task<PostResult> UpdateAsync(Guid id, UpdatePostRequestDto dto, string currentUserId);
     public Task<PostResult> DeleteAsync(Guid id, string currentUserId);
 }
 
@@ -21,20 +21,20 @@ public class PostLogic(
     IPostRepository _repo, 
     IImageProcessor _imageProcessor) : IPostLogic
 {
-    public async Task<List<ResponsePostDto>> ReadAll()
+    public async Task<List<GetAllPostsResponseDto>> ReadAll()
     {
         var posts = await _repo.GetAllAsync();
         return posts.Select(x => x.FromDomainToResponsePostDto()).ToList();
     }
     
-    public async Task<PostWithCommentsDto?> ReadWithCommentsByIdAsync(Guid id)
+    public async Task<GetPostWithCommentsResponseDto?> ReadWithCommentsByIdAsync(Guid id)
     {
         var post = await _repo.GetByIdWithCommentsAsync(id);
         var dto = post?.FromDomainToPostWithCommentsDto();
         return dto;
     }
     
-    public async Task<Guid> CreateAsync(CreatePostDto dto, string currentUserId)
+    public async Task<Guid> CreateAsync(CreatePostRequestDto dto, string currentUserId)
     {
         var relativePath = await _imageProcessor.ProcessAndSavePostImageAsync(dto.Image);
         
@@ -71,7 +71,7 @@ public class PostLogic(
         return new PostLikeToggleResult(true, "Post liked.");
     }
     
-    public async Task<PostResult> UpdateAsync(Guid id, UpdatePostDto dto, string currentUserId)
+    public async Task<PostResult> UpdateAsync(Guid id, UpdatePostRequestDto dto, string currentUserId)
     {
         var existingPost = await _repo.GetByIdAsync(id);
         if (existingPost is null)
