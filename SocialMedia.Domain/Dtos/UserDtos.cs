@@ -3,7 +3,7 @@ using SocialMedia.Domain.Entities;
 
 namespace SocialMedia.Domain.Dtos;
 
-public record GetUserResponseDto(
+public record GetUserByIdResponseDto(
     string Id,
     string FirstName,
     string LastName,
@@ -51,9 +51,9 @@ public record FollowUserResponseDto(
 
 public static class UserMappingExtensions
 {
-    public static GetUserResponseDto FromDomainToGetUserDto(this AppUser user)
+    public static GetUserByIdResponseDto FromDomainToGetUserDto(this AppUser user)
     {
-        return new GetUserResponseDto(
+        return new GetUserByIdResponseDto(
             user.Id,
             user.FirstName,
             user.LastName,

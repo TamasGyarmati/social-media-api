@@ -13,11 +13,11 @@ namespace SocialMedia.App.Controllers;
 public class UserController(IUserLogic _logic) : ControllerBase 
 {
     [HttpGet]
-    [ProducesResponseType(typeof(GetUserResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(GetUserByIdResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [EndpointSummary("Gets the user by ID.")]
-    public async Task<ActionResult<GetUserResponseDto>> GetUserById(string id)
+    public async Task<ActionResult<GetUserByIdResponseDto>> GetUserById(string id)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (currentUserId is null)
