@@ -14,10 +14,10 @@ namespace SocialMedia.Logic.Logics;
 
 public interface IAuthLogic
 {
-    public Task<RegisterResult> RegisterAsync(UserCreateDto dto);
+    public Task<RegisterResult> RegisterAsync(UserCreateRequestDto dto);
     public Task<bool> SendConfirmationEmailAsync(string email, string confirmationLink);
-    public Task<LoginResult> LoginAsync(UserLoginDto dto);
-    public Task<RefreshResult> RefreshAsync(TokenApiDto tokenApiDto);
+    public Task<LoginResult> LoginAsync(UserLoginRequestDto dto);
+    public Task<RefreshResult> RefreshAsync(RefreshRequestDto tokenApiDto);
     public Task<ConfirmEmailResult> ConfirmEmailAsync(string userId, string token);
 }
 
@@ -26,7 +26,7 @@ public class AuthLogic(UserManager<AppUser> _userManager,
     ITokenGenerator _tokenGenerator,
     IEmailSender _emailSender) : IAuthLogic
 {
-    public async Task<RegisterResult> RegisterAsync(UserCreateDto dto)
+    public async Task<RegisterResult> RegisterAsync(UserCreateRequestDto dto)
     {
         var user = new AppUser
         {
@@ -98,7 +98,7 @@ public class AuthLogic(UserManager<AppUser> _userManager,
         return true;
     }
     
-    public async Task<LoginResult> LoginAsync(UserLoginDto dto)
+    public async Task<LoginResult> LoginAsync(UserLoginRequestDto dto)
     {
         var user = await _userManager.FindByEmailAsync(dto.Email);
         if (user != null)
@@ -127,7 +127,7 @@ public class AuthLogic(UserManager<AppUser> _userManager,
                 const int refreshTokenExpiryInMinutes = 24 * 60 * 7;
                 var refreshToken = await _tokenGenerator.GenerateRefreshTokenAsync(user);
                 
-                var tokenWithExpiryDate = new LoginResultDto(
+                var tokenWithExpiryDate = new UserLoginResponseDto(
                     AccessToken: new JwtSecurityTokenHandler().WriteToken(accessToken),
                     AccessTokenExpireDate: DateTime.Now.AddMinutes(accessTokenExpiryInMinutes), 
                     RefreshToken: refreshToken, 
@@ -140,7 +140,7 @@ public class AuthLogic(UserManager<AppUser> _userManager,
         return new LoginResult.UserOrPasswordNotExist("The user or password doesn't exist.");
     }
     
-    public async Task<RefreshResult> RefreshAsync(TokenApiDto tokenApiDto)
+    public async Task<RefreshResult> RefreshAsync(RefreshRequestDto tokenApiDto)
     {
         string accessToken = tokenApiDto.AccessToken;
         string refreshToken = tokenApiDto.RefreshToken;
@@ -160,7 +160,7 @@ public class AuthLogic(UserManager<AppUser> _userManager,
 
         await _userManager.UpdateAsync(user);
 
-        return new RefreshResult.Success(new AuthResponseDto(
+        return new RefreshResult.Success(new RefreshResponseDto(
             AccessToken: new JwtSecurityTokenHandler().WriteToken(newAccessToken),
             RefreshToken: newRefreshToken,
             AccessTokenExpiration: newAccessToken.ValidTo,

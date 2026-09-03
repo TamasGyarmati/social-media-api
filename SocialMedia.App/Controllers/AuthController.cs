@@ -12,11 +12,11 @@ public class AuthController(
     IAuthLogic _logic) : ControllerBase
 {
     [HttpPost("register")]
-    [ProducesResponseType(typeof(IActionResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(UserCreateResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [EndpointSummary("Creates a new user by the provided DTO.")]
     [EndpointDescription("Sends out a confirmation link in the provided email.")]
-    public async Task<IActionResult> Register(UserCreateDto dto)
+    public async Task<ActionResult<UserCreateResponseDto>> Register(UserCreateRequestDto dto)
     {
         var result = await _logic.RegisterAsync(dto);
 
@@ -40,7 +40,7 @@ public class AuthController(
                     return BadRequest(new { Message = "An error occurred while sending the confirmation."});
                 }
 
-                return Ok(new { Message = "Register successful. Check your inbox and activate your account." });
+                return Ok(new UserCreateResponseDto("Register successful. Check your inbox and activate your account."));
             }
             
             default:
@@ -49,12 +49,12 @@ public class AuthController(
     }
 
     [HttpPost("login")]
-    [ProducesResponseType(typeof(LoginResultDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(UserLoginResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [EndpointSummary("Logs in the user.")]
     [EndpointDescription("Returns the access/refresh tokens with their expiry date.")]
-    public async Task<ActionResult<LoginResultDto>> Login(UserLoginDto dto)
+    public async Task<ActionResult<UserLoginResponseDto>> Login(UserLoginRequestDto dto)
     {
         var result = await _logic.LoginAsync(dto);
 
@@ -68,10 +68,10 @@ public class AuthController(
     }
     
     [HttpPost("refresh")]
-    [ProducesResponseType(typeof(LoginResultDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(RefreshResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [EndpointSummary("Refreshes the token.")]
-    public async Task<ActionResult<AuthResponseDto>> Refresh(TokenApiDto tokenApiDto)
+    public async Task<ActionResult<RefreshResponseDto>> Refresh(RefreshRequestDto tokenApiDto)
     {
         var result = await _logic.RefreshAsync(tokenApiDto);
         
@@ -85,11 +85,11 @@ public class AuthController(
 
     [HttpGet("confirm-email")]
     [AllowAnonymous]
-    [ProducesResponseType(typeof(IActionResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ConfirmEmailResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [EndpointSummary("Confirms the email through the sent out confirmation link.")]
-    public async Task<IActionResult> ConfirmEmail(string userId, string token)
+    public async Task<ActionResult<ConfirmEmailResponseDto>> ConfirmEmail(string userId, string token)
     {
         var result = await _logic.ConfirmEmailAsync(userId, token);
         
@@ -99,7 +99,7 @@ public class AuthController(
             ConfirmEmailResult.InvalidTokenFormat error => BadRequest(new { error.Message }),
             ConfirmEmailResult.InvalidTokenOrExpired error => BadRequest(new { error.Message }),
             ConfirmEmailResult.UserNotFound error => NotFound(new { error.Message }),
-            ConfirmEmailResult.Success response => Ok(new { response.Message }),
+            ConfirmEmailResult.Success response => Ok(new ConfirmEmailResponseDto(response.Message)),
             _ => StatusCode(500)
         };
     }

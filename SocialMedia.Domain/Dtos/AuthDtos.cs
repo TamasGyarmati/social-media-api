@@ -1,6 +1,6 @@
 namespace SocialMedia.Domain.Dtos;
 
-public record UserCreateDto(
+public record UserCreateRequestDto(
     string FirstName,
     string LastName,
     string UserName,
@@ -8,26 +8,34 @@ public record UserCreateDto(
     string Password
 );
 
-public record UserLoginDto(
+public record UserLoginRequestDto(
     string Email,
     string Password
 );
 
-public record LoginResultDto(
+public record RefreshRequestDto(
+    string AccessToken,
+    string RefreshToken
+);
+
+public record RefreshResponseDto(
+    string AccessToken,
+    string RefreshToken,
+    DateTime AccessTokenExpiration,
+    DateTime RefreshTokenExpiration
+);
+
+public record UserCreateResponseDto(
+    string Message
+);
+
+public record UserLoginResponseDto(
     string AccessToken, 
     DateTime AccessTokenExpireDate,
     string RefreshToken,
     DateTime RefreshTokenExpireDate
 );
 
-public record TokenApiDto(
-    string AccessToken,
-    string RefreshToken
-);
-
-public record AuthResponseDto(
-    string AccessToken,
-    string RefreshToken,
-    DateTime AccessTokenExpiration,
-    DateTime RefreshTokenExpiration
+public record ConfirmEmailResponseDto(
+    string Message
 );
