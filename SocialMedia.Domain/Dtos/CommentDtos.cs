@@ -1,5 +1,4 @@
 using SocialMedia.Domain.Entities;
-using SocialMedia.Domain.Enums;
 
 namespace SocialMedia.Domain.Dtos;
 

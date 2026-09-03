@@ -1,8 +1,8 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SocialMedia.App.Exceptions;
 using SocialMedia.Domain.Dtos;
+using SocialMedia.Logic.Exceptions;
 using SocialMedia.Logic.Logics;
 using SocialMedia.Logic.ReturnResults.UserResults;
 

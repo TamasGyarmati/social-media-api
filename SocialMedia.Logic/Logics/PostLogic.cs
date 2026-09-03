@@ -1,7 +1,6 @@
 using SocialMedia.Data.Repository;
 using SocialMedia.Domain.Dtos;
 using SocialMedia.Domain.Entities;
-using SocialMedia.Logic.ReturnResults;
 using SocialMedia.Logic.ReturnResults.PostResults;
 using SocialMedia.Logic.Services;
 

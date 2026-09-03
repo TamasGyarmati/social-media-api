@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.WebUtilities;
 using SocialMedia.Domain.Dtos;
 using SocialMedia.Domain.Entities;
-using SocialMedia.Logic.ReturnResults;
 using SocialMedia.Logic.ReturnResults.AuthResults;
 using SocialMedia.Logic.Services;
 
@@ -154,7 +153,7 @@ public class AuthLogic(UserManager<AppUser> _userManager,
 
         const int accessTokenExpiryInMinutes = 24 * 60;
         
-        var newAccessToken = _tokenGenerator.GenerateAccessToken(principal?.Claims, accessTokenExpiryInMinutes);
+        var newAccessToken = _tokenGenerator.GenerateAccessToken(principal.Claims, accessTokenExpiryInMinutes);
         var newRefreshToken = await _tokenGenerator.GenerateRefreshTokenAsync(user);
         user.RefreshToken = newRefreshToken;
 

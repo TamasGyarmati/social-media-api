@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
-using SocialMedia.App.Exceptions;
+using SocialMedia.Logic.Exceptions;
 
 namespace SocialMedia.Logic.Services;
 
@@ -41,7 +41,7 @@ public class ImageProcessor(IWebHostEnvironment _env) : IImageProcessor
                 File.Delete(targetFile);
             }
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return false;
         }
