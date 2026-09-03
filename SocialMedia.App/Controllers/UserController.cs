@@ -13,11 +13,11 @@ namespace SocialMedia.App.Controllers;
 public class UserController(IUserLogic _logic) : ControllerBase 
 {
     [HttpGet]
-    [ProducesResponseType(typeof(GetUserDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(GetUserResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [EndpointSummary("Gets the user by ID.")]
-    public async Task<ActionResult<GetUserDto>> GetUserById(string id)
+    public async Task<ActionResult<GetUserResponseDto>> GetUserById(string id)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (currentUserId is null)
@@ -38,13 +38,13 @@ public class UserController(IUserLogic _logic) : ControllerBase
     [HttpPost("avatar")]
     [Authorize]
     [Consumes("multipart/form-data")]
-    [ProducesResponseType(typeof(IActionResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(UploadAvatarResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [EndpointSummary("Uploads a user the avatar from the provided DTO.")]
     [EndpointDescription("Returns the relative path of the uploaded Avatar.")]
-    public async Task<IActionResult> UploadAvatarAsync([FromForm] UploadAvatarDto dto)
+    public async Task<ActionResult<UploadAvatarResponseDto>> UploadAvatarAsync([FromForm] UploadAvatarRequestDto dto)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (currentUserId is null)
@@ -62,7 +62,7 @@ public class UserController(IUserLogic _logic) : ControllerBase
                 UploadAvatarResult.FailedToUpdateAvatar error => BadRequest(new { error.Message }),
                 UploadAvatarResult.ImageProcessingError error => BadRequest(new { error.Message }),
                 UploadAvatarResult.ExistingAvatarDeleteFailed error => BadRequest(new { error.Message }),
-                UploadAvatarResult.Success response => Ok(new { AvatarUrl = response.RelativePath }),
+                UploadAvatarResult.Success response => Ok(new UploadAvatarResponseDto(response.RelativePath)),
                 _ => StatusCode(500)
             };
         }
@@ -75,12 +75,12 @@ public class UserController(IUserLogic _logic) : ControllerBase
     [HttpPut("all")]
     [Authorize]
     [Consumes("multipart/form-data")]
-    [ProducesResponseType(typeof(IActionResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(UserMessageResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [EndpointSummary("Updates the user through the provided DTO.")]
-    public async Task<IActionResult> UpdateUserAsync([FromForm] UpdateUserDto dto)
+    public async Task<ActionResult<UserMessageResponseDto>> UpdateUserAsync([FromForm] UpdateUserRequestDto dto)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (currentUserId is null)
@@ -96,18 +96,18 @@ public class UserController(IUserLogic _logic) : ControllerBase
             UpdateUserResult.FailedToUpdateUser error => BadRequest(new { error.Message }),
             UpdateUserResult.UserNameChangeFailed error => BadRequest(new { error.Message }),
             UpdateUserResult.UserNotFound error => NotFound(new { error.Message }),
-            UpdateUserResult.Success response => Ok(new { response.Message }),
+            UpdateUserResult.Success response => Ok(new UserMessageResponseDto(response.Message)),
             _ => StatusCode(500)
         };
     }
     
     [HttpPut("password")]
     [Authorize]
-    [ProducesResponseType(typeof(IActionResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(UserMessageResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [EndpointSummary("Updates the user password through the provided DTO.")]
-    public async Task<IActionResult> UpdatePasswordAsync(UpdatePasswordDto dto)
+    public async Task<ActionResult<UserMessageResponseDto>> UpdatePasswordAsync(UpdatePasswordRequestDto dto)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (currentUserId is null)
@@ -122,18 +122,18 @@ public class UserController(IUserLogic _logic) : ControllerBase
             UpdatePasswordResult.PasswordChangeFailed error => BadRequest(new { error.Message }),
             UpdatePasswordResult.PasswordIsNullOrWhitespace error => BadRequest(new { error.Message }),
             UpdatePasswordResult.UserNotFound error => BadRequest(new { error.Message }),
-            UpdatePasswordResult.Success response => Ok(new { response.Message }),
+            UpdatePasswordResult.Success response => Ok(new UserMessageResponseDto(response.Message)),
             _ => StatusCode(500)
         };
     }
     
     [HttpPut("email")]
     [Authorize]
-    [ProducesResponseType(typeof(IActionResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(UserMessageResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [EndpointSummary("Requests an email address change through the provided DTO.")]
-    public async Task<IActionResult> RequestEmailChange(RequestEmailChangeDto dto)
+    public async Task<ActionResult<UserMessageResponseDto>> RequestEmailChange(EmailChangeRequestDto dto)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (currentUserId is null)
@@ -174,18 +174,18 @@ public class UserController(IUserLogic _logic) : ControllerBase
         {
             SendEmailConfirmationResult.EmailOrConfirmationLinkFailed error => BadRequest(new { error.Message }),
             SendEmailConfirmationResult.SendingEmailFailed error => BadRequest(new { error.Message }),
-            SendEmailConfirmationResult.Success response => Ok(new { response.Message }),
+            SendEmailConfirmationResult.Success response => Ok(new UserMessageResponseDto(response.Message)),
             _ => StatusCode(500)
         };
     }
 
     [HttpGet("confirm-email-change")]
     [AllowAnonymous]
-    [ProducesResponseType(typeof(IActionResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(UserMessageResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [EndpointSummary("Confirms the email through the sent out confirmation link.")]
-    public async Task<IActionResult> ConfirmEmailChange(
+    public async Task<ActionResult<UserMessageResponseDto>> ConfirmEmailChange(
         [FromQuery] string userId, 
         [FromQuery] string newEmail, 
         [FromQuery] string token)
@@ -197,18 +197,18 @@ public class UserController(IUserLogic _logic) : ControllerBase
             ConfirmEmailChangeResult.ArgumentsRequired error => BadRequest(new { error.Message }),
             ConfirmEmailChangeResult.EmailChangeFailed error => BadRequest(new { error.Message }),
             ConfirmEmailChangeResult.UserNotFound error => NotFound(new { error.Message }),
-            ConfirmEmailChangeResult.Success response => Ok( new { response.Message }),
+            ConfirmEmailChangeResult.Success response => Ok( new UserMessageResponseDto(response.Message)),
             _ => StatusCode(500)
         };
     }
 
     [HttpPost("follow")]
     [Authorize]
-    [ProducesResponseType(typeof(IActionResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(FollowUserResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [EndpointSummary("Follows the user provided by the ID.")]
-    public async Task<IActionResult> FollowUser(string id)
+    public async Task<ActionResult<FollowUserResponseDto>> FollowUser(string id)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (currentUserId is null)
@@ -223,7 +223,7 @@ public class UserController(IUserLogic _logic) : ControllerBase
             FollowResult.AlreadyFollowing error => BadRequest(new { error.Message }),
             FollowResult.CannotFollowSelf error => BadRequest(new { error.Message }),
             FollowResult.TargetUserNotFound error => BadRequest(new { error.Message }),
-            FollowResult.Success response => Ok(new { response.Message, FollowedId = id }),
+            FollowResult.Success response => Ok(new FollowUserResponseDto(response.Message, id)),
             _ => StatusCode(500)
         };
     }

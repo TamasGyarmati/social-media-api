@@ -3,7 +3,7 @@ using SocialMedia.Domain.Entities;
 
 namespace SocialMedia.Domain.Dtos;
 
-public record GetUserDto(
+public record GetUserResponseDto(
     string Id,
     string FirstName,
     string LastName,
@@ -16,31 +16,44 @@ public record GetUserDto(
     List<string> FollowingUsernames
 );
 
-public record UploadAvatarDto(
+public record UploadAvatarRequestDto(
     IFormFile Image
 );
 
-public record UpdateUserDto(
+public record UpdateUserRequestDto(
     string? FirstName,
     string? LastName,
     string? UserName,
     IFormFile? Avatar
 );
 
-public record UpdatePasswordDto(
+public record UpdatePasswordRequestDto(
     string OldPassword,
     string NewPassword
 );
 
-public record RequestEmailChangeDto(
+public record EmailChangeRequestDto(
     string NewEmail
+);
+
+public record UploadAvatarResponseDto(
+    string AvatarUrl
+);
+
+public record UserMessageResponseDto(
+    string Message
+);
+
+public record FollowUserResponseDto(
+    string Message,
+    string FollowedId
 );
 
 public static class UserMappingExtensions
 {
-    public static GetUserDto FromDomainToGetUserDto(this AppUser user)
+    public static GetUserResponseDto FromDomainToGetUserDto(this AppUser user)
     {
-        return new GetUserDto(
+        return new GetUserResponseDto(
             user.Id,
             user.FirstName,
             user.LastName,

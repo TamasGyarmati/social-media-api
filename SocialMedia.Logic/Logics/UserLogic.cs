@@ -15,10 +15,10 @@ namespace SocialMedia.Logic.Logics;
 public interface IUserLogic
 {
     public Task<GetUserResult> GetUserByIdAsync(string userId);
-    public Task<UploadAvatarResult> UploadAsync(UploadAvatarDto dto, string currentUserId);
-    public Task<UpdateUserResult> UpdateAsync(UpdateUserDto dto, string currentUserId);
-    public Task<UpdatePasswordResult> UpdatePasswordAsync(UpdatePasswordDto dto, string currentUserId);
-    public Task<GenerateEmailTokenResult> GenerateEmailChangeTokenAsync(RequestEmailChangeDto dto, string currentUserId);
+    public Task<UploadAvatarResult> UploadAsync(UploadAvatarRequestDto dto, string currentUserId);
+    public Task<UpdateUserResult> UpdateAsync(UpdateUserRequestDto dto, string currentUserId);
+    public Task<UpdatePasswordResult> UpdatePasswordAsync(UpdatePasswordRequestDto dto, string currentUserId);
+    public Task<GenerateEmailTokenResult> GenerateEmailChangeTokenAsync(EmailChangeRequestDto dto, string currentUserId);
     public Task<SendEmailConfirmationResult> SendEmailChangeConfirmationAsync(string email, string confirmationLink);
     public Task<ConfirmEmailChangeResult> ConfirmEmailChangeAsync(string userId, string newEmail, string token);
     public Task<FollowResult> CreateFollowAsync(string targerUserId, string currentUserId);
@@ -50,7 +50,7 @@ public class UserLogic(
         return new GetUserResult.Success(response);
     }
     
-    public async Task<UploadAvatarResult> UploadAsync(UploadAvatarDto dto, string currentUserId)
+    public async Task<UploadAvatarResult> UploadAsync(UploadAvatarRequestDto dto, string currentUserId)
     {
         var user = await _userManager.FindByIdAsync(currentUserId);
         if (user is null)
@@ -83,7 +83,7 @@ public class UserLogic(
             : new UploadAvatarResult.FailedToUpdateAvatar("Failed to upload avatar.");
     }
 
-    public async Task<UpdateUserResult> UpdateAsync(UpdateUserDto dto, string currentUserId)
+    public async Task<UpdateUserResult> UpdateAsync(UpdateUserRequestDto dto, string currentUserId)
     {
         var user = await _userManager.FindByIdAsync(currentUserId);
         if (user is null)
@@ -138,7 +138,7 @@ public class UserLogic(
             : new UpdateUserResult.FailedToUpdateUser("Failed to update the user.");
     }
 
-    public async Task<UpdatePasswordResult> UpdatePasswordAsync(UpdatePasswordDto dto, string currentUserId)
+    public async Task<UpdatePasswordResult> UpdatePasswordAsync(UpdatePasswordRequestDto dto, string currentUserId)
     {
         if (string.IsNullOrWhiteSpace(dto.OldPassword) || string.IsNullOrWhiteSpace(dto.NewPassword))
         {
@@ -158,7 +158,7 @@ public class UserLogic(
             : new UpdatePasswordResult.PasswordChangeFailed("The change of password was unsuccessful");
     }
     
-    public async Task<GenerateEmailTokenResult> GenerateEmailChangeTokenAsync(RequestEmailChangeDto dto, string currentUserId)
+    public async Task<GenerateEmailTokenResult> GenerateEmailChangeTokenAsync(EmailChangeRequestDto dto, string currentUserId)
     {
         var result = await ValidateEmailChangeAsync(dto, currentUserId);
         if (result is ValidateEmailResult.Failure error)
@@ -174,7 +174,7 @@ public class UserLogic(
         return new GenerateEmailTokenResult.Success(encodedToken);
     }
 
-    async Task<ValidateEmailResult> ValidateEmailChangeAsync(RequestEmailChangeDto dto, string currentUserId)
+    async Task<ValidateEmailResult> ValidateEmailChangeAsync(EmailChangeRequestDto dto, string currentUserId)
     {
         if (string.IsNullOrWhiteSpace(dto.NewEmail))
         {
