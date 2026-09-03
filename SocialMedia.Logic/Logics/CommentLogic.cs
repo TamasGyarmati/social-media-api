@@ -10,9 +10,9 @@ public interface ICommentLogic
 {
     public Task<List<CommentResponseDto>> ReadAllFromPostAsync(Guid id);
     public Task<CommentResponseDto?> GetByIdAsync(Guid id);
-    public Task<Guid> CreateAsync(CreateCommentDto dto, string currentUserId);
+    public Task<Guid> CreateAsync(CreateCommentRequestDto dto, string currentUserId);
     public Task<CommentLikeToggleResult?> CreateLikeAsync(Guid id, string currentUserId);
-    public Task<CommentResult> UpdateAsync(Guid id, UpdateCommentDto dto, string currentUserId);
+    public Task<CommentResult> UpdateAsync(Guid id, UpdateCommentRequestDto dto, string currentUserId);
     public Task<CommentResult> DeleteAsync(Guid id, string currentUserId);
 }
 
@@ -32,7 +32,7 @@ public class CommentLogic(ICommentRepository _repo) : ICommentLogic
         return response;
     }
     
-    public async Task<Guid> CreateAsync(CreateCommentDto dto, string currentUserId)
+    public async Task<Guid> CreateAsync(CreateCommentRequestDto dto, string currentUserId)
     {
         var comment = dto.FromCreateCommentToDomain(currentUserId);
         var response = await _repo.CreateAsync(comment);
@@ -66,7 +66,7 @@ public class CommentLogic(ICommentRepository _repo) : ICommentLogic
         return new CommentLikeToggleResult(true, "Comment liked.");
     }
     
-    public async Task<CommentResult> UpdateAsync(Guid id, UpdateCommentDto dto, string currentUserId)
+    public async Task<CommentResult> UpdateAsync(Guid id, UpdateCommentRequestDto dto, string currentUserId)
     {
         var existingComment = await _repo.GetByIdAsync(id);
 

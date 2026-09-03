@@ -24,14 +24,27 @@ public record CommentShortDto(
     int ReplyCount
 );
 
-public record UpdateCommentDto(
+public record UpdateCommentRequestDto(
     string Content
 );
 
-public record CreateCommentDto(
+public record CreateCommentRequestDto(
     string Content,
     Guid PostId,
     Guid? ParentCommentId = null
+);
+
+public record CreateCommentResponseDto(
+    Guid Id
+);
+
+public record UpdateCommentResponseDto(
+    Guid? Id
+);
+
+public record CreateCommentLikeResponseDto(
+    bool IsLiked, 
+    string Message
 );
 
 public static class CommentMappingExtensions
@@ -53,13 +66,13 @@ public static class CommentMappingExtensions
         );
     }
     
-    public static void UpdateFromDto(this Comment comment, UpdateCommentDto dto)
+    public static void UpdateFromDto(this Comment comment, UpdateCommentRequestDto dto)
     {
         comment.Content = dto.Content;
         comment.UpdatedAtUtc = DateTime.UtcNow;
     }
     
-    public static Comment FromCreateCommentToDomain(this CreateCommentDto dto, string creatorId)
+    public static Comment FromCreateCommentToDomain(this CreateCommentRequestDto dto, string creatorId)
     {
         return new Comment
         {

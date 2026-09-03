@@ -32,11 +32,11 @@ public class CommentController(ICommentLogic _logic) : ControllerBase
 
     [HttpPost]
     [Authorize]
-    [ProducesResponseType(typeof(IActionResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(CreateCommentResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [EndpointSummary("Creates the comment from the provided DTO object.")]
     [EndpointDescription("Returns the created entity's ID back.")]
-    public async Task<IActionResult> CreateCommentAsync(CreateCommentDto dto)
+    public async Task<ActionResult<CreateCommentResponseDto>> CreateCommentAsync(CreateCommentRequestDto dto)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (currentUserId is null)
@@ -46,16 +46,16 @@ public class CommentController(ICommentLogic _logic) : ControllerBase
 
         var commentId = await _logic.CreateAsync(dto, currentUserId);
         
-        return Ok(new { Id = commentId});
+        return Ok(new CreateCommentResponseDto(commentId));
     }
     
     [HttpPost("{id:guid}/like")]
     [Authorize]
-    [ProducesResponseType(typeof(CommentLikeToggleResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(CreateCommentLikeResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [EndpointSummary("Likes the provided comment.")]
-    public async Task<ActionResult<CommentLikeToggleResult>> CreateCommentLikeAsync(Guid id)
+    public async Task<ActionResult<CreateCommentLikeResponseDto>> CreateCommentLikeAsync(Guid id)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (currentUserId is null)
@@ -67,17 +67,17 @@ public class CommentController(ICommentLogic _logic) : ControllerBase
         
         return result is null 
             ? NotFound(new { Message = "The comment was not found."}) 
-            : Ok(result);
+            : Ok(new CreateCommentLikeResponseDto(result.IsLiked, result.Message));
     }
 
     [HttpPut("{id:guid}")]
     [Authorize]
-    [ProducesResponseType(typeof(IActionResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(UpdateCommentResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [EndpointSummary("Updates the provided comment.")]
-    public async Task<IActionResult> UpdateCommentAsync(Guid id, [FromBody] UpdateCommentDto dto)
+    public async Task<ActionResult<UpdateCommentResponseDto>> UpdateCommentAsync(Guid id, [FromBody] UpdateCommentRequestDto dto)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (currentUserId is null)
@@ -91,7 +91,7 @@ public class CommentController(ICommentLogic _logic) : ControllerBase
         {
             CommentResult.NotFound error => NotFound(new { error.Message }),
             CommentResult.Forbidden error => StatusCode(StatusCodes.Status403Forbidden, new { error.Message }),
-            CommentResult.Success response => Ok(new { response.Id }),
+            CommentResult.Success response => Ok(new UpdateCommentResponseDto(response.Id)),
             _ => StatusCode(500)
         };
     }
