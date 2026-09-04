@@ -7,8 +7,8 @@ namespace SocialMedia.Data.Repository;
 public interface IPostRepository
 {
     public Task<List<Post>> GetAllAsync(CancellationToken ct = default);
-    public Task<Post?> GetByIdAsync(Guid id);
-    public Task<PostLike?> GetLikeByIdAsync(Guid postId, string userId);
+    public Task<Post?> GetByIdAsync(Guid id, CancellationToken ct = default);
+    public Task<PostLike?> GetLikeByIdAsync(Guid postId, string userId, CancellationToken ct = default);
     public Task<Post?> GetByIdWithCommentsAsync(Guid id, CancellationToken ct = default);
     public Task<Post> CreateAsync(Post post, CancellationToken ct = default);
     public Task<PostLike> CreateLikeAsync(PostLike like);
@@ -26,14 +26,14 @@ public class PostRepository(SocialMediaDbContext _db) : IPostRepository
             .Include(x => x.Comments)
             .Include(p => p.Likes)
             .ToListAsync(ct);
-
-    public async Task<Post?> GetByIdAsync(Guid id)
+    
+    public async Task<Post?> GetByIdAsync(Guid id, CancellationToken ct = default)
         => await _db.Posts
             .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Id == id);
+            .FirstOrDefaultAsync(x => x.Id == id, ct);
 
-    public async Task<PostLike?> GetLikeByIdAsync(Guid postId, string userId)
-        => await _db.PostLikes.FirstOrDefaultAsync(pl => pl.PostId == postId && pl.UserId == userId);
+    public async Task<PostLike?> GetLikeByIdAsync(Guid postId, string userId, CancellationToken ct = default)
+        => await _db.PostLikes.FirstOrDefaultAsync(pl => pl.PostId == postId && pl.UserId == userId, ct);
 
     public async Task<Post?> GetByIdWithCommentsAsync(Guid id, CancellationToken ct = default)
         => await _db.Posts

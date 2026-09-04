@@ -11,9 +11,9 @@ public interface IPostLogic
     public Task<List<GetAllPostsResponseDto>> ReadAll(CancellationToken ct = default);
     public Task<GetPostWithCommentsResponseDto?> ReadWithCommentsByIdAsync(Guid id, CancellationToken ct = default);
     public Task<Guid> CreateAsync(CreatePostRequestDto dto, string currentUserId, CancellationToken ct = default);
-    public Task<PostLikeToggleResult?> CreateLikeAsync(Guid id, string currentUserId);
+    public Task<PostLikeToggleResult?> CreateLikeAsync(Guid id, string currentUserId, CancellationToken ct = default);
     public Task<PostResult> UpdateAsync(Guid id, UpdatePostRequestDto dto, string currentUserId, CancellationToken ct = default);
-    public Task<PostResult> DeleteAsync(Guid id, string currentUserId);
+    public Task<PostResult> DeleteAsync(Guid id, string currentUserId, CancellationToken ct = default);
 }
 
 public class PostLogic(
@@ -43,15 +43,15 @@ public class PostLogic(
         return response.Id;
     }
     
-    public async Task<PostLikeToggleResult?> CreateLikeAsync(Guid id, string currentUserId)
+    public async Task<PostLikeToggleResult?> CreateLikeAsync(Guid id, string currentUserId, CancellationToken ct = default)
     {
-        var existingPost = await _repo.GetByIdAsync(id);
+        var existingPost = await _repo.GetByIdAsync(id, ct);
         if (existingPost is null)
         {
             return null;
         }
         
-        var existingLike = await _repo.GetLikeByIdAsync(existingPost.Id, currentUserId);
+        var existingLike = await _repo.GetLikeByIdAsync(existingPost.Id, currentUserId, ct);
 
         if (existingLike is not null)
         {
@@ -72,7 +72,7 @@ public class PostLogic(
     
     public async Task<PostResult> UpdateAsync(Guid id, UpdatePostRequestDto dto, string currentUserId, CancellationToken ct = default)
     {
-        var existingPost = await _repo.GetByIdAsync(id);
+        var existingPost = await _repo.GetByIdAsync(id, ct);
         if (existingPost is null)
         {
             return new PostResult.NotFound("The post was not found.");
@@ -91,9 +91,9 @@ public class PostLogic(
         return new PostResult.Success(existingPost.Id);
     }
     
-    public async Task<PostResult> DeleteAsync(Guid id, string currentUserId)
+    public async Task<PostResult> DeleteAsync(Guid id, string currentUserId, CancellationToken ct = default)
     {
-        var post = await _repo.GetByIdAsync(id);
+        var post = await _repo.GetByIdAsync(id, ct);
 
         if (post is null)
         {
