@@ -14,16 +14,20 @@ public class CommentController(ICommentLogic _logic) : ControllerBase
     [HttpGet("all/{postId:guid}")]
     [ProducesResponseType(typeof(List<CommentResponseDto>), StatusCodes.Status200OK)]
     [EndpointSummary("Fetches all the comments from the provided post.")]
-    public async Task<ActionResult<List<CommentResponseDto>>> GetAllCommentFromPostAsync(Guid postId)
-        => Ok(await _logic.ReadAllFromPostAsync(postId));
+    public async Task<ActionResult<List<CommentResponseDto>>> GetAllCommentFromPostAsync(
+        Guid postId, 
+        CancellationToken ct = default)
+        => Ok(await _logic.ReadAllFromPostAsync(postId, ct));
     
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(CommentResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [EndpointSummary("Fetches the comment by ID.")]
-    public async Task<ActionResult<CommentResponseDto>> GetCommentByIdAsync(Guid id)
+    public async Task<ActionResult<CommentResponseDto>> GetCommentByIdAsync(
+        Guid id, 
+        CancellationToken ct = default)
     {
-        var comment = await _logic.GetByIdAsync(id);
+        var comment = await _logic.GetByIdAsync(id, ct);
         
         return comment is null 
             ? NotFound(new { Message = "Comment was not found."}) 
@@ -36,7 +40,9 @@ public class CommentController(ICommentLogic _logic) : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [EndpointSummary("Creates the comment from the provided DTO object.")]
     [EndpointDescription("Returns the created entity's ID back.")]
-    public async Task<ActionResult<CreateCommentResponseDto>> CreateCommentAsync(CreateCommentRequestDto dto)
+    public async Task<ActionResult<CreateCommentResponseDto>> CreateCommentAsync(
+        CreateCommentRequestDto dto, 
+        CancellationToken ct = default)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (currentUserId is null)
@@ -44,7 +50,7 @@ public class CommentController(ICommentLogic _logic) : ControllerBase
             return Unauthorized();
         }
 
-        var commentId = await _logic.CreateAsync(dto, currentUserId);
+        var commentId = await _logic.CreateAsync(dto, currentUserId, ct);
         
         return Ok(new CreateCommentResponseDto(commentId));
     }
@@ -55,7 +61,9 @@ public class CommentController(ICommentLogic _logic) : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [EndpointSummary("Likes the provided comment.")]
-    public async Task<ActionResult<CreateCommentLikeResponseDto>> CreateCommentLikeAsync(Guid id)
+    public async Task<ActionResult<CreateCommentLikeResponseDto>> ToggleCommentLikeAsync(
+        Guid id, 
+        CancellationToken ct = default)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (currentUserId is null)
@@ -63,7 +71,7 @@ public class CommentController(ICommentLogic _logic) : ControllerBase
             return Unauthorized();
         }
         
-        var result = await _logic.CreateLikeAsync(id, currentUserId);
+        var result = await _logic.ToggleLikeAsync(id, currentUserId, ct);
         
         return result is null 
             ? NotFound(new { Message = "The comment was not found."}) 
@@ -77,7 +85,10 @@ public class CommentController(ICommentLogic _logic) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [EndpointSummary("Updates the provided comment.")]
-    public async Task<ActionResult<UpdateCommentResponseDto>> UpdateCommentAsync(Guid id, [FromBody] UpdateCommentRequestDto dto)
+    public async Task<ActionResult<UpdateCommentResponseDto>> UpdateCommentAsync(
+        Guid id, 
+        [FromBody] UpdateCommentRequestDto dto, 
+        CancellationToken ct = default)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (currentUserId is null)
@@ -85,7 +96,7 @@ public class CommentController(ICommentLogic _logic) : ControllerBase
             return Unauthorized();
         }
 
-        var result = await _logic.UpdateAsync(id, dto, currentUserId);
+        var result = await _logic.UpdateAsync(id, dto, currentUserId, ct);
 
         return result switch
         {
@@ -103,7 +114,7 @@ public class CommentController(ICommentLogic _logic) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [EndpointSummary("Deletes the provided comment.")]
-    public async Task<IActionResult> DeleteCommentAsync(Guid id)
+    public async Task<IActionResult> DeleteCommentAsync(Guid id, CancellationToken ct = default)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (currentUserId is null)
@@ -111,7 +122,7 @@ public class CommentController(ICommentLogic _logic) : ControllerBase
             return Unauthorized();
         }
 
-        var result = await _logic.DeleteAsync(id, currentUserId);
+        var result = await _logic.DeleteAsync(id, currentUserId, ct);
 
         return result switch
         {

@@ -12,7 +12,7 @@ public interface IPostLogic
     public Task<List<GetAllPostsResponseDto>> ReadAll(CancellationToken ct = default);
     public Task<GetPostWithCommentsResponseDto?> ReadWithCommentsByIdAsync(Guid id, CancellationToken ct = default);
     public Task<Guid> CreateAsync(CreatePostRequestDto dto, string currentUserId, CancellationToken ct = default);
-    public Task<PostLikeToggleResult?> CreateLikeAsync(Guid id, string currentUserId, CancellationToken ct = default);
+    public Task<PostLikeToggleResult?> ToggleLikeAsync(Guid id, string currentUserId, CancellationToken ct = default);
     public Task<PostResult> UpdateAsync(Guid id, UpdatePostRequestDto dto, string currentUserId, CancellationToken ct = default);
     public Task<PostResult> DeleteAsync(Guid id, string currentUserId, CancellationToken ct = default);
 }
@@ -44,7 +44,7 @@ public class PostLogic(
         return response.Id;
     }
     
-    public async Task<PostLikeToggleResult?> CreateLikeAsync(Guid id, string currentUserId, CancellationToken ct = default)
+    public async Task<PostLikeToggleResult?> ToggleLikeAsync(Guid id, string currentUserId, CancellationToken ct = default)
     {
         var existingPost = await _repo.GetByIdAsync(id, ct);
         if (existingPost is null)

@@ -68,7 +68,7 @@ public class PostController(IPostLogic _logic) : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [EndpointSummary("Likes the provided post.")]
-    public async Task<ActionResult<CreatePostLikeResponseDto>> CreatePostLikeAsync(
+    public async Task<ActionResult<CreatePostLikeResponseDto>> TogglePostLikeAsync(
         Guid id, 
         CancellationToken ct = default)
     {
@@ -78,7 +78,7 @@ public class PostController(IPostLogic _logic) : ControllerBase
             return Unauthorized();
         }
         
-        var result = await _logic.CreateLikeAsync(id, currentUserId, ct);
+        var result = await _logic.ToggleLikeAsync(id, currentUserId, ct);
         
         return result is null 
             ? NotFound(new { Message = "The post was not found." }) 

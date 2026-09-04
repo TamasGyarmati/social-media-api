@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using SocialMedia.Data.Repository;
 using SocialMedia.Domain.Dtos;
 using SocialMedia.Domain.Entities;
@@ -7,50 +8,56 @@ namespace SocialMedia.Logic.Logics;
 
 public interface ICommentLogic
 {
-    public Task<List<CommentResponseDto>> ReadAllFromPostAsync(Guid id);
-    public Task<CommentResponseDto?> GetByIdAsync(Guid id);
-    public Task<Guid> CreateAsync(CreateCommentRequestDto dto, string currentUserId);
-    public Task<CommentLikeToggleResult?> CreateLikeAsync(Guid id, string currentUserId);
-    public Task<CommentResult> UpdateAsync(Guid id, UpdateCommentRequestDto dto, string currentUserId);
-    public Task<CommentResult> DeleteAsync(Guid id, string currentUserId);
+    public Task<List<CommentResponseDto>> ReadAllFromPostAsync(Guid id, CancellationToken ct = default);
+    public Task<CommentResponseDto?> GetByIdAsync(Guid id, CancellationToken ct = default);
+    public Task<Guid> CreateAsync(CreateCommentRequestDto dto, string currentUserId, CancellationToken ct = default);
+    public Task<CommentLikeToggleResult?> ToggleLikeAsync(Guid id, string currentUserId, CancellationToken ct = default);
+    public Task<CommentResult> UpdateAsync(Guid id, UpdateCommentRequestDto dto, string currentUserId, CancellationToken ct = default);
+    public Task<CommentResult> DeleteAsync(Guid id, string currentUserId, CancellationToken ct = default);
 }
 
 public class CommentLogic(ICommentRepository _repo) : ICommentLogic
 {
-    public async Task<List<CommentResponseDto>> ReadAllFromPostAsync(Guid id)
+    public async Task<List<CommentResponseDto>> ReadAllFromPostAsync(Guid id, CancellationToken ct = default)
     {
-        var comments = await _repo.GetAllFromPostAsync(id);
+        var comments = await _repo.GetAllFromPostAsync(id, ct);
         var responseDtos = comments.Select(x => x.FromDomainToCommentResponseDto()).ToList();
         return responseDtos;
     }
     
-    public async Task<CommentResponseDto?> GetByIdAsync(Guid id)
+    public async Task<CommentResponseDto?> GetByIdAsync(Guid id, CancellationToken ct = default)
     {
-        var comment = await _repo.GetByIdAsync(id);
+        var comment = await _repo.GetByIdAsync(id, ct);
         var response = comment?.FromDomainToCommentResponseDto();
         return response;
     }
     
-    public async Task<Guid> CreateAsync(CreateCommentRequestDto dto, string currentUserId)
+    public async Task<Guid> CreateAsync(
+        CreateCommentRequestDto dto, 
+        string currentUserId, 
+        CancellationToken ct = default)
     {
         var comment = dto.FromCreateCommentToDomain(currentUserId);
-        var response = await _repo.CreateAsync(comment);
+        var response = await _repo.CreateAsync(comment, ct);
         return response.Id;
     }
     
-    public async Task<CommentLikeToggleResult?> CreateLikeAsync(Guid id, string currentUserId)
+    public async Task<CommentLikeToggleResult?> ToggleLikeAsync(
+        Guid id, 
+        string currentUserId, 
+        CancellationToken ct = default)
     {
-        var existingComment = await _repo.GetByIdAsync(id);
+        var existingComment = await _repo.GetByIdAsync(id, ct);
         if (existingComment is null)
         {
             return null;
         }
         
-        var existingLike = await _repo.GetLikeByIdAsync(existingComment.Id, currentUserId);
+        var existingLike = await _repo.GetLikeByIdAsync(existingComment.Id, currentUserId, ct);
 
         if (existingLike is not null)
         {
-            await _repo.DeleteLikeAsync(existingLike);
+            await _repo.DeleteLikeAsync(existingLike, ct);
             return new CommentLikeToggleResult(false, "Comment unliked.");
         }
 
@@ -60,14 +67,24 @@ public class CommentLogic(ICommentRepository _repo) : ICommentLogic
             UserId = currentUserId
         };
 
-        await _repo.CreateLikeAsync(like);
-        
-        return new CommentLikeToggleResult(true, "Comment liked.");
+        try
+        {
+            await _repo.CreateLikeAsync(like, ct);
+            return new CommentLikeToggleResult(true, "Comment liked.");
+        }
+        catch (DbUpdateException)
+        {
+            return new CommentLikeToggleResult(true, "Comment liked.");
+        }
     }
     
-    public async Task<CommentResult> UpdateAsync(Guid id, UpdateCommentRequestDto dto, string currentUserId)
+    public async Task<CommentResult> UpdateAsync(
+        Guid id, 
+        UpdateCommentRequestDto dto, 
+        string currentUserId, 
+        CancellationToken ct = default)
     {
-        var existingComment = await _repo.GetByIdAsync(id);
+        var existingComment = await _repo.GetByIdAsync(id, ct);
 
         if (existingComment is null)
         {
@@ -81,14 +98,17 @@ public class CommentLogic(ICommentRepository _repo) : ICommentLogic
             
         existingComment.UpdateFromDto(dto);
             
-        await _repo.UpdateAsync(existingComment);
+        await _repo.UpdateAsync(existingComment, ct);
             
         return new CommentResult.Success(existingComment.Id);
     }
     
-    public async Task<CommentResult> DeleteAsync(Guid id, string currentUserId)
+    public async Task<CommentResult> DeleteAsync(
+        Guid id, 
+        string currentUserId, 
+        CancellationToken ct = default)
     {
-        var comment = await _repo.GetByIdAsync(id);
+        var comment = await _repo.GetByIdAsync(id, ct);
 
         if (comment is null)
         {
@@ -104,11 +124,11 @@ public class CommentLogic(ICommentRepository _repo) : ICommentLogic
         {
             comment.Content = "[This comment was removed by the Author.]";
             comment.DeletedAtUtc = DateTime.UtcNow;
-            await _repo.UpdateAsync(comment);
+            await _repo.UpdateAsync(comment, ct);
         }
         else
         {
-            await _repo.DeleteAsync(comment);
+            await _repo.DeleteAsync(comment, ct);
         }
         
         return new CommentResult.Success(null);

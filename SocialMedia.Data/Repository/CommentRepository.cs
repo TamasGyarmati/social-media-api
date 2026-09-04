@@ -6,19 +6,19 @@ namespace SocialMedia.Data.Repository;
 
 public interface ICommentRepository
 {
-    public Task<List<Comment>> GetAllFromPostAsync(Guid id);
-    public Task<Comment?> GetByIdAsync(Guid id);
-    public Task<CommentLike?> GetLikeByIdAsync(Guid commentId, string userId);
-    public Task<Comment> CreateAsync(Comment comment);
-    public Task<CommentLike> CreateLikeAsync(CommentLike like);
-    public Task<Comment> UpdateAsync(Comment comment);
-    public Task DeleteAsync(Comment comment);
-    public Task DeleteLikeAsync(CommentLike commentLike);
+    public Task<List<Comment>> GetAllFromPostAsync(Guid id, CancellationToken ct = default);
+    public Task<Comment?> GetByIdAsync(Guid id, CancellationToken ct = default);
+    public Task<CommentLike?> GetLikeByIdAsync(Guid commentId, string userId, CancellationToken ct = default);
+    public Task<Comment> CreateAsync(Comment comment, CancellationToken ct = default);
+    public Task<CommentLike> CreateLikeAsync(CommentLike like, CancellationToken ct = default);
+    public Task<Comment> UpdateAsync(Comment comment, CancellationToken ct = default);
+    public Task DeleteAsync(Comment comment, CancellationToken ct = default);
+    public Task DeleteLikeAsync(CommentLike commentLike, CancellationToken ct = default);
 }
 
 public class CommentRepository(SocialMediaDbContext _db) : ICommentRepository
 {
-    public async Task<List<Comment>> GetAllFromPostAsync(Guid id)
+    public async Task<List<Comment>> GetAllFromPostAsync(Guid id, CancellationToken ct = default)
         => await _db.Comments
             .AsNoTracking()
             .AsSplitQuery()
@@ -26,52 +26,55 @@ public class CommentRepository(SocialMediaDbContext _db) : ICommentRepository
             .Include(x => x.Likes)
             .Include(x => x.Replies)
             .Include(x => x.Creator)
-            .ToListAsync();
+            .ToListAsync(ct);
     
-    public async Task<Comment?> GetByIdAsync(Guid id)
+    public async Task<Comment?> GetByIdAsync(Guid id, CancellationToken ct = default)
         => await _db.Comments
             .AsNoTracking()
             .AsSplitQuery()
             .Include(x => x.Likes)
             .Include(x => x.Replies)
-            .FirstOrDefaultAsync(c => c.Id == id);
+            .FirstOrDefaultAsync(c => c.Id == id, ct);
 
-    public async Task<CommentLike?> GetLikeByIdAsync(Guid commentId, string userId)
-        => await _db.CommentLikes.FirstOrDefaultAsync(x => x.CommentId == commentId && x.UserId == userId);
+    public async Task<CommentLike?> GetLikeByIdAsync(
+        Guid commentId, 
+        string userId, 
+        CancellationToken ct = default)
+        => await _db.CommentLikes.FirstOrDefaultAsync(x => x.CommentId == commentId && x.UserId == userId, ct);
 
-    public async Task<Comment> CreateAsync(Comment comment)
+    public async Task<Comment> CreateAsync(Comment comment, CancellationToken ct = default)
     {
-        await _db.Comments.AddAsync(comment);
-        await _db.SaveChangesAsync();
+        _db.Comments.Add(comment);
+        await _db.SaveChangesAsync(ct);
         
         return comment;
     }
 
-    public async Task<CommentLike> CreateLikeAsync(CommentLike like)
+    public async Task<CommentLike> CreateLikeAsync(CommentLike like, CancellationToken ct = default)
     {
-        await _db.CommentLikes.AddAsync(like);
-        await _db.SaveChangesAsync();
+        _db.CommentLikes.Add(like);
+        await _db.SaveChangesAsync(ct);
         
         return like;
     }
 
-    public async Task<Comment> UpdateAsync(Comment comment)
+    public async Task<Comment> UpdateAsync(Comment comment, CancellationToken ct = default)
     {
         _db.Comments.Update(comment);
-        await _db.SaveChangesAsync();
+        await _db.SaveChangesAsync(ct);
         
         return comment;
     }
 
-    public async Task DeleteAsync(Comment comment)
+    public async Task DeleteAsync(Comment comment, CancellationToken ct = default)
     {
         _db.Comments.Remove(comment);
-        await _db.SaveChangesAsync();
+        await _db.SaveChangesAsync(ct);
     }
 
-    public async Task DeleteLikeAsync(CommentLike like)
+    public async Task DeleteLikeAsync(CommentLike like, CancellationToken ct = default)
     {
         _db.CommentLikes.Remove(like);
-        await _db.SaveChangesAsync();
+        await _db.SaveChangesAsync(ct);
     }
 }
