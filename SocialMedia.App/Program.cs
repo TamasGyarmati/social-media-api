@@ -1,7 +1,6 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
@@ -9,6 +8,7 @@ using SocialMedia.App.Middlewares;
 using SocialMedia.Data.Database;
 using SocialMedia.Data.Repository;
 using SocialMedia.Domain.Entities;
+using SocialMedia.Domain.Enums;
 using SocialMedia.Logic.Logics;
 using SocialMedia.Logic.Services;
 
