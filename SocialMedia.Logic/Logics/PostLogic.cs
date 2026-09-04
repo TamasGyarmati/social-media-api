@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using SocialMedia.Data.Repository;
 using SocialMedia.Domain.Dtos;
 using SocialMedia.Domain.Entities;
@@ -55,7 +56,7 @@ public class PostLogic(
 
         if (existingLike is not null)
         {
-            await _repo.DeleteLikeAsync(existingLike);
+            await _repo.DeleteLikeAsync(existingLike, ct);
             return new PostLikeToggleResult(false, "Post unliked.");
         }
 
@@ -65,12 +66,23 @@ public class PostLogic(
             UserId = currentUserId
         };
 
-        await _repo.CreateLikeAsync(like);
-        
-        return new PostLikeToggleResult(true, "Post liked.");
+        try
+        {
+            await _repo.CreateLikeAsync(like, ct);
+            return new PostLikeToggleResult(true, "Post liked.");
+        }
+        catch (DbUpdateException)
+        {
+            // Parallel click caused already a like, so no need to 'unliked'
+            return new PostLikeToggleResult(true, "Post liked.");
+        }
     }
     
-    public async Task<PostResult> UpdateAsync(Guid id, UpdatePostRequestDto dto, string currentUserId, CancellationToken ct = default)
+    public async Task<PostResult> UpdateAsync(
+        Guid id, 
+        UpdatePostRequestDto dto, 
+        string currentUserId, 
+        CancellationToken ct = default)
     {
         var existingPost = await _repo.GetByIdAsync(id, ct);
         if (existingPost is null)
@@ -83,10 +95,45 @@ public class PostLogic(
             return new PostResult.Forbidden("Forbidden.");
         }
         
-        string? relativePath = await _imageProcessor.ProcessAndSavePostImageAsync(dto.Image, ct);
+        var oldImageUrl = existingPost.ImageUrl;
+        string? relativePath = null;
+
+        if (dto.Image is not null && dto.Image.Length > 0)
+        {
+            relativePath = await _imageProcessor.ProcessAndSavePostImageAsync(dto.Image, ct);
+            if (relativePath is null)
+            {
+                return new PostResult.FailedToDeleteImage("Failed to process image");
+            }
+        }
             
         existingPost.UpdateFromDto(dto, relativePath);
-        await _repo.UpdateAsync(existingPost, ct);
+
+        try
+        {
+            await _repo.UpdateAsync(existingPost, ct);
+        }
+        catch (OperationCanceledException)
+        {
+            if (relativePath is not null)
+            {
+                _imageProcessor.DeleteImage(relativePath);
+            }
+            throw;
+        }
+        catch (Exception)
+        {
+            if (relativePath is not null)
+            {
+                _imageProcessor.DeleteImage(relativePath);
+            }
+            throw;
+        }
+
+        if (relativePath is not null && !string.IsNullOrWhiteSpace(oldImageUrl))
+        {
+            _imageProcessor.DeleteImage(oldImageUrl);
+        }
 
         return new PostResult.Success(existingPost.Id);
     }
@@ -94,27 +141,26 @@ public class PostLogic(
     public async Task<PostResult> DeleteAsync(Guid id, string currentUserId, CancellationToken ct = default)
     {
         var post = await _repo.GetByIdAsync(id, ct);
-
         if (post is null)
         {
             return new PostResult.NotFound("The post was not found.");
         }
-
-        var oldImage = post.ImageUrl;
         
         if (post.CreatedById != currentUserId)
         {
             return new PostResult.Forbidden("Forbidden.");
         }
         
-        await _repo.DeleteAsync(post);
+        var oldImage = post.ImageUrl;
+        
+        await _repo.DeleteAsync(post, ct);
 
         if (!string.IsNullOrWhiteSpace(oldImage))
         {
-            var result = _imageProcessor.DeleteImage(oldImage);
-            if (!result)
+            var deleted = _imageProcessor.DeleteImage(oldImage);
+            if (!deleted)
             {
-                return new PostResult.FailedToDeleteImage("Failed to delete image.");
+                // LOG, by business the image is already deleted, only from the disk it wasn't
             }
         }
 

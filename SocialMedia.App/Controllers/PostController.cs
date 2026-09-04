@@ -22,7 +22,9 @@ public class PostController(IPostLogic _logic) : ControllerBase
     [ProducesResponseType(typeof(GetPostWithCommentsResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [EndpointSummary("Fetches the post by id with the comments included.")]
-    public async Task<ActionResult<GetPostWithCommentsResponseDto>> GetPostWithCommentsByIdAsync(Guid id, CancellationToken ct = default)
+    public async Task<ActionResult<GetPostWithCommentsResponseDto>> GetPostWithCommentsByIdAsync(
+        Guid id, 
+        CancellationToken ct = default)
     {
         var post = await _logic.ReadWithCommentsByIdAsync(id, ct);
         
@@ -39,7 +41,9 @@ public class PostController(IPostLogic _logic) : ControllerBase
     [Consumes("multipart/form-data")]
     [EndpointSummary("Creates the post from the provided DTO object.")]
     [EndpointDescription("Returns the created entity's ID back.")]
-    public async Task<ActionResult<CreatePostResponseDto>> CreatePostAsync([FromForm] CreatePostRequestDto dto, CancellationToken ct = default)
+    public async Task<ActionResult<CreatePostResponseDto>> CreatePostAsync(
+        [FromForm] CreatePostRequestDto dto, 
+        CancellationToken ct = default)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (currentUserId is null)
@@ -64,7 +68,9 @@ public class PostController(IPostLogic _logic) : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [EndpointSummary("Likes the provided post.")]
-    public async Task<ActionResult<CreatePostLikeResponseDto>> CreatePostLikeAsync(Guid id)
+    public async Task<ActionResult<CreatePostLikeResponseDto>> CreatePostLikeAsync(
+        Guid id, 
+        CancellationToken ct = default)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (currentUserId is null)
@@ -72,7 +78,7 @@ public class PostController(IPostLogic _logic) : ControllerBase
             return Unauthorized();
         }
         
-        var result = await _logic.CreateLikeAsync(id, currentUserId);
+        var result = await _logic.CreateLikeAsync(id, currentUserId, ct);
         
         return result is null 
             ? NotFound(new { Message = "The post was not found." }) 
@@ -85,10 +91,12 @@ public class PostController(IPostLogic _logic) : ControllerBase
     [ProducesResponseType(typeof(UpdatePostResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [EndpointSummary("Updates the provided post.")]
-    public async Task<ActionResult<UpdatePostResponseDto>> UpdatePostAsync(Guid id, [FromForm] UpdatePostRequestDto dto)
+    public async Task<ActionResult<UpdatePostResponseDto>> UpdatePostAsync(
+        Guid id, 
+        [FromForm] UpdatePostRequestDto dto,
+        CancellationToken ct = default)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (currentUserId is null)
@@ -96,7 +104,7 @@ public class PostController(IPostLogic _logic) : ControllerBase
             return Unauthorized();
         }
         
-        var result = await _logic.UpdateAsync(id, dto, currentUserId);
+        var result = await _logic.UpdateAsync(id, dto, currentUserId, ct);
 
         return result switch
         {
@@ -112,10 +120,9 @@ public class PostController(IPostLogic _logic) : ControllerBase
     [ProducesResponseType(typeof(IActionResult), StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [EndpointSummary("Deletes the provided post.")]
-    public async Task<IActionResult> DeletePostAsync(Guid id)
+    public async Task<IActionResult> DeletePostAsync(Guid id, CancellationToken ct = default)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (currentUserId is null)
@@ -123,13 +130,12 @@ public class PostController(IPostLogic _logic) : ControllerBase
             return Unauthorized();
         }
         
-        var result = await _logic.DeleteAsync(id, currentUserId);
+        var result = await _logic.DeleteAsync(id, currentUserId, ct);
 
         return result switch
         {
             PostResult.NotFound error => NotFound(new { error.Message }),
             PostResult.Forbidden error => StatusCode(StatusCodes.Status403Forbidden, new { error.Message }),
-            PostResult.FailedToDeleteImage error => BadRequest(new { error.Message }),
             PostResult.Success => NoContent(),
             _ => StatusCode(500)
         };

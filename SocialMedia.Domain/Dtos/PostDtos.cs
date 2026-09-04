@@ -34,7 +34,8 @@ public record CreatePostRequestDto(
 public record UpdatePostRequestDto(
     string Title,
     string Description,
-    IFormFile? Image
+    IFormFile? Image,
+    bool RemoveImage = false
 );
 
 public record CreatePostResponseDto(
@@ -95,6 +96,14 @@ public static class PostMappingExtensions
     {
         post.Title = dto.Title;
         post.Description = dto.Description;
-        post.ImageUrl = relativePath;
+        
+        if (relativePath is not null)
+        {
+            post.ImageUrl = relativePath;
+        }
+        else if (dto.RemoveImage)
+        {
+            post.ImageUrl = null;
+        }
     }
 }
