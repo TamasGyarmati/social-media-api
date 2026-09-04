@@ -6,26 +6,26 @@ namespace SocialMedia.Data.Repository;
 
 public interface IPostRepository
 {
-    public Task<List<Post>> GetAllAsync();
+    public Task<List<Post>> GetAllAsync(CancellationToken ct = default);
     public Task<Post?> GetByIdAsync(Guid id);
     public Task<PostLike?> GetLikeByIdAsync(Guid postId, string userId);
-    public Task<Post?> GetByIdWithCommentsAsync(Guid id);
-    public Task<Post> CreateAsync(Post post);
+    public Task<Post?> GetByIdWithCommentsAsync(Guid id, CancellationToken ct = default);
+    public Task<Post> CreateAsync(Post post, CancellationToken ct = default);
     public Task<PostLike> CreateLikeAsync(PostLike like);
-    public Task<Post> UpdateAsync(Post post);
+    public Task<Post> UpdateAsync(Post post, CancellationToken ct = default);
     public Task DeleteAsync(Post post);
     public Task DeleteLikeAsync(PostLike like);
 }
 
 public class PostRepository(SocialMediaDbContext _db) : IPostRepository
 {
-    public async Task<List<Post>> GetAllAsync()
+    public async Task<List<Post>> GetAllAsync(CancellationToken ct = default)
         => await _db.Posts
             .AsNoTracking() // Useful when not using SaveChanges (Get), turns off tracking
             .AsSplitQuery()
             .Include(x => x.Comments)
             .Include(p => p.Likes)
-            .ToListAsync();
+            .ToListAsync(ct);
 
     public async Task<Post?> GetByIdAsync(Guid id)
         => await _db.Posts
@@ -35,19 +35,19 @@ public class PostRepository(SocialMediaDbContext _db) : IPostRepository
     public async Task<PostLike?> GetLikeByIdAsync(Guid postId, string userId)
         => await _db.PostLikes.FirstOrDefaultAsync(pl => pl.PostId == postId && pl.UserId == userId);
 
-    public async Task<Post?> GetByIdWithCommentsAsync(Guid id)
+    public async Task<Post?> GetByIdWithCommentsAsync(Guid id, CancellationToken ct = default)
         => await _db.Posts
             .AsNoTracking()
             .AsSplitQuery() // More, faster SELECT instead of one big JOIN
             .Include(x => x.Likes)
             .Include(x => x.Comments)
                 .ThenInclude(c => c.Replies)
-            .FirstOrDefaultAsync(x => x.Id == id);
+            .FirstOrDefaultAsync(x => x.Id == id, ct);
 
-    public async Task<Post> CreateAsync(Post post)
+    public async Task<Post> CreateAsync(Post post, CancellationToken ct = default)
     {
         _db.Posts.Add(post);
-        await _db.SaveChangesAsync();
+        await _db.SaveChangesAsync(ct);
         
         return post;
     }
@@ -60,10 +60,10 @@ public class PostRepository(SocialMediaDbContext _db) : IPostRepository
         return like;
     }
 
-    public async Task<Post> UpdateAsync(Post post)
+    public async Task<Post> UpdateAsync(Post post, CancellationToken ct = default)
     {
         _db.Posts.Update(post);
-        await _db.SaveChangesAsync();
+        await _db.SaveChangesAsync(ct);
         
         return post;
     }

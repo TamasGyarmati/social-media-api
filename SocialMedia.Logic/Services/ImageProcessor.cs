@@ -8,8 +8,8 @@ namespace SocialMedia.Logic.Services;
 
 public interface IImageProcessor
 {
-    public Task<string?> ProcessAndSaveAvatarAsync(IFormFile? file);
-    public Task<string?> ProcessAndSavePostImageAsync(IFormFile? file);
+    public Task<string?> ProcessAndSaveAvatarAsync(IFormFile? file, CancellationToken ct = default);
+    public Task<string?> ProcessAndSavePostImageAsync(IFormFile? file, CancellationToken ct = default);
     public bool DeleteImage(string imageUrl);
 }
 
@@ -49,24 +49,24 @@ public class ImageProcessor(IWebHostEnvironment _env) : IImageProcessor
         return true;
     }
     
-    public async Task<string?> ProcessAndSaveAvatarAsync(IFormFile? file)
+    public async Task<string?> ProcessAndSaveAvatarAsync(IFormFile? file, CancellationToken ct = default)
     {
         if (file is null || file.Length == 0) return null;
 
         ValidateExtension(file);
 
         // Avatar: 256x256 négyzetesre vágva a közepétől
-        return await ProcessAndSaveAsync(file, "avatars", 256, 256, ResizeMode.Crop);
+        return await ProcessAndSaveAsync(file, "avatars", 256, 256, ResizeMode.Crop, ct);
     }
 
-    public async Task<string?> ProcessAndSavePostImageAsync(IFormFile? file)
+    public async Task<string?> ProcessAndSavePostImageAsync(IFormFile? file, CancellationToken ct = default)
     {
         if (file is null || file.Length == 0) return null;
 
         ValidateExtension(file);
 
         // Poszt kép: max 1200 széles vagy 1200 magas, aránytartóan (nem vág le semmit)
-        return await ProcessAndSaveAsync(file, "posts", 1200, 1200, ResizeMode.Max);
+        return await ProcessAndSaveAsync(file, "posts", 1200, 1200, ResizeMode.Max, ct);
     }
     
     void ValidateExtension(IFormFile file)
@@ -83,7 +83,8 @@ public class ImageProcessor(IWebHostEnvironment _env) : IImageProcessor
             string subFolder, 
             int width, 
             int height, 
-            ResizeMode resizeMode)
+            ResizeMode resizeMode,
+            CancellationToken ct = default)
         {
             var uniqueFileName = $"{Guid.NewGuid()}.webp";
     
@@ -93,17 +94,38 @@ public class ImageProcessor(IWebHostEnvironment _env) : IImageProcessor
     
             var fullFilePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-            await using var imageStream = file.OpenReadStream();
-            using var image = await Image.LoadAsync(imageStream);
-    
-            image.Mutate(x => x.Resize(new ResizeOptions
+            try
             {
-                Size = new Size(width, height),
-                Mode = resizeMode
-            }));
+                await using var imageStream = file.OpenReadStream();
+                using var image = await Image.LoadAsync(imageStream, ct);
+                
+                ct.ThrowIfCancellationRequested();
     
-            await image.SaveAsWebpAsync(fullFilePath);
+                image.Mutate(x => x.Resize(new ResizeOptions
+                {
+                    Size = new Size(width, height),
+                    Mode = resizeMode
+                }));
     
-            return $"/images/{subFolder}/{uniqueFileName}";
+                await image.SaveAsWebpAsync(fullFilePath, ct);
+    
+                return $"/images/{subFolder}/{uniqueFileName}";
+            }
+            catch (OperationCanceledException)
+            {
+                if (File.Exists(fullFilePath))
+                {
+                    try
+                    {
+                        File.Delete(fullFilePath);
+                    }
+                    catch
+                    {
+                        // ?
+                    }
+                }
+
+                throw;
+            }
         }
 }

@@ -15,16 +15,16 @@ public class PostController(IPostLogic _logic) : ControllerBase
     [HttpGet("all/")]
     [ProducesResponseType(typeof(List<GetAllPostsResponseDto>), StatusCodes.Status200OK)]
     [EndpointSummary("Fetches all the posts.")]
-    public async Task<ActionResult<List<GetAllPostsResponseDto>>> GetAllPosts()
-        => Ok(await _logic.ReadAll());
+    public async Task<ActionResult<List<GetAllPostsResponseDto>>> GetAllPosts(CancellationToken ct = default)
+        => Ok(await _logic.ReadAll(ct));
     
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(GetPostWithCommentsResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [EndpointSummary("Fetches the post by id with the comments included.")]
-    public async Task<ActionResult<GetPostWithCommentsResponseDto>> GetPostWithCommentsByIdAsync(Guid id)
+    public async Task<ActionResult<GetPostWithCommentsResponseDto>> GetPostWithCommentsByIdAsync(Guid id, CancellationToken ct = default)
     {
-        var post = await _logic.ReadWithCommentsByIdAsync(id);
+        var post = await _logic.ReadWithCommentsByIdAsync(id, ct);
         
         return post is null 
             ? NotFound(new { Message = "Post was not found." }) 
@@ -39,7 +39,7 @@ public class PostController(IPostLogic _logic) : ControllerBase
     [Consumes("multipart/form-data")]
     [EndpointSummary("Creates the post from the provided DTO object.")]
     [EndpointDescription("Returns the created entity's ID back.")]
-    public async Task<ActionResult<CreatePostResponseDto>> CreatePostAsync([FromForm] CreatePostRequestDto dto)
+    public async Task<ActionResult<CreatePostResponseDto>> CreatePostAsync([FromForm] CreatePostRequestDto dto, CancellationToken ct = default)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (currentUserId is null)
@@ -49,7 +49,7 @@ public class PostController(IPostLogic _logic) : ControllerBase
 
         try
         {
-            var id = await _logic.CreateAsync(dto, currentUserId);
+            var id = await _logic.CreateAsync(dto, currentUserId, ct);
             return Ok(new CreatePostResponseDto(id));
         }
         catch (NotAllowedExtensionException ex)

@@ -8,11 +8,11 @@ namespace SocialMedia.Logic.Logics;
 
 public interface IPostLogic
 {
-    public Task<List<GetAllPostsResponseDto>> ReadAll();
-    public Task<GetPostWithCommentsResponseDto?> ReadWithCommentsByIdAsync(Guid id);
-    public Task<Guid> CreateAsync(CreatePostRequestDto dto, string currentUserId);
+    public Task<List<GetAllPostsResponseDto>> ReadAll(CancellationToken ct = default);
+    public Task<GetPostWithCommentsResponseDto?> ReadWithCommentsByIdAsync(Guid id, CancellationToken ct = default);
+    public Task<Guid> CreateAsync(CreatePostRequestDto dto, string currentUserId, CancellationToken ct = default);
     public Task<PostLikeToggleResult?> CreateLikeAsync(Guid id, string currentUserId);
-    public Task<PostResult> UpdateAsync(Guid id, UpdatePostRequestDto dto, string currentUserId);
+    public Task<PostResult> UpdateAsync(Guid id, UpdatePostRequestDto dto, string currentUserId, CancellationToken ct = default);
     public Task<PostResult> DeleteAsync(Guid id, string currentUserId);
 }
 
@@ -20,25 +20,25 @@ public class PostLogic(
     IPostRepository _repo, 
     IImageProcessor _imageProcessor) : IPostLogic
 {
-    public async Task<List<GetAllPostsResponseDto>> ReadAll()
+    public async Task<List<GetAllPostsResponseDto>> ReadAll(CancellationToken ct = default)
     {
-        var posts = await _repo.GetAllAsync();
+        var posts = await _repo.GetAllAsync(ct);
         return posts.Select(x => x.FromDomainToResponsePostDto()).ToList();
     }
     
-    public async Task<GetPostWithCommentsResponseDto?> ReadWithCommentsByIdAsync(Guid id)
+    public async Task<GetPostWithCommentsResponseDto?> ReadWithCommentsByIdAsync(Guid id, CancellationToken ct = default)
     {
-        var post = await _repo.GetByIdWithCommentsAsync(id);
+        var post = await _repo.GetByIdWithCommentsAsync(id, ct);
         var dto = post?.FromDomainToPostWithCommentsDto();
         return dto;
     }
     
-    public async Task<Guid> CreateAsync(CreatePostRequestDto dto, string currentUserId)
+    public async Task<Guid> CreateAsync(CreatePostRequestDto dto, string currentUserId, CancellationToken ct = default)
     {
-        var relativePath = await _imageProcessor.ProcessAndSavePostImageAsync(dto.Image);
+        var relativePath = await _imageProcessor.ProcessAndSavePostImageAsync(dto.Image, ct);
         
         var post = dto.FromCreatePostToDomain(relativePath, currentUserId);
-        var response = await _repo.CreateAsync(post);
+        var response = await _repo.CreateAsync(post, ct);
         
         return response.Id;
     }
@@ -70,7 +70,7 @@ public class PostLogic(
         return new PostLikeToggleResult(true, "Post liked.");
     }
     
-    public async Task<PostResult> UpdateAsync(Guid id, UpdatePostRequestDto dto, string currentUserId)
+    public async Task<PostResult> UpdateAsync(Guid id, UpdatePostRequestDto dto, string currentUserId, CancellationToken ct = default)
     {
         var existingPost = await _repo.GetByIdAsync(id);
         if (existingPost is null)
@@ -83,10 +83,10 @@ public class PostLogic(
             return new PostResult.Forbidden("Forbidden.");
         }
         
-        string? relativePath = await _imageProcessor.ProcessAndSavePostImageAsync(dto.Image);
+        string? relativePath = await _imageProcessor.ProcessAndSavePostImageAsync(dto.Image, ct);
             
         existingPost.UpdateFromDto(dto, relativePath);
-        await _repo.UpdateAsync(existingPost);
+        await _repo.UpdateAsync(existingPost, ct);
 
         return new PostResult.Success(existingPost.Id);
     }
