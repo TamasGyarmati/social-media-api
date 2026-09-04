@@ -12,7 +12,10 @@ public interface IUserRepository
 
 public class UserRepository(SocialMediaDbContext _db) : IUserRepository
 {
-    public async Task<FollowDbStatus> CreateFollowAsync(string followedId, string followerId, CancellationToken ct = default)
+    public async Task<FollowDbStatus> CreateFollowAsync(
+        string followedId, 
+        string followerId, 
+        CancellationToken ct = default)
     {
         var targetExists = await _db.AppUsers.AnyAsync(x => x.Id == followedId, ct);
         if (!targetExists)

@@ -215,7 +215,10 @@ public class UserLogic(
         return new GenerateEmailTokenResult.Success(encodedToken);
     }
 
-    async Task<ValidateEmailResult> ValidateEmailChangeAsync(EmailChangeRequestDto dto, string currentUserId, CancellationToken ct = default)
+    async Task<ValidateEmailResult> ValidateEmailChangeAsync(
+        EmailChangeRequestDto dto, 
+        string currentUserId, 
+        CancellationToken ct = default)
     {
         if (string.IsNullOrWhiteSpace(dto.NewEmail))
         {

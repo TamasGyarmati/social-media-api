@@ -27,14 +27,19 @@ public class PostLogic(
         return posts.Select(x => x.FromDomainToResponsePostDto()).ToList();
     }
     
-    public async Task<GetPostWithCommentsResponseDto?> ReadWithCommentsByIdAsync(Guid id, CancellationToken ct = default)
+    public async Task<GetPostWithCommentsResponseDto?> ReadWithCommentsByIdAsync(
+        Guid id, 
+        CancellationToken ct = default)
     {
         var post = await _repo.GetByIdWithCommentsAsync(id, ct);
         var dto = post?.FromDomainToPostWithCommentsDto();
         return dto;
     }
     
-    public async Task<Guid> CreateAsync(CreatePostRequestDto dto, string currentUserId, CancellationToken ct = default)
+    public async Task<Guid> CreateAsync(
+        CreatePostRequestDto dto, 
+        string currentUserId, 
+        CancellationToken ct = default)
     {
         var relativePath = await _imageProcessor.ProcessAndSavePostImageAsync(dto.Image, ct);
         
@@ -44,7 +49,10 @@ public class PostLogic(
         return response.Id;
     }
     
-    public async Task<PostLikeToggleResult?> ToggleLikeAsync(Guid id, string currentUserId, CancellationToken ct = default)
+    public async Task<PostLikeToggleResult?> ToggleLikeAsync(
+        Guid id, 
+        string currentUserId, 
+        CancellationToken ct = default)
     {
         var existingPost = await _repo.GetByIdAsync(id, ct);
         if (existingPost is null)
