@@ -21,7 +21,8 @@ public interface IAuthLogic
     public Task<ConfirmEmailResult> ConfirmEmailAsync(string userId, string token, CancellationToken ct = default);
 }
 
-public class AuthLogic(UserManager<AppUser> _userManager, 
+public class AuthLogic(
+    UserManager<AppUser> _userManager, 
     RoleManager<IdentityRole> _roleManager,
     ITokenGenerator _tokenGenerator,
     IEmailSender _emailSender) : IAuthLogic
