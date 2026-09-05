@@ -6,7 +6,8 @@ public class AppUser : IdentityUser
 {
     public required string FirstName { get; set; }
     public required string LastName { get; set; }
-    public required string RefreshToken { get; set; }
+    public string? RefreshToken { get; set; }
+    public DateTime? RefreshTokenExpiryTime { get; set; }
     public string? AvatarUrl { get; set; }
     
     public ICollection<UserFollow> Followers { get; set; } = new List<UserFollow>(); 

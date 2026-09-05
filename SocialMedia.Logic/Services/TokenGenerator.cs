@@ -13,7 +13,7 @@ public interface ITokenGenerator
 {
     public ClaimsPrincipal GetPrincipalFromExpiredToken(string token);
     public JwtSecurityToken GenerateAccessToken(IEnumerable<Claim>? claims, int expiryInMinutes);
-    public Task<string> GenerateRefreshTokenAsync(AppUser user);
+    public string GenerateRefreshToken(AppUser user, int expiryInMinutes);
 }
 
 public class TokenGenerator(
@@ -28,7 +28,8 @@ public class TokenGenerator(
             ValidateIssuer = false,
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_config["Jwt:Key"] ?? "")),
+                Encoding.UTF8.GetBytes(_config["Jwt:Key"] ?? "")
+            ),
             ValidateLifetime = false
         };
         
@@ -36,8 +37,11 @@ public class TokenGenerator(
         var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out var securityToken);
         
         var jwtSecurityToken = securityToken as JwtSecurityToken;
-        if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+        if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256,
+                StringComparison.InvariantCultureIgnoreCase))
+        {
             throw new SecurityTokenException("Invalid token");
+        }
         
         return principal;
     }
@@ -51,19 +55,23 @@ public class TokenGenerator(
             issuer: "socialmedia.com",
             audience: "socialmedia.com",
             claims: claims?.ToArray(),
-            expires: DateTime.Now.AddMinutes(expiryInMinutes),
+            expires: DateTime.UtcNow.AddMinutes(expiryInMinutes),
             signingCredentials: new SigningCredentials(signinKey, SecurityAlgorithms.HmacSha256)
         );
     }
 
-    public async Task<string> GenerateRefreshTokenAsync(AppUser user)
+    public string GenerateRefreshToken(
+        AppUser user,
+        int expiryInMinutes)
     {
         var randomNumber = new byte[32];
         using var rng = RandomNumberGenerator.Create();
         rng.GetBytes(randomNumber);
         string result = Convert.ToBase64String(randomNumber);
+        
         user.RefreshToken = result;
-        await _userManager.UpdateAsync(user);
+        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddMinutes(expiryInMinutes);
+        
         return result;
     }
 }

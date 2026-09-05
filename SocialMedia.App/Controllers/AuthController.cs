@@ -16,9 +16,11 @@ public class AuthController(
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [EndpointSummary("Creates a new user by the provided DTO.")]
     [EndpointDescription("Sends out a confirmation link in the provided email.")]
-    public async Task<ActionResult<UserCreateResponseDto>> Register(UserCreateRequestDto dto)
+    public async Task<ActionResult<UserCreateResponseDto>> Register(
+        UserCreateRequestDto dto,
+        CancellationToken ct = default)
     {
-        var result = await _logic.RegisterAsync(dto);
+        var result = await _logic.RegisterAsync(dto, ct);
 
         switch (result)
         {
@@ -34,7 +36,7 @@ public class AuthController(
                     protocol: Request.Scheme
                 );
 
-                var confirmed = await _logic.SendConfirmationEmailAsync(response.User.Email!, confirmationLink!);
+                var confirmed = await _logic.SendConfirmationEmailAsync(response.User.Email!, confirmationLink!, ct);
                 if (!confirmed)
                 {
                     return BadRequest(new { Message = "An error occurred while sending the confirmation."});
@@ -54,9 +56,11 @@ public class AuthController(
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [EndpointSummary("Logs in the user.")]
     [EndpointDescription("Returns the access/refresh tokens with their expiry date.")]
-    public async Task<ActionResult<UserLoginResponseDto>> Login(UserLoginRequestDto dto)
+    public async Task<ActionResult<UserLoginResponseDto>> Login(
+        UserLoginRequestDto dto, 
+        CancellationToken ct = default)
     {
-        var result = await _logic.LoginAsync(dto);
+        var result = await _logic.LoginAsync(dto, ct);
 
         return result switch
         {
