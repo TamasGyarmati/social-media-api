@@ -13,14 +13,14 @@ namespace SocialMedia.Logic.Logics;
 
 public interface IUserLogic
 {
-    public Task<GetUserResult> GetUserByIdAsync(string userId, CancellationToken ct = default);
-    public Task<UploadAvatarResult> UploadAsync(UploadAvatarRequestDto dto, string currentUserId, CancellationToken ct = default);
-    public Task<UpdateUserResult> UpdateAsync(UpdateUserRequestDto dto, string currentUserId, CancellationToken ct = default);
-    public Task<UpdatePasswordResult> UpdatePasswordAsync(UpdatePasswordRequestDto dto, string currentUserId, CancellationToken ct = default);
-    public Task<GenerateEmailTokenResult> GenerateEmailChangeTokenAsync(EmailChangeRequestDto dto, string currentUserId, CancellationToken ct = default);
-    public Task<SendEmailConfirmationResult> SendEmailChangeConfirmationAsync(string email, string confirmationLink, CancellationToken ct = default);
-    public Task<ConfirmEmailChangeResult> ConfirmEmailChangeAsync(string userId, string newEmail, string token, CancellationToken ct = default);
-    public Task<FollowResult> CreateFollowAsync(string targerUserId, string currentUserId, CancellationToken ct = default);
+    Task<GetUserResult> GetUserByIdAsync(string userId, CancellationToken ct = default);
+    Task<UploadAvatarResult> UploadAsync(UploadAvatarRequestDto dto, string currentUserId, CancellationToken ct = default);
+    Task<UpdateUserResult> UpdateAsync(UpdateUserRequestDto dto, string currentUserId, CancellationToken ct = default);
+    Task<UpdatePasswordResult> UpdatePasswordAsync(UpdatePasswordRequestDto dto, string currentUserId, CancellationToken ct = default);
+    Task<GenerateEmailTokenResult> GenerateEmailChangeTokenAsync(EmailChangeRequestDto dto, string currentUserId, CancellationToken ct = default);
+    Task<SendEmailConfirmationResult> SendEmailChangeConfirmationAsync(string email, string confirmationLink, CancellationToken ct = default);
+    Task<ConfirmEmailChangeResult> ConfirmEmailChangeAsync(string userId, string newEmail, string token, CancellationToken ct = default);
+    Task<FollowResult> CreateFollowAsync(string targerUserId, string currentUserId, CancellationToken ct = default);
 }
 
 public class UserLogic(

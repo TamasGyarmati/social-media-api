@@ -14,11 +14,11 @@ namespace SocialMedia.Logic.Logics;
 
 public interface IAuthLogic
 {
-    public Task<RegisterResult> RegisterAsync(UserCreateRequestDto dto, CancellationToken ct = default);
-    public Task<bool> SendConfirmationEmailAsync(string email, string confirmationLink, CancellationToken ct = default);
-    public Task<LoginResult> LoginAsync(UserLoginRequestDto dto, CancellationToken ct = default);
-    public Task<RefreshResult> RefreshAsync(RefreshRequestDto tokenApiDto, CancellationToken ct = default);
-    public Task<ConfirmEmailResult> ConfirmEmailAsync(string userId, string token, CancellationToken ct = default);
+    Task<RegisterResult> RegisterAsync(UserCreateRequestDto dto, CancellationToken ct = default);
+    Task<bool> SendConfirmationEmailAsync(string email, string confirmationLink, CancellationToken ct = default);
+    Task<LoginResult> LoginAsync(UserLoginRequestDto dto, CancellationToken ct = default);
+    Task<RefreshResult> RefreshAsync(RefreshRequestDto tokenApiDto, CancellationToken ct = default);
+    Task<ConfirmEmailResult> ConfirmEmailAsync(string userId, string token, CancellationToken ct = default);
 }
 
 public class AuthLogic(

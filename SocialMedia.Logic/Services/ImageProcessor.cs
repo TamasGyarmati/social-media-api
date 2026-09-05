@@ -8,9 +8,9 @@ namespace SocialMedia.Logic.Services;
 
 public interface IImageProcessor
 {
-    public Task<string?> ProcessAndSaveAvatarAsync(IFormFile? file, CancellationToken ct = default);
-    public Task<string?> ProcessAndSavePostImageAsync(IFormFile? file, CancellationToken ct = default);
-    public bool DeleteImage(string imageUrl);
+    Task<string?> ProcessAndSaveAvatarAsync(IFormFile? file, CancellationToken ct = default);
+    Task<string?> ProcessAndSavePostImageAsync(IFormFile? file, CancellationToken ct = default);
+    bool DeleteImage(string imageUrl);
 }
 
 public class ImageProcessor(IWebHostEnvironment _env) : IImageProcessor

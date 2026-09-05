@@ -6,14 +6,14 @@ namespace SocialMedia.Data.Repository;
 
 public interface ICommentRepository
 {
-    public Task<List<Comment>> GetAllFromPostAsync(Guid id, CancellationToken ct = default);
-    public Task<Comment?> GetByIdAsync(Guid id, CancellationToken ct = default);
-    public Task<CommentLike?> GetLikeByIdAsync(Guid commentId, string userId, CancellationToken ct = default);
-    public Task<Comment> CreateAsync(Comment comment, CancellationToken ct = default);
-    public Task<CommentLike> CreateLikeAsync(CommentLike like, CancellationToken ct = default);
-    public Task<Comment> UpdateAsync(Comment comment, CancellationToken ct = default);
-    public Task DeleteAsync(Comment comment, CancellationToken ct = default);
-    public Task DeleteLikeAsync(CommentLike commentLike, CancellationToken ct = default);
+    Task<List<Comment>> GetAllFromPostAsync(Guid id, CancellationToken ct = default);
+    Task<Comment?> GetByIdAsync(Guid id, CancellationToken ct = default);
+    Task<CommentLike?> GetLikeByIdAsync(Guid commentId, string userId, CancellationToken ct = default);
+    Task<Comment> CreateAsync(Comment comment, CancellationToken ct = default);
+    Task<CommentLike> CreateLikeAsync(CommentLike like, CancellationToken ct = default);
+    Task<Comment> UpdateAsync(Comment comment, CancellationToken ct = default);
+    Task DeleteAsync(Comment comment, CancellationToken ct = default);
+    Task DeleteLikeAsync(CommentLike commentLike, CancellationToken ct = default);
 }
 
 public class CommentRepository(SocialMediaDbContext _db) : ICommentRepository

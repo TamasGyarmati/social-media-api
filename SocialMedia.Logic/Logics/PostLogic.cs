@@ -9,12 +9,12 @@ namespace SocialMedia.Logic.Logics;
 
 public interface IPostLogic
 {
-    public Task<List<GetAllPostsResponseDto>> ReadAll(CancellationToken ct = default);
-    public Task<GetPostWithCommentsResponseDto?> ReadWithCommentsByIdAsync(Guid id, CancellationToken ct = default);
-    public Task<Guid> CreateAsync(CreatePostRequestDto dto, string currentUserId, CancellationToken ct = default);
-    public Task<PostLikeToggleResult?> ToggleLikeAsync(Guid id, string currentUserId, CancellationToken ct = default);
-    public Task<PostResult> UpdateAsync(Guid id, UpdatePostRequestDto dto, string currentUserId, CancellationToken ct = default);
-    public Task<PostResult> DeleteAsync(Guid id, string currentUserId, CancellationToken ct = default);
+    Task<List<GetAllPostsResponseDto>> ReadAll(CancellationToken ct = default);
+    Task<GetPostWithCommentsResponseDto?> ReadWithCommentsByIdAsync(Guid id, CancellationToken ct = default);
+    Task<Guid> CreateAsync(CreatePostRequestDto dto, string currentUserId, CancellationToken ct = default);
+    Task<PostLikeToggleResult?> ToggleLikeAsync(Guid id, string currentUserId, CancellationToken ct = default);
+    Task<PostResult> UpdateAsync(Guid id, UpdatePostRequestDto dto, string currentUserId, CancellationToken ct = default);
+    Task<PostResult> DeleteAsync(Guid id, string currentUserId, CancellationToken ct = default);
 }
 
 public class PostLogic(

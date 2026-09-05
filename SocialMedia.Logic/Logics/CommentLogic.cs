@@ -8,12 +8,12 @@ namespace SocialMedia.Logic.Logics;
 
 public interface ICommentLogic
 {
-    public Task<List<CommentResponseDto>> ReadAllFromPostAsync(Guid id, CancellationToken ct = default);
-    public Task<CommentResponseDto?> GetByIdAsync(Guid id, CancellationToken ct = default);
-    public Task<Guid> CreateAsync(CreateCommentRequestDto dto, string currentUserId, CancellationToken ct = default);
-    public Task<CommentLikeToggleResult?> ToggleLikeAsync(Guid id, string currentUserId, CancellationToken ct = default);
-    public Task<CommentResult> UpdateAsync(Guid id, UpdateCommentRequestDto dto, string currentUserId, CancellationToken ct = default);
-    public Task<CommentResult> DeleteAsync(Guid id, string currentUserId, CancellationToken ct = default);
+    Task<List<CommentResponseDto>> ReadAllFromPostAsync(Guid id, CancellationToken ct = default);
+    Task<CommentResponseDto?> GetByIdAsync(Guid id, CancellationToken ct = default);
+    Task<Guid> CreateAsync(CreateCommentRequestDto dto, string currentUserId, CancellationToken ct = default);
+    Task<CommentLikeToggleResult?> ToggleLikeAsync(Guid id, string currentUserId, CancellationToken ct = default);
+    Task<CommentResult> UpdateAsync(Guid id, UpdateCommentRequestDto dto, string currentUserId, CancellationToken ct = default);
+    Task<CommentResult> DeleteAsync(Guid id, string currentUserId, CancellationToken ct = default);
 }
 
 public class CommentLogic(ICommentRepository _repo) : ICommentLogic

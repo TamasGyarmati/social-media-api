@@ -10,9 +10,9 @@ namespace SocialMedia.Logic.Services;
 
 public interface ITokenGenerator
 {
-    public ClaimsPrincipal GetPrincipalFromExpiredToken(string token);
-    public JwtSecurityToken GenerateAccessToken(IEnumerable<Claim>? claims, int expiryInMinutes);
-    public string GenerateRefreshToken(AppUser user, int expiryInMinutes);
+    ClaimsPrincipal GetPrincipalFromExpiredToken(string token);
+    JwtSecurityToken GenerateAccessToken(IEnumerable<Claim>? claims, int expiryInMinutes);
+    string GenerateRefreshToken(AppUser user, int expiryInMinutes);
 }
 
 public class TokenGenerator(IConfiguration _config) : ITokenGenerator

@@ -6,6 +6,11 @@ using SocialMedia.Domain.Enums;
 
 namespace SocialMedia.Logic.Services;
 
+public interface IEmailSender
+{
+    public Task SendEmailAsync(string email, string subject, string htmlMessage, CancellationToken ct = default);
+}
+
 public class SmtpEmailSender(IConfiguration config) : IEmailSender
 {
     public async Task SendEmailAsync(string email, string subject, string htmlMessage,  CancellationToken ct)

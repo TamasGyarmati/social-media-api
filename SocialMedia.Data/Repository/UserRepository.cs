@@ -7,7 +7,7 @@ namespace SocialMedia.Data.Repository;
 
 public interface IUserRepository
 {
-    public Task<FollowDbStatus> CreateFollowAsync(string followedId, string followerId, CancellationToken ct = default);
+    Task<FollowDbStatus> CreateFollowAsync(string followedId, string followerId, CancellationToken ct = default);
 }
 
 public class UserRepository(SocialMediaDbContext _db) : IUserRepository
