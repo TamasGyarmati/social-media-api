@@ -25,10 +25,6 @@ public record RefreshResponseDto(
     DateTime RefreshTokenExpiration
 );
 
-public record UserCreateResponseDto(
-    string Message
-);
-
 public record UserLoginResponseDto(
     string AccessToken, 
     DateTime AccessTokenExpireDate,
@@ -36,6 +32,6 @@ public record UserLoginResponseDto(
     DateTime RefreshTokenExpireDate
 );
 
-public record ConfirmEmailResponseDto(
+public record AuthMessageResponseDto(
     string Message
 );

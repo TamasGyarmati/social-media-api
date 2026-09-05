@@ -35,13 +35,13 @@ public class PostController(IPostLogic _logic) : ControllerBase
     
     [HttpPost]
     [Authorize]
-    [ProducesResponseType(typeof(CreatePostResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(GuidPostResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Consumes("multipart/form-data")]
     [EndpointSummary("Creates the post from the provided DTO object.")]
     [EndpointDescription("Returns the created entity's ID back.")]
-    public async Task<ActionResult<CreatePostResponseDto>> CreatePostAsync(
+    public async Task<ActionResult<GuidPostResponseDto>> CreatePostAsync(
         [FromForm] CreatePostRequestDto dto, 
         CancellationToken ct = default)
     {
@@ -54,7 +54,7 @@ public class PostController(IPostLogic _logic) : ControllerBase
         try
         {
             var id = await _logic.CreateAsync(dto, currentUserId, ct);
-            return Ok(new CreatePostResponseDto(id));
+            return Ok(new GuidPostResponseDto(id));
         }
         catch (NotAllowedExtensionException ex)
         {
@@ -88,12 +88,12 @@ public class PostController(IPostLogic _logic) : ControllerBase
     [HttpPut("{id:guid}")]
     [Consumes("multipart/form-data")]
     [Authorize]
-    [ProducesResponseType(typeof(UpdatePostResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(GuidPostResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [EndpointSummary("Updates the provided post.")]
-    public async Task<ActionResult<UpdatePostResponseDto>> UpdatePostAsync(
+    public async Task<ActionResult<GuidPostResponseDto>> UpdatePostAsync(
         Guid id, 
         [FromForm] UpdatePostRequestDto dto,
         CancellationToken ct = default)

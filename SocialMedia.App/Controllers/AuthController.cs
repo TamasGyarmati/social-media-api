@@ -12,11 +12,11 @@ public class AuthController(
     IAuthLogic _logic) : ControllerBase
 {
     [HttpPost("register")]
-    [ProducesResponseType(typeof(UserCreateResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AuthMessageResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [EndpointSummary("Creates a new user by the provided DTO.")]
     [EndpointDescription("Sends out a confirmation link in the provided email.")]
-    public async Task<ActionResult<UserCreateResponseDto>> Register(
+    public async Task<ActionResult<AuthMessageResponseDto>> Register(
         UserCreateRequestDto dto,
         CancellationToken ct = default)
     {
@@ -36,13 +36,13 @@ public class AuthController(
                     protocol: Request.Scheme
                 );
 
-                var confirmed = await _logic.SendConfirmationEmailAsync(response.User.Email!, confirmationLink!, ct);
-                if (!confirmed)
+                var isConfirmed = await _logic.SendConfirmationEmailAsync(response.User.Email!, confirmationLink!, ct);
+                if (!isConfirmed)
                 {
                     return BadRequest(new { Message = "An error occurred while sending the confirmation."});
                 }
 
-                return Ok(new UserCreateResponseDto("Register successful. Check your inbox and activate your account."));
+                return Ok(new AuthMessageResponseDto("Register successful. Check your inbox and activate your account."));
             }
             
             default:
@@ -75,9 +75,11 @@ public class AuthController(
     [ProducesResponseType(typeof(RefreshResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [EndpointSummary("Refreshes the token.")]
-    public async Task<ActionResult<RefreshResponseDto>> Refresh(RefreshRequestDto tokenApiDto)
+    public async Task<ActionResult<RefreshResponseDto>> Refresh(
+        RefreshRequestDto tokenApiDto, 
+        CancellationToken ct = default)
     {
-        var result = await _logic.RefreshAsync(tokenApiDto);
+        var result = await _logic.RefreshAsync(tokenApiDto, ct);
         
         return result switch
         {
@@ -89,13 +91,16 @@ public class AuthController(
 
     [HttpGet("confirm-email")]
     [AllowAnonymous]
-    [ProducesResponseType(typeof(ConfirmEmailResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AuthMessageResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [EndpointSummary("Confirms the email through the sent out confirmation link.")]
-    public async Task<ActionResult<ConfirmEmailResponseDto>> ConfirmEmail(string userId, string token)
+    public async Task<ActionResult<AuthMessageResponseDto>> ConfirmEmail(
+        string userId, 
+        string token, 
+        CancellationToken ct = default)
     {
-        var result = await _logic.ConfirmEmailAsync(userId, token);
+        var result = await _logic.ConfirmEmailAsync(userId, token, ct);
         
         return result switch
         {
@@ -103,7 +108,7 @@ public class AuthController(
             ConfirmEmailResult.InvalidTokenFormat error => BadRequest(new { error.Message }),
             ConfirmEmailResult.InvalidTokenOrExpired error => BadRequest(new { error.Message }),
             ConfirmEmailResult.UserNotFound error => NotFound(new { error.Message }),
-            ConfirmEmailResult.Success response => Ok(new ConfirmEmailResponseDto(response.Message)),
+            ConfirmEmailResult.Success response => Ok(new AuthMessageResponseDto(response.Message)),
             _ => StatusCode(500)
         };
     }

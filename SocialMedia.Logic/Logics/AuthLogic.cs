@@ -244,7 +244,6 @@ public class AuthLogic(UserManager<AppUser> _userManager,
         }
         
         var result = await _userManager.ConfirmEmailAsync(user, decodedToken);
-
         if (result.Succeeded)
         {
             return new ConfirmEmailResult.Success("Email confirmed successfully. You can now log in.");

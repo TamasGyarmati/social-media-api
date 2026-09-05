@@ -2,7 +2,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using SocialMedia.Domain.Entities;
@@ -16,9 +15,7 @@ public interface ITokenGenerator
     public string GenerateRefreshToken(AppUser user, int expiryInMinutes);
 }
 
-public class TokenGenerator(
-    IConfiguration _config, 
-    UserManager<AppUser> _userManager) : ITokenGenerator
+public class TokenGenerator(IConfiguration _config) : ITokenGenerator
 {
     public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
     {

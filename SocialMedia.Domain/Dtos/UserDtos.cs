@@ -40,13 +40,13 @@ public record UploadAvatarResponseDto(
     string AvatarUrl
 );
 
-public record UserMessageResponseDto(
-    string Message
-);
-
 public record FollowUserResponseDto(
     string Message,
     string FollowedId
+);
+
+public record UserMessageResponseDto(
+    string Message
 );
 
 public static class UserMappingExtensions

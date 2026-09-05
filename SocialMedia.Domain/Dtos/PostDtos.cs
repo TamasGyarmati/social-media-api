@@ -38,11 +38,7 @@ public record UpdatePostRequestDto(
     bool RemoveImage = false
 );
 
-public record CreatePostResponseDto(
-    Guid Id
-);
-
-public record UpdatePostResponseDto(
+public record GuidPostResponseDto(
     Guid Id
 );
 
