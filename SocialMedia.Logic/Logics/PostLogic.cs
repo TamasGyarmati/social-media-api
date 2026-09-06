@@ -64,7 +64,7 @@ public class PostLogic(
 
         if (existingLike is not null)
         {
-            await _repo.DeleteLikeAsync(existingLike, ct);
+            await _repo.DeleteLikeAsync(existingLike.Id, ct);
             return new PostLikeToggleResult(false, "Post unliked.");
         }
 
@@ -167,7 +167,7 @@ public class PostLogic(
         
         var oldImage = post.ImageUrl;
         
-        await _repo.DeleteAsync(post, ct);
+        await _repo.DeleteAsync(post.Id, ct);
 
         if (!string.IsNullOrWhiteSpace(oldImage))
         {

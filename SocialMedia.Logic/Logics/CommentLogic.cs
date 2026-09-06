@@ -57,7 +57,7 @@ public class CommentLogic(ICommentRepository _repo) : ICommentLogic
 
         if (existingLike is not null)
         {
-            await _repo.DeleteLikeAsync(existingLike, ct);
+            await _repo.DeleteLikeAsync(existingLike.Id, ct);
             return new CommentLikeToggleResult(false, "Comment unliked.");
         }
 
@@ -133,7 +133,7 @@ public class CommentLogic(ICommentRepository _repo) : ICommentLogic
         }
         else
         {
-            await _repo.DeleteAsync(comment, ct);
+            await _repo.DeleteAsync(comment.Id, ct);
         }
         
         return new CommentResult.Success(null);
