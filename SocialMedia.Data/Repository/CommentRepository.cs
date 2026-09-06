@@ -15,7 +15,7 @@ public interface ICommentRepository
     Task<int> UpdateAsync(Guid commentId, UpdateCommentRequestDto dto, CancellationToken ct = default);
     Task<int> UpdateForDeletionAsync(Guid commentId, CancellationToken ct = default);
     Task<int> DeleteAsync(Guid commentId, CancellationToken ct = default);
-    Task DeleteLikeAsync(Guid commentLikeId, CancellationToken ct = default);
+    Task DeleteLikeAsync(Guid commentId, string userId, CancellationToken ct = default);
 }
 
 public class CommentRepository(SocialMediaDbContext _db) : ICommentRepository
@@ -81,6 +81,6 @@ public class CommentRepository(SocialMediaDbContext _db) : ICommentRepository
     public async Task<int> DeleteAsync(Guid commentId, CancellationToken ct = default)
         => await _db.Comments.Where(x => x.Id == commentId).ExecuteDeleteAsync(ct);
 
-    public async Task DeleteLikeAsync(Guid likeId, CancellationToken ct = default)
-        => await _db.CommentLikes.Where(x => x.Id == likeId).ExecuteDeleteAsync(ct);
+    public async Task DeleteLikeAsync(Guid commentId, string userId, CancellationToken ct = default)
+        => await _db.CommentLikes.Where(x => x.CommentId == commentId && x.UserId == userId).ExecuteDeleteAsync(ct);
 }

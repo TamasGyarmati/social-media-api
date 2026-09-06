@@ -15,7 +15,7 @@ public interface IPostRepository
     Task<PostLike> CreateLikeAsync(PostLike like, CancellationToken ct = default);
     Task<int> UpdateAsync(Guid postId, UpdatePostRequestDto dto, string? imageUrl, CancellationToken ct = default);
     Task DeleteAsync(Guid postId, CancellationToken ct = default);
-    Task DeleteLikeAsync(Guid likeId, CancellationToken ct = default);
+    Task DeleteLikeAsync(Guid postId, string userId, CancellationToken ct = default);
 }
 
 public class PostRepository(SocialMediaDbContext _db) : IPostRepository
@@ -81,6 +81,6 @@ public class PostRepository(SocialMediaDbContext _db) : IPostRepository
     public async Task DeleteAsync(Guid postId, CancellationToken ct = default)
         => await _db.Posts.Where(x => x.Id == postId).ExecuteDeleteAsync(ct);
 
-    public async Task DeleteLikeAsync(Guid likeId, CancellationToken ct = default)
-        => await _db.PostLikes.Where(x => x.Id == likeId).ExecuteDeleteAsync(ct);
+    public async Task DeleteLikeAsync(Guid postId, string userId, CancellationToken ct = default)
+        => await _db.PostLikes.Where(x => x.PostId == postId && x.UserId == userId).ExecuteDeleteAsync(ct);
 }

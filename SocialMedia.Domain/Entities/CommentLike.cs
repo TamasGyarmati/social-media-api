@@ -2,8 +2,6 @@ namespace SocialMedia.Domain.Entities;
 
 public class CommentLike
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
-    
     public required Guid CommentId { get; set; }
     public Comment? Comment { get; set; }
     

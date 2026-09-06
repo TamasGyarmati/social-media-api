@@ -42,10 +42,8 @@ public class SocialMediaDbContext(DbContextOptions<SocialMediaDbContext> options
 
         modelBuilder.Entity<PostLike>(entity =>
         {
-            entity.HasKey(pl => pl.Id);
-            
             // Against duplicates
-            entity.HasIndex(pl => new { pl.PostId, pl.UserId }).IsUnique();
+            entity.HasKey(pl => new { pl.PostId, pl.UserId });
 
             entity.HasOne(pl => pl.Post)
                 .WithMany(p => p.Likes)
@@ -85,9 +83,7 @@ public class SocialMediaDbContext(DbContextOptions<SocialMediaDbContext> options
         
         modelBuilder.Entity<CommentLike>(entity =>
         {
-            entity.HasKey(cl => cl.Id);
-            
-            entity.HasIndex(cl => new { cl.CommentId, cl.UserId }).IsUnique();
+            entity.HasKey(cl => new { cl.CommentId, cl.UserId });
 
             entity.HasOne(cl => cl.Comment)
                 .WithMany(c => c.Likes)

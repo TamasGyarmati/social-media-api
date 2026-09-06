@@ -2,7 +2,7 @@ namespace SocialMedia.Domain.Entities;
 
 public class PostLike
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
+    //public Guid Id { get; set; } = Guid.NewGuid();
     
     public required Guid PostId { get; set; }
     public Post? Post { get; set; }

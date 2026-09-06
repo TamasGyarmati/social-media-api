@@ -64,7 +64,7 @@ public class PostLogic(
 
         if (existingLike is not null)
         {
-            await _repo.DeleteLikeAsync(existingLike.Id, ct);
+            await _repo.DeleteLikeAsync(existingLike.PostId, existingLike.UserId,  ct);
             return new PostLikeToggleResult(false, "Post unliked.");
         }
 
