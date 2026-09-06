@@ -4,7 +4,7 @@ public class PostLike
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     
-    public Guid PostId { get; set; }
+    public required Guid PostId { get; set; }
     public Post? Post { get; set; }
     
     public required string UserId { get; set; }

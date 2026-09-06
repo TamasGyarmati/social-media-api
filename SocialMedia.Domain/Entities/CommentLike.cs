@@ -4,7 +4,7 @@ public class CommentLike
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     
-    public Guid CommentId { get; set; }
+    public required Guid CommentId { get; set; }
     public Comment? Comment { get; set; }
     
     public required string UserId { get; set; }

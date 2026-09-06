@@ -2,11 +2,11 @@ namespace SocialMedia.Domain.Entities;
 
 public class UserFollow
 {
-    public string FollowerId { get; set; } = null!;
-    public AppUser Follower { get; set; } = null!;
+    public required string FollowerId { get; set; }
+    public AppUser? Follower { get; set; }
     
-    public string FollowedId { get; set; } = null!;
-    public AppUser Followed { get; set; } = null!;
+    public required string FollowedId { get; set; }
+    public AppUser? Followed { get; set; }
     
     public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
 }

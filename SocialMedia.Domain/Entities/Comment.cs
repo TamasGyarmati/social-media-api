@@ -10,7 +10,8 @@ public class Comment
     public DateTime? UpdatedAtUtc { get; set; }
     public DateTime? DeletedAtUtc { get; set; }
     
-    public Guid PostId { get; set; }
+    // No need for 'required', non-nullable struct, Guid.Empty automatically
+    public required Guid PostId { get; set; }
     public Post? Post { get; set; }
     
     public Guid? ParentCommentId { get; set; }

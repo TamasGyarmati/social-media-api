@@ -19,23 +19,23 @@ public class SocialMediaDbContext(DbContextOptions<SocialMediaDbContext> options
 
         modelBuilder.Entity<Post>(entity =>
         {
-            entity.HasKey(e => e.Id);
+            entity.HasKey(p => p.Id);
             
-            entity.HasOne(e => e.Creator)
+            entity.HasOne(p => p.Creator)
                 .WithMany()
-                .HasForeignKey(e => e.CreatedById)
+                .HasForeignKey(p => p.CreatedById)
                 .IsRequired()
-                .OnDelete(DeleteBehavior.Cascade); // Cascade : Deletes all post made by the creator
+                .OnDelete(DeleteBehavior.Cascade);
             
-            entity.Property(e => e.Title)
+            entity.Property(p => p.Title)
                 .IsRequired()
                 .HasMaxLength(100);
             
-            entity.Property(e => e.Description)
+            entity.Property(p => p.Description)
                 .IsRequired()
                 .HasMaxLength(4000);
 
-            entity.Property(e => e.ImageUrl)
+            entity.Property(p => p.ImageUrl)
                 .IsRequired(false)
                 .HasMaxLength(500);
         });
@@ -44,6 +44,7 @@ public class SocialMediaDbContext(DbContextOptions<SocialMediaDbContext> options
         {
             entity.HasKey(pl => pl.Id);
             
+            // Against duplicates
             entity.HasIndex(pl => new { pl.PostId, pl.UserId }).IsUnique();
 
             entity.HasOne(pl => pl.Post)
@@ -59,26 +60,26 @@ public class SocialMediaDbContext(DbContextOptions<SocialMediaDbContext> options
 
         modelBuilder.Entity<Comment>(entity =>
         {
-            entity.HasKey(e => e.Id);
+            entity.HasKey(c => c.Id);
             
-            entity.HasOne(e => e.Creator)
+            entity.HasOne(c => c.Creator)
                 .WithMany()
-                .HasForeignKey(e => e.CreatedById)
+                .HasForeignKey(c => c.CreatedById)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
-            entity.Property(e => e.Content)
+            entity.Property(c => c.Content)
                 .IsRequired()
                 .HasMaxLength(1000);
             
-            entity.HasOne(e => e.Post)
+            entity.HasOne(c => c.Post)
                 .WithMany(p => p.Comments)
-                .HasForeignKey(e => e.PostId)
+                .HasForeignKey(c => c.PostId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            entity.HasOne(e => e.ParentComment)
-                .WithMany(c => c.Replies)
-                .HasForeignKey(e => e.ParentCommentId)
+            entity.HasOne(c => c.ParentComment)
+                .WithMany(pc => pc.Replies)
+                .HasForeignKey(c => c.ParentCommentId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
         
