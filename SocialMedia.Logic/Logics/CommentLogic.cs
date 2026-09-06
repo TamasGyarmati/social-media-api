@@ -96,9 +96,12 @@ public class CommentLogic(ICommentRepository _repo) : ICommentLogic
             return new CommentResult.Forbidden("Forbidden.");
         }
             
-        existingComment.UpdateFromDto(dto);
-            
-        await _repo.UpdateAsync(existingComment, ct);
+        var result = await _repo.UpdateAsync(existingComment.Id, dto, ct);
+
+        if (result is 0)
+        {
+            return new CommentResult.UpdateFailed("The update was failed.");
+        }
             
         return new CommentResult.Success(existingComment.Id);
     }
@@ -122,9 +125,11 @@ public class CommentLogic(ICommentRepository _repo) : ICommentLogic
 
         if (comment.Replies.Count > 0)
         {
-            comment.Content = "[This comment was removed by the Author.]";
-            comment.DeletedAtUtc = DateTime.UtcNow;
-            await _repo.UpdateAsync(comment, ct);
+            var result = await _repo.UpdateForDeletionAsync(comment.Id, ct);
+            if (result is 0)
+            {
+                return new CommentResult.UpdateFailed("The deletion failed.");
+            }
         }
         else
         {

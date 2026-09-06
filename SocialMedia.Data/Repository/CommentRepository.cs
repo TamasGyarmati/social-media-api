@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SocialMedia.Data.Database;
+using SocialMedia.Domain.Dtos;
 using SocialMedia.Domain.Entities;
 
 namespace SocialMedia.Data.Repository;
@@ -11,7 +12,8 @@ public interface ICommentRepository
     Task<CommentLike?> GetLikeByIdAsync(Guid commentId, string userId, CancellationToken ct = default);
     Task<Comment> CreateAsync(Comment comment, CancellationToken ct = default);
     Task<CommentLike> CreateLikeAsync(CommentLike like, CancellationToken ct = default);
-    Task<Comment> UpdateAsync(Comment comment, CancellationToken ct = default);
+    Task<int> UpdateAsync(Guid commentId, UpdateCommentRequestDto dto, CancellationToken ct = default);
+    Task<int> UpdateForDeletionAsync(Guid commentId, CancellationToken ct = default);
     Task DeleteAsync(Comment comment, CancellationToken ct = default);
     Task DeleteLikeAsync(CommentLike commentLike, CancellationToken ct = default);
 }
@@ -58,12 +60,22 @@ public class CommentRepository(SocialMediaDbContext _db) : ICommentRepository
         return like;
     }
 
-    public async Task<Comment> UpdateAsync(Comment comment, CancellationToken ct = default)
+    public async Task<int> UpdateAsync(Guid commentId, UpdateCommentRequestDto dto, CancellationToken ct = default)
     {
-        _db.Comments.Update(comment);
-        await _db.SaveChangesAsync(ct);
-        
-        return comment;
+        return await _db.Comments
+            .Where(x => x.Id == commentId)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(x => x.Content, dto.Content)
+                .SetProperty(x => x.UpdatedAtUtc, DateTime.UtcNow), ct);
+    }
+    
+    public async Task<int> UpdateForDeletionAsync(Guid commentId, CancellationToken ct = default)
+    {
+        return await _db.Comments
+            .Where(x => x.Id == commentId)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(x => x.Content, "[This comment was removed by the Author.]")
+                .SetProperty(x => x.DeletedAtUtc, DateTime.UtcNow), ct);
     }
 
     public async Task DeleteAsync(Comment comment, CancellationToken ct = default)

@@ -111,15 +111,28 @@ public class PostLogic(
             relativePath = await _imageProcessor.ProcessAndSavePostImageAsync(dto.Image, ct);
             if (relativePath is null)
             {
-                return new PostResult.FailedToDeleteImage("Failed to process image");
+                return new PostResult.FailedToDeleteImage("Failed to process image.");
             }
         }
-            
-        existingPost.UpdateFromDto(dto, relativePath);
 
         try
         {
-            await _repo.UpdateAsync(existingPost, ct);
+            var result = await _repo.UpdateAsync(existingPost.Id, dto, relativePath, ct);
+            if (result is 0)
+            {
+                if (relativePath is not null)
+                {
+                    _imageProcessor.DeleteImage(relativePath);
+                }
+                return new PostResult.FailedToUpdate("Failed to update post.");
+            }
+            
+            if (relativePath is not null && !string.IsNullOrWhiteSpace(oldImageUrl))
+            {
+                _imageProcessor.DeleteImage(oldImageUrl);
+            }
+            
+            return new PostResult.Success(existingPost.Id);   
         }
         catch (OperationCanceledException)
         {
@@ -137,13 +150,6 @@ public class PostLogic(
             }
             throw;
         }
-
-        if (relativePath is not null && !string.IsNullOrWhiteSpace(oldImageUrl))
-        {
-            _imageProcessor.DeleteImage(oldImageUrl);
-        }
-
-        return new PostResult.Success(existingPost.Id);
     }
     
     public async Task<PostResult> DeleteAsync(Guid id, string currentUserId, CancellationToken ct = default)

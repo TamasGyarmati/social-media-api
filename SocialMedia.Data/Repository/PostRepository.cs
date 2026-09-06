@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SocialMedia.Data.Database;
+using SocialMedia.Domain.Dtos;
 using SocialMedia.Domain.Entities;
 
 namespace SocialMedia.Data.Repository;
@@ -12,7 +13,7 @@ public interface IPostRepository
     Task<Post?> GetByIdWithCommentsAsync(Guid id, CancellationToken ct = default);
     Task<Post> CreateAsync(Post post, CancellationToken ct = default);
     Task<PostLike> CreateLikeAsync(PostLike like, CancellationToken ct = default);
-    Task<Post> UpdateAsync(Post post, CancellationToken ct = default);
+    Task<int> UpdateAsync(Guid postId, UpdatePostRequestDto dto, string? imageUrl, CancellationToken ct = default);
     Task DeleteAsync(Post post, CancellationToken ct = default);
     Task DeleteLikeAsync(PostLike like, CancellationToken ct = default);
 }
@@ -60,12 +61,21 @@ public class PostRepository(SocialMediaDbContext _db) : IPostRepository
         return like;
     }
 
-    public async Task<Post> UpdateAsync(Post post, CancellationToken ct = default)
+    public async Task<int> UpdateAsync(Guid postId, UpdatePostRequestDto dto, string? imageUrl, CancellationToken ct = default)
     {
-        _db.Posts.Update(post);
-        await _db.SaveChangesAsync(ct);
-        
-        return post;
+        return await _db.Posts
+            .Where(x => x.Id == postId)
+            .ExecuteUpdateAsync(setters =>
+            {
+                setters.SetProperty(x => x.Title, dto.Title)
+                    .SetProperty(x => x.Description, dto.Description)
+                    .SetProperty(x => x.UpdatedAtUtc, DateTime.UtcNow);
+
+                if (imageUrl is not null)
+                {
+                    setters.SetProperty(x => x.ImageUrl, imageUrl);
+                }
+            }, ct);
     }
 
     public async Task DeleteAsync(Post post, CancellationToken ct = default)

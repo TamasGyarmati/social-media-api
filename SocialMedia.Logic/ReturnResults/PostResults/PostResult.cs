@@ -6,4 +6,5 @@ public abstract record PostResult
     public sealed record NotFound(string Message) : PostResult;
     public sealed record FailedToDeleteImage(string Message) : PostResult;
     public sealed record Forbidden(string Message) : PostResult;
+    public sealed record FailedToUpdate(string Message) : PostResult;
 }
