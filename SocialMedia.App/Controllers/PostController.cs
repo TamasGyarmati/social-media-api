@@ -91,6 +91,7 @@ public class PostController(IPostLogic _logic) : ControllerBase
     [ProducesResponseType(typeof(GuidPostResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [EndpointSummary("Updates the provided post.")]
     public async Task<ActionResult<GuidPostResponseDto>> UpdatePostAsync(
@@ -110,6 +111,8 @@ public class PostController(IPostLogic _logic) : ControllerBase
         {
             PostResult.NotFound error => NotFound(new { error.Message }),
             PostResult.Forbidden error => StatusCode(StatusCodes.Status403Forbidden, new { error.Message }),
+            PostResult.FailedToUpdate error => BadRequest(new { error.Message }),
+            PostResult.FailedToDeleteImage error => BadRequest(new { error.Message }),
             PostResult.Success response => Ok(new { response.Id }),
             _ => StatusCode(500)
         };

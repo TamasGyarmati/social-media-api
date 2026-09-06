@@ -81,6 +81,7 @@ public class CommentController(ICommentLogic _logic) : ControllerBase
     [HttpPut("{id:guid}")]
     [Authorize]
     [ProducesResponseType(typeof(UpdateCommentResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -101,6 +102,7 @@ public class CommentController(ICommentLogic _logic) : ControllerBase
         return result switch
         {
             CommentResult.NotFound error => NotFound(new { error.Message }),
+            CommentResult.UpdateFailed error => BadRequest(new { error.Message }),
             CommentResult.Forbidden error => StatusCode(StatusCodes.Status403Forbidden, new { error.Message }),
             CommentResult.Success response => Ok(new UpdateCommentResponseDto(response.Id)),
             _ => StatusCode(500)
@@ -110,6 +112,7 @@ public class CommentController(ICommentLogic _logic) : ControllerBase
     [HttpDelete("{id:guid}")]
     [Authorize]
     [ProducesResponseType(typeof(IActionResult), StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -127,6 +130,7 @@ public class CommentController(ICommentLogic _logic) : ControllerBase
         return result switch
         {
             CommentResult.NotFound error => NotFound(new { error.Message }),
+            CommentResult.UpdateFailed error => BadRequest(new { error.Message }),
             CommentResult.Forbidden error => StatusCode(StatusCodes.Status403Forbidden, new { error.Message }),
             CommentResult.Success => NoContent(),
             _ => StatusCode(500)
