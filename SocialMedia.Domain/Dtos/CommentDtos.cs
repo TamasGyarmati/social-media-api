@@ -65,12 +65,6 @@ public static class CommentMappingExtensions
         );
     }
     
-    public static void UpdateFromDto(this Comment comment, UpdateCommentRequestDto dto)
-    {
-        comment.Content = dto.Content;
-        comment.UpdatedAtUtc = DateTime.UtcNow;
-    }
-    
     public static Comment FromCreateCommentToDomain(this CreateCommentRequestDto dto, string creatorId)
     {
         return new Comment
