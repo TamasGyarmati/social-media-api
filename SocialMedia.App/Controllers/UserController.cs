@@ -235,8 +235,9 @@ public class UserController(IUserLogic _logic) : ControllerBase
     [HttpDelete("me")]
     [Authorize]
     [ProducesResponseType(typeof(UserSoftDeleteResponseDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [EndpointSummary("Soft deletes the provided user.")]
     public async Task<ActionResult<UserSoftDeleteResponseDto>> SoftDeleteUser(CancellationToken ct = default)
     {
@@ -253,7 +254,7 @@ public class UserController(IUserLogic _logic) : ControllerBase
         return result switch
         {
             SoftDeleteUserResult.DeletionFailed error => BadRequest(new { error.Message }),
-            SoftDeleteUserResult.Forbidden error => BadRequest(new { error.Message }),
+            SoftDeleteUserResult.Forbidden error => StatusCode(StatusCodes.Status403Forbidden, new { error.Message }),
             SoftDeleteUserResult.Success response => Ok(new UserSoftDeleteResponseDto(response.Message, currentUserId)),
             _ => StatusCode(500)
         };
