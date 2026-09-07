@@ -1,5 +1,6 @@
 using System.Text;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using SocialMedia.Data.Repository;
@@ -13,7 +14,7 @@ namespace SocialMedia.Logic.Logics;
 
 public interface IUserLogic
 {
-    Task<GetUserResult> GetUserByIdAsync(string userId, CancellationToken ct = default);
+    Task<GetUserByIdResult> GetUserByIdAsync(string userId, CancellationToken ct = default);
     Task<UploadAvatarResult> UploadAsync(UploadAvatarRequestDto dto, string currentUserId, CancellationToken ct = default);
     Task<UpdateUserResult> UpdateAsync(UpdateUserRequestDto dto, string currentUserId, CancellationToken ct = default);
     Task<UpdatePasswordResult> UpdatePasswordAsync(UpdatePasswordRequestDto dto, string currentUserId, CancellationToken ct = default);
@@ -32,7 +33,7 @@ public class UserLogic(
     IUserRepository _repo,
     UserManager<AppUser> _userManager) : IUserLogic
 {
-    public async Task<GetUserResult> GetUserByIdAsync(string userId, CancellationToken ct = default)
+    public async Task<GetUserByIdResult> GetUserByIdAsync(string userId, CancellationToken ct = default)
     {
         var user = await _userManager.Users
             .AsSplitQuery()
@@ -44,12 +45,12 @@ public class UserLogic(
         
         if (user is null)
         {
-            return new GetUserResult.UserNotFound("The user was not found.");
+            return new GetUserByIdResult.UserNotFound("The user was not found.");
         }
         
         var response = user.FromDomainToGetUserDto();
         
-        return new GetUserResult.Success(response);
+        return new GetUserByIdResult.Success(response);
     }
     
     public async Task<UploadAvatarResult> UploadAsync(
@@ -382,6 +383,8 @@ public class UserLogic(
 
     public async Task<AddToAdminResult> AddToAdminAsync(string userId, CancellationToken ct = default)
     {
+        ct.ThrowIfCancellationRequested();
+        
         var user = await _userManager.FindByIdAsync(userId);
         if (user is null)
         {
@@ -395,6 +398,8 @@ public class UserLogic(
         {
             return new AddToAdminResult.RoleAdditionFailed("The role addition was failed", result.Errors);
         }
+        
+        await _repo.LogOutUserAsync(userId, ct);
         
         return new AddToAdminResult.Success("The user was successfully added.");
     }

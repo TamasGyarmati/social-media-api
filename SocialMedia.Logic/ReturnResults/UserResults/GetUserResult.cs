@@ -2,8 +2,8 @@ using SocialMedia.Domain.Dtos;
 
 namespace SocialMedia.Logic.ReturnResults.UserResults;
 
-public abstract record GetUserResult
+public abstract record GetUserByIdResult
 {
-    public sealed record UserNotFound(string Message) : GetUserResult;
-    public sealed record Success(GetUserByIdResponseDto User) : GetUserResult;
+    public sealed record UserNotFound(string Message) : GetUserByIdResult;
+    public sealed record Success(GetUserByIdResponseDto User) : GetUserByIdResult;
 }

@@ -12,6 +12,26 @@ namespace SocialMedia.App.Controllers;
 [Route("[controller]")]
 public class UserController(IUserLogic _logic) : ControllerBase 
 {
+    [HttpGet("whoami")]
+    [EndpointSummary("Gets the user by Claim.")]
+    public async Task<ActionResult<GetUserByIdResponseDto>> WhoAmI(CancellationToken ct = default)
+    {
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (currentUserId is null)
+        {
+            return Unauthorized();
+        }
+
+        var result = await _logic.GetUserByIdAsync(currentUserId, ct);
+
+        return result switch
+        {
+            GetUserByIdResult.UserNotFound error => NotFound(new { error.Message }),
+            GetUserByIdResult.Success response => Ok(response),
+            _ => StatusCode(500)
+        };
+    }
+    
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(GetUserByIdResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -29,8 +49,8 @@ public class UserController(IUserLogic _logic) : ControllerBase
 
         return result switch
         {
-            GetUserResult.UserNotFound error => NotFound(new { error.Message }),
-            GetUserResult.Success response => Ok(response),
+            GetUserByIdResult.UserNotFound error => NotFound(new { error.Message }),
+            GetUserByIdResult.Success response => Ok(response),
             _ => StatusCode(500)
         };
     }
@@ -289,6 +309,7 @@ public class UserController(IUserLogic _logic) : ControllerBase
     [ProducesResponseType(typeof(AddToAdminResult), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [EndpointSummary("Add an user to the Admin role.")]
     public async Task<ActionResult<AddToAdminResult>> AddToAdminRole(string userId, CancellationToken ct = default)
     {
