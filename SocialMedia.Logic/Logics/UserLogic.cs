@@ -22,6 +22,7 @@ public interface IUserLogic
     Task<ConfirmEmailChangeResult> ConfirmEmailChangeAsync(string userId, string newEmail, string token, CancellationToken ct = default);
     Task<FollowResult> CreateFollowAsync(string targerUserId, string currentUserId, CancellationToken ct = default);
     Task<SoftDeleteUserResult> SoftDeleteUserAsync(string currentUserId, bool isAdmin, CancellationToken ct = default);
+    Task<LogoutUserResult> LogoutUserAsync(string currentUserId, CancellationToken ct = default);
 }
 
 public class UserLogic(
@@ -367,5 +368,14 @@ public class UserLogic(
         return userWasDeleted is not 0 
             ? new SoftDeleteUserResult.Success("The user was successfully deleted.") 
             : new SoftDeleteUserResult.DeletionFailed("The user was not deleted.");
+    }
+
+    public async Task<LogoutUserResult> LogoutUserAsync(string currentUserId, CancellationToken ct = default)
+    {
+        var result = await _repo.LogOutUserAsync(currentUserId, ct);
+
+        return result is not 0
+            ? new LogoutUserResult.Success("The user successfully logged out.")
+            : new LogoutUserResult.FailedToLogout("The user wasn't logged out due to error.");
     }
 }

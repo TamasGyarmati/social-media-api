@@ -238,7 +238,7 @@ public class UserController(IUserLogic _logic) : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [EndpointSummary("Soft deletes the provided user.")]
+    [EndpointSummary("Soft deletes the user by Claim.")]
     public async Task<ActionResult<UserSoftDeleteResponseDto>> SoftDeleteUser(CancellationToken ct = default)
     {
         var isAdmin = User.IsInRole("Admin");
@@ -256,6 +256,30 @@ public class UserController(IUserLogic _logic) : ControllerBase
             SoftDeleteUserResult.DeletionFailed error => BadRequest(new { error.Message }),
             SoftDeleteUserResult.Forbidden error => StatusCode(StatusCodes.Status403Forbidden, new { error.Message }),
             SoftDeleteUserResult.Success response => Ok(new UserSoftDeleteResponseDto(response.Message, currentUserId)),
+            _ => StatusCode(500)
+        };
+    }
+
+    [HttpPost("logout")]
+    [Authorize]
+    [ProducesResponseType(typeof(UserLogoutResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [EndpointSummary("Logs out the user by Claim.")]
+    public async Task<ActionResult<UserLogoutResponseDto>> LogoutUser(CancellationToken ct = default)
+    {
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (currentUserId is null)
+        {
+            return Unauthorized();
+        }
+
+        var result = await _logic.LogoutUserAsync(currentUserId, ct);
+
+        return result switch
+        {
+            LogoutUserResult.FailedToLogout error => BadRequest(new { error.Message }),
+            LogoutUserResult.Success response => Ok(new UserLogoutResponseDto(response.Message, currentUserId)),
             _ => StatusCode(500)
         };
     }

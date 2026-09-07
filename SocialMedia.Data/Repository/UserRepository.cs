@@ -10,6 +10,7 @@ public interface IUserRepository
     Task<FollowDbStatus> CreateFollowAsync(string followedId, string followerId, CancellationToken ct = default);
     Task<int> SoftDeleteUserAsync(string userId, CancellationToken ct = default);
     Task<int> DeleteFollowsAsync(string userId, CancellationToken ct = default);
+    Task<int> LogOutUserAsync(string userId, CancellationToken ct = default);
 }
 
 public class UserRepository(SocialMediaDbContext _db) : IUserRepository
@@ -78,5 +79,16 @@ public class UserRepository(SocialMediaDbContext _db) : IUserRepository
         return await _db.UserFollows
             .Where(uf => uf.FollowedId == userId || uf.FollowerId == userId)
             .ExecuteDeleteAsync(ct);
+    }
+
+    public async Task<int> LogOutUserAsync(string userId, CancellationToken ct = default)
+    {
+        return await _db.AppUsers
+            .Where(u => u.Id == userId)
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(u => u.RefreshToken, (string?)null)
+                .SetProperty(u => u.RefreshTokenExpiryTime, DateTime.UtcNow)
+                .SetProperty(u => u.SecurityStamp,  Guid.NewGuid().ToString()), 
+                ct);
     }
 }

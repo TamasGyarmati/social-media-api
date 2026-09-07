@@ -54,6 +54,11 @@ public record UserSoftDeleteResponseDto(
     string DeletedUserId
 );
 
+public record UserLogoutResponseDto(
+    string Message,
+    string LoggedOutUserId
+);
+
 public static class UserMappingExtensions
 {
     public static GetUserByIdResponseDto FromDomainToGetUserDto(this AppUser user)
