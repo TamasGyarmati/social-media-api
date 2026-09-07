@@ -5,7 +5,13 @@
 
 # Logs and wwwroot
 SocialMedia.App/Logs/
-SocialMedia.App/wwwroot/
+*.log
+
+**/wwwroot/images/avatars/*
+**/wwwroot/images/posts/*
+
+!**/wwwroot/images/avatars/.gitkeep
+!**/wwwroot/images/posts/.gitkeep
 
 # User-specific files
 *.suo
