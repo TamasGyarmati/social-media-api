@@ -356,9 +356,15 @@ public class UserLogic(
             return new SoftDeleteUserResult.Forbidden("Can't delete an admin account.");
         }
         
-        var result = await _repo.SoftDeleteUserAsync(currentUserId, ct);
+        var followsWasDeleted = await _repo.DeleteFollowsAsync(currentUserId, ct);
+        if (followsWasDeleted is 0)
+        {
+            return new SoftDeleteUserResult.DeletionFailed("The user followings/followers deletion was unsuccessful.");
+        }
         
-        return result is not 0 
+        var userWasDeleted = await _repo.SoftDeleteUserAsync(currentUserId, ct);
+        
+        return userWasDeleted is not 0 
             ? new SoftDeleteUserResult.Success("The user was successfully deleted.") 
             : new SoftDeleteUserResult.DeletionFailed("The user was not deleted.");
     }
