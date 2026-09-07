@@ -35,10 +35,7 @@ public class UserLogic(
 {
     public async Task<List<GetUsersResponseDto>> GetUsersAsync(CancellationToken ct = default)
     {
-        var users = await _userManager.Users
-            .Where(u => u.UserName != null && !u.UserName.StartsWith("[deleted_user_"))
-            .ToListAsync(ct);
-        
+        var users = await _userManager.Users.Where(u => !u.IsDeleted).ToListAsync(ct);
         var response = users.Select(x => x.FromDomainToGetUsersDto()).ToList();
         return response;
     }
