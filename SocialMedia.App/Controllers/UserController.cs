@@ -12,7 +12,7 @@ namespace SocialMedia.App.Controllers;
 [Route("[controller]")]
 public class UserController(IUserLogic _logic) : ControllerBase 
 {
-    [HttpGet]
+    [HttpGet("{id}")]
     [ProducesResponseType(typeof(GetUserByIdResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -280,6 +280,35 @@ public class UserController(IUserLogic _logic) : ControllerBase
         {
             LogoutUserResult.FailedToLogout error => BadRequest(new { error.Message }),
             LogoutUserResult.Success response => Ok(new UserLogoutResponseDto(response.Message, currentUserId)),
+            _ => StatusCode(500)
+        };
+    }
+
+    [HttpPost("add-to-admin/{userId}")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType(typeof(AddToAdminResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [EndpointSummary("Add an user to the Admin role.")]
+    public async Task<ActionResult<AddToAdminResult>> AddToAdminRole(string userId, CancellationToken ct = default)
+    {
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (currentUserId is null)
+        {
+            return Unauthorized();
+        }
+
+        var result = await _logic.AddToAdminAsync(userId, ct);
+
+        return result switch
+        {
+            AddToAdminResult.RoleAdditionFailed error => BadRequest(new
+            {
+                error.Message,
+                Errors = error.Errors.Select(e => e.Description)
+            }),
+            AddToAdminResult.UserNotFound error => NotFound(new { error.Message }),
+            AddToAdminResult.Success response => Ok(new UserAddedToAdminDto(response.Message, userId)),
             _ => StatusCode(500)
         };
     }

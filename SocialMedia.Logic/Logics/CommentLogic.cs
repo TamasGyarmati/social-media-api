@@ -13,7 +13,7 @@ public interface ICommentLogic
     Task<Guid> CreateAsync(CreateCommentRequestDto dto, string currentUserId, CancellationToken ct = default);
     Task<CommentLikeToggleResult?> ToggleLikeAsync(Guid id, string currentUserId, CancellationToken ct = default);
     Task<CommentResult> UpdateAsync(Guid id, UpdateCommentRequestDto dto, string currentUserId, CancellationToken ct = default);
-    Task<CommentResult> DeleteAsync(Guid id, string currentUserId, CancellationToken ct = default);
+    Task<CommentResult> DeleteAsync(Guid id, bool isAdmin, string currentUserId, CancellationToken ct = default);
 }
 
 public class CommentLogic(ICommentRepository _repo) : ICommentLogic
@@ -108,6 +108,7 @@ public class CommentLogic(ICommentRepository _repo) : ICommentLogic
     
     public async Task<CommentResult> DeleteAsync(
         Guid id, 
+        bool isAdmin,
         string currentUserId, 
         CancellationToken ct = default)
     {
@@ -118,7 +119,7 @@ public class CommentLogic(ICommentRepository _repo) : ICommentLogic
             return new CommentResult.NotFound("The comment was not found.");
         }
 
-        if (comment.CreatedById != currentUserId)
+        if (comment.CreatedById != currentUserId && !isAdmin)
         {
             return new CommentResult.Forbidden("Forbidden.");
         }

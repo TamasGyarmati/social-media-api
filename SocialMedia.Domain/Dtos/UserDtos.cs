@@ -59,6 +59,11 @@ public record UserLogoutResponseDto(
     string LoggedOutUserId
 );
 
+public record UserAddedToAdminDto(
+    string Message,
+    string AddedUserId
+);
+
 public static class UserMappingExtensions
 {
     public static GetUserByIdResponseDto FromDomainToGetUserDto(this AppUser user)

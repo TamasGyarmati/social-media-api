@@ -16,3 +16,12 @@
 [2026-09-07 10:00:38.141] GET /api/Comment/all/4b3eac1e-6183-4abd-b042-0ed72bf6f072 -> Status: 200 (87ms) | User: 8aed4790-2bfd-408c-8e89-bb74f4f6ae7a | UserName: kovacspista_ | IP: ::1
 [2026-09-07 10:00:58.610] GET /api/Comment/all/211537f9-a127-41df-82ef-de259fb24d7c -> Status: 200 (33ms) | User: 8aed4790-2bfd-408c-8e89-bb74f4f6ae7a | UserName: kovacspista_ | IP: ::1
 [2026-09-07 10:01:43.553] PUT /api/Comment/dcb135f1-1671-442a-a46b-23fce3eb3f11 -> Status: 403 (56ms) | User: 8aed4790-2bfd-408c-8e89-bb74f4f6ae7a | UserName: kovacspista_ | IP: ::1
+[2026-09-07 12:25:40.655] GET / -> Status: 404 (0ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-09-07 12:25:44.727] GET /openapi/v1.json -> Status: 200 (274ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-09-07 12:26:00.468] POST /api/Auth/login -> Status: 401 (1248ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-09-07 12:26:06.829] POST /api/Auth/login -> Status: 401 (67ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-09-07 12:26:33.746] POST /api/Auth/login -> Status: 401 (161ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-09-07 12:26:45.450] POST /api/Auth/login -> Status: 200 (250ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-09-07 12:28:18.300] POST /User/logout -> Status: 200 (77ms) | User: 2e59e43c-8f7a-4127-b775-fd1bdbfff042 | UserName: tamasgy | IP: ::1
+[2026-09-07 12:28:29.144] GET /api/Post/all -> Status: 200 (161ms) | User: 2e59e43c-8f7a-4127-b775-fd1bdbfff042 | UserName: tamasgy | IP: ::1
+[2026-09-07 12:28:49.498] POST /api/Auth/refresh -> Status: 401 (63ms) | User: 2e59e43c-8f7a-4127-b775-fd1bdbfff042 | UserName: tamasgy | IP: ::1

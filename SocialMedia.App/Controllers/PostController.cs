@@ -128,12 +128,13 @@ public class PostController(IPostLogic _logic) : ControllerBase
     public async Task<IActionResult> DeletePostAsync(Guid id, CancellationToken ct = default)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var isAdmin = User.IsInRole("Admin");
         if (currentUserId is null)
         {
             return Unauthorized();
         }
         
-        var result = await _logic.DeleteAsync(id, currentUserId, ct);
+        var result = await _logic.DeleteAsync(id, isAdmin, currentUserId, ct);
 
         return result switch
         {

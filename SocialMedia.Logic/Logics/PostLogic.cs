@@ -14,7 +14,7 @@ public interface IPostLogic
     Task<Guid> CreateAsync(CreatePostRequestDto dto, string currentUserId, CancellationToken ct = default);
     Task<PostLikeToggleResult?> ToggleLikeAsync(Guid id, string currentUserId, CancellationToken ct = default);
     Task<PostResult> UpdateAsync(Guid id, UpdatePostRequestDto dto, string currentUserId, CancellationToken ct = default);
-    Task<PostResult> DeleteAsync(Guid id, string currentUserId, CancellationToken ct = default);
+    Task<PostResult> DeleteAsync(Guid id, bool isAdmin, string currentUserId, CancellationToken ct = default);
 }
 
 public class PostLogic(
@@ -152,7 +152,7 @@ public class PostLogic(
         }
     }
     
-    public async Task<PostResult> DeleteAsync(Guid id, string currentUserId, CancellationToken ct = default)
+    public async Task<PostResult> DeleteAsync(Guid id, bool isAdmin, string currentUserId, CancellationToken ct = default)
     {
         var post = await _repo.GetByIdAsync(id, ct);
         if (post is null)
@@ -160,7 +160,7 @@ public class PostLogic(
             return new PostResult.NotFound("The post was not found.");
         }
         
-        if (post.CreatedById != currentUserId)
+        if (post.CreatedById != currentUserId && !isAdmin)
         {
             return new PostResult.Forbidden("Forbidden.");
         }

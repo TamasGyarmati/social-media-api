@@ -23,6 +23,7 @@ public interface IUserLogic
     Task<FollowResult> CreateFollowAsync(string targerUserId, string currentUserId, CancellationToken ct = default);
     Task<SoftDeleteUserResult> SoftDeleteUserAsync(string currentUserId, bool isAdmin, CancellationToken ct = default);
     Task<LogoutUserResult> LogoutUserAsync(string currentUserId, CancellationToken ct = default);
+    Task<AddToAdminResult> AddToAdminAsync(string userId, CancellationToken ct = default);
 }
 
 public class UserLogic(
@@ -377,5 +378,24 @@ public class UserLogic(
         return result is not 0
             ? new LogoutUserResult.Success("The user successfully logged out.")
             : new LogoutUserResult.FailedToLogout("The user wasn't logged out due to error.");
+    }
+
+    public async Task<AddToAdminResult> AddToAdminAsync(string userId, CancellationToken ct = default)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user is null)
+        {
+            return new AddToAdminResult.UserNotFound("The user was not found.");
+        }
+        
+        ct.ThrowIfCancellationRequested();
+        
+        var result = await _userManager.AddToRoleAsync(user, "Admin");
+        if (!result.Succeeded)
+        {
+            return new AddToAdminResult.RoleAdditionFailed("The role addition was failed", result.Errors);
+        }
+        
+        return new AddToAdminResult.Success("The user was successfully added.");
     }
 }
