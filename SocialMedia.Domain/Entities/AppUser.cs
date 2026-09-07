@@ -10,6 +10,9 @@ public class AppUser : IdentityUser
     public DateTime? RefreshTokenExpiryTime { get; set; }
     public string? AvatarUrl { get; set;  }
     
+    public bool IsDeleted { get; set; }
+    public DateTime? DeletedAt { get; set; }
+    
     public ICollection<UserFollow> Followers { get; set; } = new List<UserFollow>(); 
     public ICollection<UserFollow> Following { get; set; } = new List<UserFollow>();
 }

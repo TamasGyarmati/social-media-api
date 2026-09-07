@@ -8,6 +8,7 @@ namespace SocialMedia.Data.Repository;
 public interface IUserRepository
 {
     Task<FollowDbStatus> CreateFollowAsync(string followedId, string followerId, CancellationToken ct = default);
+    Task<int> SoftDeleteUserAsync(string userId, CancellationToken ct = default);
 }
 
 public class UserRepository(SocialMediaDbContext _db) : IUserRepository
@@ -48,5 +49,26 @@ public class UserRepository(SocialMediaDbContext _db) : IUserRepository
         {
             return FollowDbStatus.AlreadyFollowing;
         }
+    }
+
+    public async Task<int> SoftDeleteUserAsync(string userId, CancellationToken ct = default)
+    {
+        return await _db.AppUsers
+            .Where(u => u.Id == userId)
+            .ExecuteUpdateAsync(s => s
+                .SetProperty(u => u.UserName, $"[deleted_user_{userId[..8]}]")
+                .SetProperty(u => u.NormalizedUserName, $"[DELETED_USER_{userId[..8]}]")
+                .SetProperty(u => u.Email, (string?)null)
+                .SetProperty(u => u.NormalizedEmail, (string?)null)
+                .SetProperty(u => u.AvatarUrl, (string?)null)
+                .SetProperty(u => u.IsDeleted, true)
+                .SetProperty(u => u.DeletedAt, DateTime.UtcNow)
+                .SetProperty(u => u.FirstName, (string?)null)
+                .SetProperty(u => u.LastName, (string?)null)
+                .SetProperty(u => u.PhoneNumber, (string?)null)
+                .SetProperty(u => u.LockoutEnabled, true)
+                .SetProperty(u => u.LockoutEnd, DateTimeOffset.MaxValue)
+                .SetProperty(u => u.SecurityStamp, Guid.NewGuid().ToString()),
+                ct);
     }
 }

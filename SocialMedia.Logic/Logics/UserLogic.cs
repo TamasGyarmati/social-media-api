@@ -21,6 +21,7 @@ public interface IUserLogic
     Task<SendEmailConfirmationResult> SendEmailChangeConfirmationAsync(string email, string confirmationLink, CancellationToken ct = default);
     Task<ConfirmEmailChangeResult> ConfirmEmailChangeAsync(string userId, string newEmail, string token, CancellationToken ct = default);
     Task<FollowResult> CreateFollowAsync(string targerUserId, string currentUserId, CancellationToken ct = default);
+    Task<SoftDeleteUserResult> SoftDeleteUserAsync(string currentUserId, bool isAdmin, CancellationToken ct = default);
 }
 
 public class UserLogic(
@@ -343,5 +344,22 @@ public class UserLogic(
             FollowDbStatus.AlreadyFollowing => new FollowResult.AlreadyFollowing("Already following."),
             _ => throw new InvalidOperationException("Unhandled DB follow status.")
         };
+    }
+
+    public async Task<SoftDeleteUserResult> SoftDeleteUserAsync(
+        string currentUserId,
+        bool isAdmin,
+        CancellationToken ct = default)
+    {
+        if (isAdmin)
+        {
+            return new SoftDeleteUserResult.Forbidden("Can't delete an admin account.");
+        }
+        
+        var result = await _repo.SoftDeleteUserAsync(currentUserId, ct);
+        
+        return result is not 0 
+            ? new SoftDeleteUserResult.Success("The user was successfully deleted.") 
+            : new SoftDeleteUserResult.DeletionFailed("The user was not deleted.");
     }
 }

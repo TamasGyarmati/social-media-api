@@ -231,4 +231,31 @@ public class UserController(IUserLogic _logic) : ControllerBase
             _ => StatusCode(500)
         };
     }
+
+    [HttpDelete("me")]
+    [Authorize]
+    [ProducesResponseType(typeof(UserSoftDeleteResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [EndpointSummary("Soft deletes the provided user.")]
+    public async Task<ActionResult<UserSoftDeleteResponseDto>> SoftDeleteUser(CancellationToken ct = default)
+    {
+        var isAdmin = User.IsInRole("Admin");
+        
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (currentUserId is null)
+        {
+            return Unauthorized();
+        }
+
+        var result = await _logic.SoftDeleteUserAsync(currentUserId, isAdmin, ct);
+
+        return result switch
+        {
+            SoftDeleteUserResult.DeletionFailed error => BadRequest(new { error.Message }),
+            SoftDeleteUserResult.Forbidden error => BadRequest(new { error.Message }),
+            SoftDeleteUserResult.Success response => Ok(new UserSoftDeleteResponseDto(response.Message, currentUserId)),
+            _ => StatusCode(500)
+        };
+    }
 }

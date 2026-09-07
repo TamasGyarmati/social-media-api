@@ -37,6 +37,7 @@ public class AuthLogic(
             LastName = dto.LastName,
             UserName = dto.UserName,
             Email = dto.Email,
+            IsDeleted = false,
             EmailConfirmed = false
         };
 

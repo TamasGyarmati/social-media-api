@@ -49,6 +49,11 @@ public record UserMessageResponseDto(
     string Message
 );
 
+public record UserSoftDeleteResponseDto(
+    string Message,
+    string DeletedUserId
+);
+
 public static class UserMappingExtensions
 {
     public static GetUserByIdResponseDto FromDomainToGetUserDto(this AppUser user)
@@ -63,11 +68,11 @@ public static class UserMappingExtensions
             user.Followers.Count,
             user.Following.Count,
             user.Followers
-                .Select(x => x.Follower.UserName ?? string.Empty)
+                .Select(x => x.Follower?.UserName ?? string.Empty)
                 .Where(u => !string.IsNullOrWhiteSpace(u))
                 .ToList(),
             user.Following
-                .Select(x => x.Followed.UserName ?? string.Empty)
+                .Select(x => x.Followed?.UserName ?? string.Empty)
                 .Where(u => !string.IsNullOrWhiteSpace(u))
                 .ToList()
         );
