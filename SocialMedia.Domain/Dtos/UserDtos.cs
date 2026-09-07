@@ -3,6 +3,14 @@ using SocialMedia.Domain.Entities;
 
 namespace SocialMedia.Domain.Dtos;
 
+public record GetUsersResponseDto(
+    string Id,
+    string UserName,
+    string FirstName,
+    string LastName,
+    string Email
+);
+
 public record GetUserByIdResponseDto(
     string Id,
     string FirstName,
@@ -66,7 +74,18 @@ public record UserAddedToAdminDto(
 
 public static class UserMappingExtensions
 {
-    public static GetUserByIdResponseDto FromDomainToGetUserDto(this AppUser user)
+    public static GetUsersResponseDto FromDomainToGetUsersDto(this AppUser user)
+    {
+        return new GetUsersResponseDto(
+            user.Id,
+            user.UserName ?? string.Empty,
+            user.FirstName,
+            user.LastName,
+            user.Email ?? string.Empty
+        );
+    }
+    
+    public static GetUserByIdResponseDto FromDomainToGetUserByIdDto(this AppUser user)
     {
         return new GetUserByIdResponseDto(
             user.Id,

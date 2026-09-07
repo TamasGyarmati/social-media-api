@@ -10,19 +10,24 @@ namespace SocialMedia.App.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class UserController(IUserLogic _logic) : ControllerBase 
+public class UserController(IUserLogic _logic) : ControllerBase
 {
-    [HttpGet("whoami")]
-    [EndpointSummary("Gets the user by Claim.")]
-    public async Task<ActionResult<GetUserByIdResponseDto>> WhoAmI(CancellationToken ct = default)
+    [HttpGet("all")]
+    [ProducesResponseType(typeof(GetUsersResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [EndpointSummary("Returns all the active users.")]
+    public async Task<ActionResult<List<GetUsersResponseDto>>> GetAllUsers(CancellationToken ct = default)
+        => await _logic.GetUsersAsync(ct);
+    
+    [HttpGet("{id}")]
+    [ProducesResponseType(typeof(GetUserByIdResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [EndpointSummary("Returns the user by ID.")]
+    public async Task<ActionResult<GetUserByIdResponseDto>> GetUserById(string id, CancellationToken ct = default)
     {
-        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (currentUserId is null)
-        {
-            return Unauthorized();
-        }
-
-        var result = await _logic.GetUserByIdAsync(currentUserId, ct);
+        var result = await _logic.GetUserByIdAsync(id, ct);
 
         return result switch
         {
@@ -32,20 +37,18 @@ public class UserController(IUserLogic _logic) : ControllerBase
         };
     }
     
-    [HttpGet("{id}")]
-    [ProducesResponseType(typeof(GetUserByIdResponseDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [EndpointSummary("Gets the user by ID.")]
-    public async Task<ActionResult<GetUserByIdResponseDto>> GetUserById(string id, CancellationToken ct = default)
+    [HttpGet("whoami")]
+    [Authorize]
+    [EndpointSummary("Returns YOU.")]
+    public async Task<ActionResult<GetUserByIdResponseDto>> WhoAmI(CancellationToken ct = default)
     {
         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
         if (currentUserId is null)
         {
             return Unauthorized();
         }
-        
-        var result = await _logic.GetUserByIdAsync(id, ct);
+
+        var result = await _logic.GetUserByIdAsync(currentUserId, ct);
 
         return result switch
         {

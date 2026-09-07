@@ -1,6 +1,5 @@
 using System.Text;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using SocialMedia.Data.Repository;
@@ -14,6 +13,7 @@ namespace SocialMedia.Logic.Logics;
 
 public interface IUserLogic
 {
+    Task<List<GetUsersResponseDto>> GetUsersAsync(CancellationToken ct = default);
     Task<GetUserByIdResult> GetUserByIdAsync(string userId, CancellationToken ct = default);
     Task<UploadAvatarResult> UploadAsync(UploadAvatarRequestDto dto, string currentUserId, CancellationToken ct = default);
     Task<UpdateUserResult> UpdateAsync(UpdateUserRequestDto dto, string currentUserId, CancellationToken ct = default);
@@ -33,6 +33,16 @@ public class UserLogic(
     IUserRepository _repo,
     UserManager<AppUser> _userManager) : IUserLogic
 {
+    public async Task<List<GetUsersResponseDto>> GetUsersAsync(CancellationToken ct = default)
+    {
+        var users = await _userManager.Users
+            .Where(u => u.UserName != null && !u.UserName.StartsWith("[deleted_user_"))
+            .ToListAsync(ct);
+        
+        var response = users.Select(x => x.FromDomainToGetUsersDto()).ToList();
+        return response;
+    }
+    
     public async Task<GetUserByIdResult> GetUserByIdAsync(string userId, CancellationToken ct = default)
     {
         var user = await _userManager.Users
@@ -48,7 +58,7 @@ public class UserLogic(
             return new GetUserByIdResult.UserNotFound("The user was not found.");
         }
         
-        var response = user.FromDomainToGetUserDto();
+        var response = user.FromDomainToGetUserByIdDto();
         
         return new GetUserByIdResult.Success(response);
     }

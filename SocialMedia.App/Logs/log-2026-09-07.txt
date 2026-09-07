@@ -50,3 +50,16 @@
 [2026-09-07 13:37:54.549] GET /openapi/v1.json -> Status: 200 (221ms) | User: Anonymous | UserName: Anonymous | IP: ::1
 [2026-09-07 13:38:25.165] POST /api/Auth/login -> Status: 200 (1564ms) | User: Anonymous | UserName: Anonymous | IP: ::1
 [2026-09-07 13:38:35.970] GET /User -> Status: 200 (175ms) | User: ba4f7cc0-b4ab-4322-92fa-d93ecd981c13 | UserName: szonja | IP: ::1
+[2026-09-07 13:43:33.727] GET /openapi/v1.json -> Status: 200 (206ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-09-07 13:43:46.815] POST /api/Auth/login -> Status: 401 (1179ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-09-07 13:43:53.470] POST /api/Auth/login -> Status: 200 (322ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-09-07 13:44:07.256] GET /User/whoami -> Status: 200 (162ms) | User: 2e59e43c-8f7a-4127-b775-fd1bdbfff042 | UserName: tamasgy | IP: ::1
+[2026-09-07 16:01:05.266] GET / -> Status: 404 (0ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-09-07 16:01:08.717] GET /openapi/v1.json -> Status: 200 (269ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-09-07 16:01:19.475] GET /User/all -> Status: 200 (1212ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-09-07 16:02:59.941] GET /openapi/v1.json -> Status: 200 (232ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-09-07 16:03:05.114] GET /User/all -> Status: 200 (1131ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-09-07 16:06:17.089] GET /openapi/v1.json -> Status: 200 (253ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-09-07 16:06:28.156] GET /User/all -> Status: 200 (1389ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-09-07 16:06:45.090] GET /openapi/v1.json -> Status: 200 (198ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-09-07 16:06:51.423] GET /User/all -> Status: 200 (1241ms) | User: Anonymous | UserName: Anonymous | IP: ::1
