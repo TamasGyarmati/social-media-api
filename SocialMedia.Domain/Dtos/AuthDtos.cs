@@ -10,7 +10,8 @@ public record UserCreateRequestDto(
 
 public record UserLoginRequestDto(
     string Email,
-    string Password
+    string Password,
+    bool RememberMe
 );
 
 public record RefreshRequestDto(

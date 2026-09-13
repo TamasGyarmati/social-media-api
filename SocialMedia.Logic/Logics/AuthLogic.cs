@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using SocialMedia.Domain.Dtos;
 using SocialMedia.Domain.Entities;
-using SocialMedia.Domain.Enums;
 using SocialMedia.Logic.ReturnResults.AuthResults;
 using SocialMedia.Logic.Services;
 
@@ -162,10 +161,15 @@ public class AuthLogic(
             claim.Add(new Claim(ClaimTypes.Role, role));
         }
 
-        const int accessTokenExpiryInMinutes = 24 * 60;
+        const int accessTokenExpiryInMinutes = 15;
         var accessToken = _tokenGenerator.GenerateAccessToken(claim, accessTokenExpiryInMinutes);
-        
-        const int refreshTokenExpiryInMinutes = 24 * 60 * 7;
+
+        int refreshTokenExpiryInMinutes = 24 * 60 * 7;
+        if (dto.RememberMe)
+        {
+            refreshTokenExpiryInMinutes = 24 * 60 * 30;
+        }
+
         var refreshToken = _tokenGenerator.GenerateRefreshToken(user, refreshTokenExpiryInMinutes);
         
         ct.ThrowIfCancellationRequested();
