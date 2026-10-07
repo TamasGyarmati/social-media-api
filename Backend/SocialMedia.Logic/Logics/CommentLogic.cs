@@ -24,17 +24,17 @@ public class CommentLogic(ICommentRepository _repo) : ICommentLogic
         var responseDtos = comments.Select(x => x.FromDomainToCommentResponseDto()).ToList();
         return responseDtos;
     }
-    
+
     public async Task<CommentResponseDto?> GetByIdAsync(Guid id, CancellationToken ct = default)
     {
         var comment = await _repo.GetByIdAsync(id, ct);
         var response = comment?.FromDomainToCommentResponseDto();
         return response;
     }
-    
+
     public async Task<CommentResponseDto> CreateAsync(
-        CreateCommentRequestDto dto, 
-        string currentUserId, 
+        CreateCommentRequestDto dto,
+        string currentUserId,
         CancellationToken ct = default)
     {
         var comment = dto.FromCreateCommentToDomain(currentUserId);
@@ -42,10 +42,10 @@ public class CommentLogic(ICommentRepository _repo) : ICommentLogic
         var responseDto = response.FromDomainToCommentResponseDto();
         return responseDto;
     }
-    
+
     public async Task<CommentLikeToggleResult?> ToggleLikeAsync(
-        Guid id, 
-        string currentUserId, 
+        Guid id,
+        string currentUserId,
         CancellationToken ct = default)
     {
         var existingComment = await _repo.GetByIdAsync(id, ct);
@@ -53,13 +53,13 @@ public class CommentLogic(ICommentRepository _repo) : ICommentLogic
         {
             return null;
         }
-        
+
         var existingLike = await _repo.GetLikeByIdAsync(existingComment.Id, currentUserId, ct);
 
         if (existingLike is not null)
         {
-            await _repo.DeleteLikeAsync(existingLike.CommentId, existingLike.UserId, ct);
-            return new CommentLikeToggleResult(false, "Comment unliked.");
+            var likes = await _repo.DeleteLikeAsync(existingLike.CommentId, existingLike.UserId, ct);
+            return new CommentLikeToggleResult(false, "Comment unliked.", likes);
         }
 
         var like = new CommentLike
@@ -78,11 +78,11 @@ public class CommentLogic(ICommentRepository _repo) : ICommentLogic
             return new CommentLikeToggleResult(true, "Comment liked.");
         }
     }
-    
+
     public async Task<CommentResult> UpdateAsync(
-        Guid id, 
-        UpdateCommentRequestDto dto, 
-        string currentUserId, 
+        Guid id,
+        UpdateCommentRequestDto dto,
+        string currentUserId,
         CancellationToken ct = default)
     {
         var existingComment = await _repo.GetByIdAsync(id, ct);
@@ -91,26 +91,26 @@ public class CommentLogic(ICommentRepository _repo) : ICommentLogic
         {
             return new CommentResult.NotFound("The comment was not found.");
         }
-        
+
         if (existingComment.CreatedById != currentUserId)
         {
             return new CommentResult.Forbidden("Forbidden.");
         }
-            
+
         var result = await _repo.UpdateAsync(existingComment.Id, dto, ct);
 
         if (result is 0)
         {
             return new CommentResult.UpdateFailed("The update was failed.");
         }
-            
+
         return new CommentResult.Success(existingComment.Id);
     }
-    
+
     public async Task<CommentResult> DeleteAsync(
-        Guid id, 
+        Guid id,
         bool isAdmin,
-        string currentUserId, 
+        string currentUserId,
         CancellationToken ct = default)
     {
         var comment = await _repo.GetByIdAsync(id, ct);
@@ -137,7 +137,7 @@ public class CommentLogic(ICommentRepository _repo) : ICommentLogic
         {
             await _repo.DeleteAsync(comment.Id, ct);
         }
-        
+
         return new CommentResult.Success(null);
     }
 }

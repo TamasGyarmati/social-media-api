@@ -18,7 +18,7 @@ public interface IPostLogic
 }
 
 public class PostLogic(
-    IPostRepository _repo, 
+    IPostRepository _repo,
     IImageProcessor _imageProcessor) : IPostLogic
 {
     public async Task<List<GetAllPostsResponseDto>> ReadAll(CancellationToken ct = default)
@@ -26,32 +26,32 @@ public class PostLogic(
         var posts = await _repo.GetAllAsync(ct);
         return posts.Select(x => x.FromDomainToResponsePostDto()).ToList();
     }
-    
+
     public async Task<GetPostWithCommentsResponseDto?> ReadWithCommentsByIdAsync(
-        Guid id, 
+        Guid id,
         CancellationToken ct = default)
     {
         var post = await _repo.GetByIdWithCommentsAsync(id, ct);
         var dto = post?.FromDomainToPostWithCommentsDto();
         return dto;
     }
-    
+
     public async Task<Guid> CreateAsync(
-        CreatePostRequestDto dto, 
-        string currentUserId, 
+        CreatePostRequestDto dto,
+        string currentUserId,
         CancellationToken ct = default)
     {
         var relativePath = await _imageProcessor.ProcessAndSavePostImageAsync(dto.Image, ct);
-        
+
         var post = dto.FromCreatePostToDomain(relativePath, currentUserId);
         var response = await _repo.CreateAsync(post, ct);
-        
+
         return response.Id;
     }
-    
+
     public async Task<PostLikeToggleResult?> ToggleLikeAsync(
-        Guid id, 
-        string currentUserId, 
+        Guid id,
+        string currentUserId,
         CancellationToken ct = default)
     {
         var existingPost = await _repo.GetByIdAsync(id, ct);
@@ -59,13 +59,13 @@ public class PostLogic(
         {
             return null;
         }
-        
+
         var existingLike = await _repo.GetLikeByIdAsync(existingPost.Id, currentUserId, ct);
 
         if (existingLike is not null)
         {
-            await _repo.DeleteLikeAsync(existingLike.PostId, existingLike.UserId,  ct);
-            return new PostLikeToggleResult(false, "Post unliked.");
+            var likes = await _repo.DeleteLikeAsync(existingLike.PostId, existingLike.UserId, ct);
+            return new PostLikeToggleResult(false, "Post unliked.", likes);
         }
 
         var like = new PostLike
@@ -85,11 +85,11 @@ public class PostLogic(
             return new PostLikeToggleResult(true, "Post liked.");
         }
     }
-    
+
     public async Task<PostResult> UpdateAsync(
-        Guid id, 
-        UpdatePostRequestDto dto, 
-        string currentUserId, 
+        Guid id,
+        UpdatePostRequestDto dto,
+        string currentUserId,
         CancellationToken ct = default)
     {
         var existingPost = await _repo.GetByIdAsync(id, ct);
@@ -97,12 +97,12 @@ public class PostLogic(
         {
             return new PostResult.NotFound("The post was not found.");
         }
-        
+
         if (existingPost.CreatedById != currentUserId)
         {
             return new PostResult.Forbidden("Forbidden.");
         }
-        
+
         var oldImageUrl = existingPost.ImageUrl;
         string? relativePath = null;
 
@@ -126,13 +126,13 @@ public class PostLogic(
                 }
                 return new PostResult.FailedToUpdate("Failed to update post.");
             }
-            
+
             if (relativePath is not null && !string.IsNullOrWhiteSpace(oldImageUrl))
             {
                 _imageProcessor.DeleteImage(oldImageUrl);
             }
-            
-            return new PostResult.Success(existingPost.Id);   
+
+            return new PostResult.Success(existingPost.Id);
         }
         catch (OperationCanceledException)
         {
@@ -151,7 +151,7 @@ public class PostLogic(
             throw;
         }
     }
-    
+
     public async Task<PostResult> DeleteAsync(Guid id, bool isAdmin, string currentUserId, CancellationToken ct = default)
     {
         var post = await _repo.GetByIdAsync(id, ct);
@@ -159,14 +159,14 @@ public class PostLogic(
         {
             return new PostResult.NotFound("The post was not found.");
         }
-        
+
         if (post.CreatedById != currentUserId && !isAdmin)
         {
             return new PostResult.Forbidden("Forbidden.");
         }
-        
+
         var oldImage = post.ImageUrl;
-        
+
         await _repo.DeleteAsync(post.Id, ct);
 
         if (!string.IsNullOrWhiteSpace(oldImage))

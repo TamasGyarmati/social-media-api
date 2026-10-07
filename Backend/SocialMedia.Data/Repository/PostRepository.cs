@@ -15,7 +15,7 @@ public interface IPostRepository
     Task<int> CreateLikeAsync(PostLike like, CancellationToken ct = default);
     Task<int> UpdateAsync(Guid postId, UpdatePostRequestDto dto, string? imageUrl, CancellationToken ct = default);
     Task DeleteAsync(Guid postId, CancellationToken ct = default);
-    Task DeleteLikeAsync(Guid postId, string userId, CancellationToken ct = default);
+    Task<int> DeleteLikeAsync(Guid postId, string userId, CancellationToken ct = default);
 }
 
 public class PostRepository(SocialMediaDbContext _db) : IPostRepository
@@ -28,7 +28,7 @@ public class PostRepository(SocialMediaDbContext _db) : IPostRepository
             .Include(p => p.Likes)
             .Include(x => x.Creator)
             .ToListAsync(ct);
-    
+
     public async Task<Post?> GetByIdAsync(Guid id, CancellationToken ct = default)
         => await _db.Posts
             .AsNoTracking()
@@ -50,7 +50,7 @@ public class PostRepository(SocialMediaDbContext _db) : IPostRepository
     {
         _db.Posts.Add(post);
         await _db.SaveChangesAsync(ct);
-        
+
         return post;
     }
 
@@ -85,6 +85,24 @@ public class PostRepository(SocialMediaDbContext _db) : IPostRepository
     public async Task DeleteAsync(Guid postId, CancellationToken ct = default)
         => await _db.Posts.Where(x => x.Id == postId).ExecuteDeleteAsync(ct);
 
-    public async Task DeleteLikeAsync(Guid postId, string userId, CancellationToken ct = default)
-        => await _db.PostLikes.Where(x => x.PostId == postId && x.UserId == userId).ExecuteDeleteAsync(ct);
+    public async Task<int> DeleteLikeAsync(
+    Guid postId,
+    string userId,
+    CancellationToken ct = default)
+
+    {
+        var like = await _db.PostLikes
+            .FirstOrDefaultAsync(
+                x => x.PostId == postId && x.UserId == userId,
+                ct);
+
+        if (like is not null)
+        {
+            _db.PostLikes.Remove(like);
+            await _db.SaveChangesAsync(ct);
+        }
+
+        return await _db.PostLikes
+            .CountAsync(x => x.PostId == postId, ct);
+    }
 }

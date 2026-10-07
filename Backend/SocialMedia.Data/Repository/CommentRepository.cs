@@ -15,7 +15,7 @@ public interface ICommentRepository
     Task<int> UpdateAsync(Guid commentId, UpdateCommentRequestDto dto, CancellationToken ct = default);
     Task<int> UpdateForDeletionAsync(Guid commentId, CancellationToken ct = default);
     Task<int> DeleteAsync(Guid commentId, CancellationToken ct = default);
-    Task DeleteLikeAsync(Guid commentId, string userId, CancellationToken ct = default);
+    Task<int> DeleteLikeAsync(Guid commentId, string userId, CancellationToken ct = default);
 }
 
 public class CommentRepository(SocialMediaDbContext _db) : ICommentRepository
@@ -29,7 +29,7 @@ public class CommentRepository(SocialMediaDbContext _db) : ICommentRepository
             .Include(x => x.Replies)
             .Include(x => x.Creator)
             .ToListAsync(ct);
-    
+
     public async Task<Comment?> GetByIdAsync(Guid id, CancellationToken ct = default)
         => await _db.Comments
             .AsNoTracking()
@@ -39,8 +39,8 @@ public class CommentRepository(SocialMediaDbContext _db) : ICommentRepository
             .FirstOrDefaultAsync(c => c.Id == id, ct);
 
     public async Task<CommentLike?> GetLikeByIdAsync(
-        Guid commentId, 
-        string userId, 
+        Guid commentId,
+        string userId,
         CancellationToken ct = default)
         => await _db.CommentLikes.FirstOrDefaultAsync(x => x.CommentId == commentId && x.UserId == userId, ct);
 
@@ -48,7 +48,7 @@ public class CommentRepository(SocialMediaDbContext _db) : ICommentRepository
     {
         _db.Comments.Add(comment);
         await _db.SaveChangesAsync(ct);
-        
+
         return await _db.Comments
             .Include(c => c.Creator)
             .FirstAsync(c => c.Id == comment.Id, ct);
@@ -73,7 +73,7 @@ public class CommentRepository(SocialMediaDbContext _db) : ICommentRepository
                 .SetProperty(x => x.Content, dto.Content)
                 .SetProperty(x => x.UpdatedAtUtc, DateTime.UtcNow), ct);
     }
-    
+
     public async Task<int> UpdateForDeletionAsync(Guid commentId, CancellationToken ct = default)
     {
         return await _db.Comments
@@ -86,6 +86,18 @@ public class CommentRepository(SocialMediaDbContext _db) : ICommentRepository
     public async Task<int> DeleteAsync(Guid commentId, CancellationToken ct = default)
         => await _db.Comments.Where(x => x.Id == commentId).ExecuteDeleteAsync(ct);
 
-    public async Task DeleteLikeAsync(Guid commentId, string userId, CancellationToken ct = default)
-        => await _db.CommentLikes.Where(x => x.CommentId == commentId && x.UserId == userId).ExecuteDeleteAsync(ct);
+    public async Task<int> DeleteLikeAsync(
+    Guid commentId,
+    string userId,
+    CancellationToken ct = default)
+    {
+        await _db.CommentLikes
+            .Where(x => x.CommentId == commentId && x.UserId == userId)
+            .ExecuteDeleteAsync(ct);
+
+        var likes = await _db.CommentLikes
+            .CountAsync(x => x.CommentId == commentId, ct);
+
+        return likes;
+    }
 }
