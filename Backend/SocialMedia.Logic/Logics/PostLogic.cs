@@ -76,8 +76,8 @@ public class PostLogic(
 
         try
         {
-            await _repo.CreateLikeAsync(like, ct);
-            return new PostLikeToggleResult(true, "Post liked.");
+            var likes = await _repo.CreateLikeAsync(like, ct);
+            return new PostLikeToggleResult(true, "Post liked.", likes);
         }
         catch (DbUpdateException)
         {

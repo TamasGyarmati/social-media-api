@@ -12,7 +12,7 @@ public interface IPostRepository
     Task<PostLike?> GetLikeByIdAsync(Guid postId, string userId, CancellationToken ct = default);
     Task<Post?> GetByIdWithCommentsAsync(Guid id, CancellationToken ct = default);
     Task<Post> CreateAsync(Post post, CancellationToken ct = default);
-    Task<PostLike> CreateLikeAsync(PostLike like, CancellationToken ct = default);
+    Task<int> CreateLikeAsync(PostLike like, CancellationToken ct = default);
     Task<int> UpdateAsync(Guid postId, UpdatePostRequestDto dto, string? imageUrl, CancellationToken ct = default);
     Task DeleteAsync(Guid postId, CancellationToken ct = default);
     Task DeleteLikeAsync(Guid postId, string userId, CancellationToken ct = default);
@@ -54,12 +54,15 @@ public class PostRepository(SocialMediaDbContext _db) : IPostRepository
         return post;
     }
 
-    public async Task<PostLike> CreateLikeAsync(PostLike like, CancellationToken ct = default)
+    public async Task<int> CreateLikeAsync(PostLike like, CancellationToken ct = default)
     {
         _db.PostLikes.Add(like);
         await _db.SaveChangesAsync(ct);
 
-        return like;
+        var likes = await _db.PostLikes
+            .CountAsync(x => x.PostId == like.PostId, ct);
+
+        return likes;
     }
 
     public async Task<int> UpdateAsync(Guid postId, UpdatePostRequestDto dto, string? imageUrl, CancellationToken ct = default)

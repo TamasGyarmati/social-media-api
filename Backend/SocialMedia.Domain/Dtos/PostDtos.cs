@@ -45,7 +45,8 @@ public record GuidPostResponseDto(
 
 public record CreatePostLikeResponseDto(
     bool IsLiked,
-    string Message
+    string Message,
+    int? Likes = 0
 );
 
 public static class PostMappingExtensions

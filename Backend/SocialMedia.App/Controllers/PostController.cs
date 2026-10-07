@@ -82,7 +82,7 @@ public class PostController(IPostLogic _logic) : ControllerBase
         
         return result is null 
             ? NotFound(new { Message = "The post was not found." }) 
-            : Ok(new CreatePostLikeResponseDto(result.IsLiked, result.Message));
+            : Ok(new CreatePostLikeResponseDto(result.IsLiked, result.Message, result.Likes));
     }
 
     [HttpPut("{id:guid}")]
