@@ -50,9 +50,9 @@ public class CommentController(ICommentLogic _logic) : ControllerBase
             return Unauthorized();
         }
 
-        var commentId = await _logic.CreateAsync(dto, currentUserId, ct);
+        var commentDto = await _logic.CreateAsync(dto, currentUserId, ct);
         
-        return Ok(new CreateCommentResponseDto(commentId));
+        return Ok(new CreateCommentResponseDto(commentDto));
     }
     
     [HttpPost("{id:guid}/like")]

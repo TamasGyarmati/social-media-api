@@ -34,7 +34,7 @@ public record CreateCommentRequestDto(
 );
 
 public record CreateCommentResponseDto(
-    Guid Id
+    CommentResponseDto comment
 );
 
 public record UpdateCommentResponseDto(

@@ -49,7 +49,9 @@ public class CommentRepository(SocialMediaDbContext _db) : ICommentRepository
         _db.Comments.Add(comment);
         await _db.SaveChangesAsync(ct);
         
-        return comment;
+        return await _db.Comments
+            .Include(c => c.Creator)
+            .FirstAsync(c => c.Id == comment.Id, ct);
     }
 
     public async Task<int> CreateLikeAsync(CommentLike like, CancellationToken ct = default)

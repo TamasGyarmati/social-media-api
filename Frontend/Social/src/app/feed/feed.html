@@ -1,4 +1,6 @@
-<div class="my-container">
+<mat-progress-spinner mode="indeterminate" *ngIf="this.isLoading()"></mat-progress-spinner>
+
+<div class="my-container" *ngIf="!this.isLoading()">
   <div class="feed-card" *ngFor="let post of this.posts()">
     <div class="feed-user-data">
       <img class="avatar" [src]="this.apiUri + '/' + post.creatorAvatarUrl" alt="" />
@@ -22,7 +24,11 @@
       </div>
     </div>
 
-    <app-comments *ngIf="openedComments().has(post.id)" [comments]="comments().get(post.id) || []">
+    <app-comments
+      *ngIf="openedComments().has(post.id)"
+      [postId]="post.id"
+      [comments]="comments().get(post.id) || []"
+    >
     </app-comments>
   </div>
 </div>

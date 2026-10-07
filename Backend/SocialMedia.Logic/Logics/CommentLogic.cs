@@ -10,7 +10,7 @@ public interface ICommentLogic
 {
     Task<List<CommentResponseDto>> ReadAllFromPostAsync(Guid id, CancellationToken ct = default);
     Task<CommentResponseDto?> GetByIdAsync(Guid id, CancellationToken ct = default);
-    Task<Guid> CreateAsync(CreateCommentRequestDto dto, string currentUserId, CancellationToken ct = default);
+    Task<CommentResponseDto> CreateAsync(CreateCommentRequestDto dto, string currentUserId, CancellationToken ct = default);
     Task<CommentLikeToggleResult?> ToggleLikeAsync(Guid id, string currentUserId, CancellationToken ct = default);
     Task<CommentResult> UpdateAsync(Guid id, UpdateCommentRequestDto dto, string currentUserId, CancellationToken ct = default);
     Task<CommentResult> DeleteAsync(Guid id, bool isAdmin, string currentUserId, CancellationToken ct = default);
@@ -32,14 +32,15 @@ public class CommentLogic(ICommentRepository _repo) : ICommentLogic
         return response;
     }
     
-    public async Task<Guid> CreateAsync(
+    public async Task<CommentResponseDto> CreateAsync(
         CreateCommentRequestDto dto, 
         string currentUserId, 
         CancellationToken ct = default)
     {
         var comment = dto.FromCreateCommentToDomain(currentUserId);
         var response = await _repo.CreateAsync(comment, ct);
-        return response.Id;
+        var responseDto = response.FromDomainToCommentResponseDto();
+        return responseDto;
     }
     
     public async Task<CommentLikeToggleResult?> ToggleLikeAsync(

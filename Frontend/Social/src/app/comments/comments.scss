@@ -6,6 +6,21 @@
   padding-top: 20px;
   border-top: 1px solid rgba(255, 255, 255, 0.2);
 
+  .comment-input {
+    width: 100%;
+
+    mat-form-field {
+      width: 100%;
+    }
+
+    button {
+      border: none;
+      outline: none;
+      box-shadow: none;
+      background: transparent;
+    }
+  }
+
   h3 {
     margin: 0;
   }

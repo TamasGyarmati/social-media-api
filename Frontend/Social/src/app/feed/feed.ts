@@ -20,6 +20,7 @@ export class Feed implements OnInit {
   public posts = signal<getAllPost[]>([]);
   public openedComments = signal<Set<string>>(new Set());
   public comments = signal<Map<string, CommentToPost[]>>(new Map());
+  public isLoading = signal<boolean>(true);
 
   constructor(private httpClient: HttpClient) {}
 
@@ -32,6 +33,8 @@ export class Feed implements OnInit {
             ...post,
           })),
         );
+
+        this.isLoading.set(false);
       },
       (error) => {
         console.log('::ERROR::', error);
@@ -51,9 +54,12 @@ export class Feed implements OnInit {
     if (!this.comments().has(postId)) {
       this.httpClient.get<CommentToPost[]>(`${env.commentGetByPostIdUri}/${postId}`).subscribe(
         (success) => {
-          const comments = new Map(this.comments());
-          comments.set(postId, success);
+          const sortedComments = success.sort(
+            (a, b) => new Date(b.createdAtUnc).getTime() - new Date(a.createdAtUnc).getTime(),
+          );
 
+          const comments = new Map(this.comments());
+          comments.set(postId, sortedComments);
           this.comments.set(comments);
 
           opened.add(postId);
