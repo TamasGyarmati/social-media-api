@@ -1,1 +1,7 @@
-<p>feed works!</p>
+<div *ngFor="let post of this.posts()">
+  <h1>{{ post.title }}</h1>
+  <h2>{{ post.creatorUserName }}</h2>
+  <img class="avatar" [src]="this.apiUri + '/' + post.creatorAvatarUrl" alt="" />
+  <p>{{ post.description }}</p>
+  <img class="post" [src]="this.apiUri + '/' + post.imageUrl" alt="" />
+</div>
