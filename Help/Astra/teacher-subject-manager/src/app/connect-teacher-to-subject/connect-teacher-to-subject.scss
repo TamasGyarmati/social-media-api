@@ -1,0 +1,104 @@
+@import '../_shared/variables.scss';
+
+.my-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+
+  .header {
+    h1 {
+      margin-top: 20vh;
+    }
+  }
+
+  .forms {
+    width: $global-input-width;
+
+    mat-form-field {
+      width: 100%;
+    }
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    button {
+      width: 130px;
+      transition: background-color 0.5s ease-out;
+    }
+
+    .go-back-btn {
+      &:hover {
+        background-color: $go-back-btn-hover-color;
+      }
+    }
+
+    .add-btn {
+      background-color: $add-btn-color;
+
+      &:hover {
+        background-color: $add-btn-hover-color;
+      }
+    }
+
+    .delete-btn {
+      background-color: $delete-btn-color;
+
+      &:hover {
+        background-color: $delete-btn-hover-color;
+      }
+    }
+  }
+}
+
+mat-select {
+  color: white;
+}
+
+mat-progress-spinner {
+  margin: 0 auto;
+}
+
+::ng-deep {
+  .mat-mdc-form-field {
+    .mdc-floating-label {
+      color: rgba(255, 255, 255, 0.8) !important;
+    }
+  }
+
+  .mdc-notched-outline {
+    &__leading,
+    &__notch,
+    &__trailing {
+      border-color: rgba(255, 255, 255, 0.6) !important;
+    }
+  }
+
+  .mdc-text-field:hover {
+    .mdc-notched-outline {
+      &__leading,
+      &__notch,
+      &__trailing {
+        border-color: rgba(255, 255, 255, 0.6) !important;
+      }
+    }
+  }
+
+  .mdc-text-field--focused {
+    .mdc-notched-outline {
+      &__leading,
+      &__notch,
+      &__trailing {
+        border-color: white !important;
+      }
+    }
+  }
+
+  .mdc-form-field,
+  .mdc-label {
+    color: white !important;
+  }
+}

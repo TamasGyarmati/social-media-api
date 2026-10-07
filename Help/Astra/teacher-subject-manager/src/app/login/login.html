@@ -1,0 +1,52 @@
+<div class="my-container">
+  <div class="header">
+    <h1>Login</h1>
+  </div>
+
+  <mat-progress-spinner mode="indeterminate" *ngIf="this.isLoading()"></mat-progress-spinner>
+
+  <div class="forms" *ngIf="!this.isLoading()">
+    <mat-form-field appearance="outline">
+      <mat-label>Email address</mat-label>
+      <input matInput [formControl]="this.email" />
+      <mat-icon matSuffix>email</mat-icon>
+      <mat-hint>Your registered email address</mat-hint>
+      <mat-error *ngIf="this.email.invalid">{{ getEmailErrorMessage }}</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Password</mat-label>
+      <input [type]="hide() ? 'password' : 'text'" matInput [formControl]="this.password" />
+      <button
+        mat-icon-button
+        matSuffix
+        type="button"
+        (click)="clickEvent($event)"
+        [attr.aria-label]="'Hide password'"
+        [attr.aria-pressed]="hide()"
+      >
+        <mat-icon
+          style="margin-right: 5px"
+          [fontIcon]="hide() ? 'visibility_off' : 'visibility'"
+        ></mat-icon>
+      </button>
+      <mat-hint>Your password used during registration</mat-hint>
+      <mat-error *ngIf="this.password.invalid">{{ getPasswordErrorMessage }}</mat-error>
+    </mat-form-field>
+  </div>
+
+  <div class="register-link" *ngIf="!this.isLoading()">
+    <h3>Haven't signed up yet? <a [routerLink]="['/register']">Register here!</a></h3>
+  </div>
+
+  <div class="actions" *ngIf="!this.isLoading()">
+    <button
+      mat-flat-button
+      color="accent"
+      (click)="sendLoginCredentials()"
+      [disabled]="!checkInput"
+    >
+      Login
+    </button>
+  </div>
+</div>

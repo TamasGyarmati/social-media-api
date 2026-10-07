@@ -1,0 +1,242 @@
+@import '../_shared/variables.scss';
+
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 30px;
+
+  .first {
+    .actions {
+      display: flex;
+      gap: 15px;
+    }
+  }
+
+  .second {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+    margin-top: 10px;
+
+    mat-form-field {
+      width: 300px;
+    }
+
+    .clear {
+      width: 30px;
+      height: 30px;
+      margin-bottom: 15px;
+      background-color: transparent;
+      color: white;
+      border: 0;
+
+      mat-icon {
+        position: relative;
+        right: 4px;
+      }
+    }
+  }
+}
+
+.connect-button,
+.create-button {
+  color: white;
+  transition: background-color 0.5s ease-out;
+
+  &:hover {
+    background-color: $go-back-btn-hover-color;
+  }
+}
+
+.connect-button {
+  background-color: $go-back-btn-color;
+}
+
+.create-button {
+  background-color: $add-btn-color;
+
+  &:hover {
+    background-color: $add-btn-hover-color;
+  }
+}
+
+.my-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;
+
+  mat-card {
+    width: 380px;
+    background: rgba(15, 23, 42, 0.55) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: white !important;
+    transition: transform 0.4s;
+
+    &:hover {
+      transform: translateY(-8px);
+    }
+
+    .subject-header {
+      display: flex;
+      align-items: center;
+
+      .subject-info {
+        flex: 1;
+      }
+
+      img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 20px;
+      }
+    }
+
+    mat-card-title {
+      font-weight: 800;
+      color: white !important;
+    }
+
+    mat-card-subtitle {
+      color: rgba(255, 255, 255, 0.65) !important;
+    }
+
+    mat-card-content {
+      color: white !important;
+
+      p {
+        font-weight: 600;
+      }
+
+      span {
+        font-weight: 300;
+      }
+
+      .exam-icon {
+        position: relative;
+        top: 0.5em;
+        font-size: 1.4em;
+      }
+    }
+
+    mat-divider {
+      margin: 10px 0;
+      border-top-color: rgba(255, 255, 255, 0.15);
+    }
+
+    mat-icon {
+      color: white;
+    }
+  }
+}
+
+.edit-btn {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+
+  span {
+    font-family: 'DM Sans', sans-serif;
+    font-size: medium;
+    font-weight: 800 !important;
+  }
+}
+
+.subject-id {
+  font-size: 0.8em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.green {
+  color: green;
+}
+
+.red {
+  color: red;
+}
+
+mat-progress-spinner {
+  margin: 100px auto 0;
+}
+
+::ng-deep {
+  input.mat-mdc-input-element {
+    color: white !important;
+    caret-color: white !important;
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.6) !important;
+      opacity: 1;
+    }
+  }
+
+  .mat-mdc-form-field {
+    .mdc-floating-label {
+      color: rgba(255, 255, 255, 0.8) !important;
+    }
+
+    .mat-mdc-form-field-hint {
+      color: rgba(255, 255, 255, 0.6) !important;
+    }
+
+    mat-icon {
+      color: white !important;
+    }
+  }
+
+  .mdc-notched-outline {
+    &__leading,
+    &__notch,
+    &__trailing {
+      border-color: rgba(255, 255, 255, 0.6) !important;
+    }
+  }
+
+  .mdc-text-field:hover {
+    .mdc-notched-outline {
+      &__leading,
+      &__notch,
+      &__trailing {
+        border-color: rgba(255, 255, 255, 0.6) !important;
+      }
+    }
+  }
+
+  .mdc-text-field--focused {
+    .mdc-notched-outline {
+      &__leading,
+      &__notch,
+      &__trailing {
+        border-color: white !important;
+      }
+    }
+  }
+
+  .mdc-form-field,
+  .mdc-label {
+    color: white !important;
+  }
+}
+
+@media (min-width: 375px) {
+  .my-container mat-card {
+    width: 450px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .my-container mat-card {
+    width: 430px;
+  }
+}
+
+@media (min-width: 1600px) {
+  .my-container mat-card {
+    width: 340px;
+  }
+}

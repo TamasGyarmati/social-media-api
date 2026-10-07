@@ -1,0 +1,35 @@
+<div class="my-container">
+  <div class="header">
+    <h1>Manage connections</h1>
+  </div>
+
+  <mat-progress-spinner mode="indeterminate" *ngIf="this.isLoading()"></mat-progress-spinner>
+
+  <div class="forms" *ngIf="!this.isLoading()">
+    <mat-form-field appearance="outline">
+      <mat-label>Teacher</mat-label>
+      <mat-select [(ngModel)]="this.selectedTeacherIdToAdd">
+        <mat-option *ngFor="let teacher of teachers()" [value]="teacher.id">
+          <span>{{ teacher.name }} - {{ teacher.neptun }}</span>
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Subject</mat-label>
+      <mat-select [(ngModel)]="this.selectedSubjectIdsToAdd" multiple>
+        <mat-option *ngFor="let subject of subjects()" [value]="subject.id">
+          <span>{{ subject.name }} - {{ subject.neptun }}</span>
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <div class="actions" *ngIf="!this.isLoading()">
+    <button class="add-btn" mat-flat-button color="accent" (click)="addConnection()">Add</button>
+    <button class="delete-btn" mat-flat-button color="accent" (click)="deleteConnection()">
+      Delete
+    </button>
+    <button class="go-back-btn" mat-flat-button color="accent" (click)="goBack()">Go back</button>
+  </div>
+</div>

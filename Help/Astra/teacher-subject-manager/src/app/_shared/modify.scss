@@ -1,0 +1,138 @@
+@import '../_shared/variables.scss';
+
+h1 {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+mat-progress-spinner {
+  margin: 100px auto 0;
+}
+
+.checkboxes {
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 40px;
+}
+
+.my-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+
+  mat-form-field {
+    width: $global-input-width;
+    max-width: 90%;
+  }
+
+  .go-back-btn,
+  .create-button,
+  .delete-button,
+  .edit-button {
+    color: white;
+    transition: background-color 0.5s ease-out;
+  }
+
+  .go-back-btn {
+    background-color: $go-back-btn-color;
+
+    &:hover {
+      background-color: $go-back-btn-hover-color;
+    }
+  }
+
+  .create-button {
+    background-color: $add-btn-color;
+
+    &:hover {
+      background-color: $add-btn-hover-color;
+    }
+  }
+
+  .delete-button {
+    background-color: $delete-btn-color;
+
+    &:hover {
+      background-color: $delete-btn-hover-color;
+    }
+
+    &:disabled {
+      color: $disabled-btn-color;
+      background-color: $disabled-btn-background-color;
+    }
+  }
+
+  .edit-button {
+    background-color: $edit-btn-color;
+
+    &:hover {
+      background-color: $edit-btn-hover-color;
+    }
+  }
+}
+
+::ng-deep {
+  input.mat-mdc-input-element {
+    color: white !important;
+    caret-color: white !important;
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.6) !important;
+      opacity: 1;
+    }
+  }
+
+  .mat-mdc-form-field {
+    .mdc-floating-label {
+      color: rgba(255, 255, 255, 0.8) !important;
+    }
+
+    .mat-mdc-form-field-hint {
+      color: rgba(255, 255, 255, 0.6) !important;
+    }
+
+    mat-icon {
+      color: white !important;
+    }
+  }
+
+  .mdc-notched-outline {
+    &__leading,
+    &__notch,
+    &__trailing {
+      border-color: rgba(255, 255, 255, 0.6) !important;
+    }
+  }
+
+  .mdc-text-field:hover {
+    .mdc-notched-outline {
+      &__leading,
+      &__notch,
+      &__trailing {
+        border-color: rgba(255, 255, 255, 0.6) !important;
+      }
+    }
+  }
+
+  .mdc-text-field--focused {
+    .mdc-notched-outline {
+      &__leading,
+      &__notch,
+      &__trailing {
+        border-color: white !important;
+      }
+    }
+  }
+
+  .mdc-form-field,
+  .mdc-label {
+    color: white !important;
+  }
+}

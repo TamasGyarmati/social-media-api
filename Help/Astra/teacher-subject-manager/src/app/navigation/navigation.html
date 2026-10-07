@@ -1,0 +1,46 @@
+<nav>
+  <button mat-stroked-button [routerLink]="['/home']">
+    <mat-icon aria-hidden="false" aria-label="Home icon" fontIcon="home"> </mat-icon>
+    Home
+  </button>
+
+  <button mat-stroked-button [matMenuTriggerFor]="menu">
+    <mat-icon aria-hidden="false" aria-label="Manage icon" fontIcon="manage_accounts"> </mat-icon>
+    Manager
+  </button>
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item [routerLink]="['/list-teachers']">
+      <mat-icon aria-hidden="false" aria-label="Manage icon" fontIcon="person"> </mat-icon>
+      Teachers
+    </button>
+    <button mat-menu-item [routerLink]="['/list-subjects']">
+      <mat-icon aria-hidden="false" aria-label="Manage icon" fontIcon="menu_book"> </mat-icon>
+      Subjects
+    </button>
+    <!--<button mat-menu-item [routerLink]="['/connect']">Create connection</button>-->
+  </mat-menu>
+
+  <!--<button mat-stroked-button [routerLink]="['/register']" *ngIf="this.api.isLoggedIn()">
+    Register
+  </button>-->
+
+  <button mat-flat-button [routerLink]="['/login']" color="accent" *ngIf="!this.api.isLoggedIn()">
+    <mat-icon aria-hidden="false" aria-label="" fontIcon="login"></mat-icon>
+    Login
+  </button>
+
+  <button
+    mat-stroked-button
+    [routerLink]="['/logout']"
+    color="accent"
+    *ngIf="this.api.isLoggedIn()"
+  >
+    <mat-icon aria-hidden="false" aria-label="" fontIcon="logout"></mat-icon>
+    Logout
+  </button>
+
+  <div class="user" *ngIf="this.api.isLoggedIn()">
+    <p>{{ this.api.userName() }}</p>
+    <mat-icon class="blink-smooth" aria-hidden="false" aria-label="" fontIcon="circle"></mat-icon>
+  </div>
+</nav>

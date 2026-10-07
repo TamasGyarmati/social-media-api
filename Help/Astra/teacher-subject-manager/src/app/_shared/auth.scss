@@ -1,0 +1,115 @@
+@import '../_shared/variables.scss';
+
+.my-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 35px;
+
+  .header {
+    h1 {
+      margin-top: 10vh;
+      text-align: center;
+    }
+  }
+
+  .forms {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+
+    mat-form-field {
+      width: $global-input-width;
+
+      input {
+        color: white;
+      }
+
+      mat-label {
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      mat-hint {
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      mat-icon {
+        color: white;
+      }
+    }
+  }
+
+  .register-link {
+    h3 {
+      a {
+        display: inline-block;
+        color: #015cbb;
+        text-decoration: none;
+        transition: transform 0.3s ease-out;
+
+        &:hover {
+          transform: translateY(-3px);
+        }
+      }
+    }
+  }
+
+  .actions {
+    button {
+      border-radius: 5px;
+
+      &:disabled {
+        background: $disabled-btn-background-color;
+        color: $disabled-btn-color;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+mat-progress-spinner {
+  margin: 0 auto;
+}
+
+button[mat-icon-button] {
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+  border: none !important;
+
+  --mat-icon-button-container-color: transparent;
+  --mat-icon-button-state-layer-color: transparent;
+  --mat-icon-button-hover-state-layer-opacity: 0;
+  --mat-icon-button-focus-state-layer-opacity: 0;
+  --mat-icon-button-pressed-state-layer-opacity: 0;
+}
+
+::ng-deep {
+  .mdc-text-field {
+    --mdc-text-field-hover-state-layer-opacity: 0;
+  }
+
+  input.mat-mdc-input-element {
+    color: white !important;
+    caret-color: white !important;
+  }
+
+  .mdc-notched-outline {
+    &__leading,
+    &__notch,
+    &__trailing {
+      border-color: rgba(255, 255, 255, 0.6) !important;
+    }
+  }
+
+  .mat-form-field-invalid {
+    .mdc-notched-outline {
+      &__leading,
+      &__notch,
+      &__trailing {
+        border-color: #f44336 !important;
+      }
+    }
+  }
+}
