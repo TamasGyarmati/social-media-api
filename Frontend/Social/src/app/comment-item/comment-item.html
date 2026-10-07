@@ -8,9 +8,9 @@
   </div>
 
   <div class="comment-actions">
-    <div>
+    <div (click)="likeComment(comment().id)">
       <mat-icon>favorite</mat-icon>
-      <span>{{ comment().likes }}</span>
+      <span>{{ likes() }}</span>
     </div>
 
     <div>
