@@ -1,5 +1,4 @@
 <div class="nav">
-  <button matButton [routerLink]="['/home']">Home</button>
   <button matButton [routerLink]="['/feed']">Feed</button>
   <button matButton [routerLink]="['/login']" *ngIf="!this.auth.isLoggedIn()">Login</button>
   <button matButton (click)="logout()" *ngIf="this.auth.isLoggedIn()">Logout</button>
