@@ -11,7 +11,7 @@ import { Login as LoginModel } from '../_models/login';
 import { CommonModule } from '@angular/common';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MATERIAL_IMPORTS } from '../_shared/material';
-import { ApiService } from '../services/api.service';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -30,7 +30,7 @@ export class Login implements OnInit {
     private router: Router,
     private http: HttpClient,
     private snackBar: MatSnackBar,
-    private api: ApiService,
+    private auth: AuthService,
   ) {
     this.password = new FormControl('', [Validators.required]);
     this.email = new FormControl('', [Validators.required, Validators.email]);
@@ -83,7 +83,7 @@ export class Login implements OnInit {
         localStorage.setItem(env.jwtAccessTokenExp, success.accessTokenExpireDate);
         localStorage.setItem(env.jwtRefreshToken, success.refreshToken);
         localStorage.setItem(env.jwtRefreshTokenExp, success.refreshTokenExpireDate);
-        this.api.checkIfLoggedIn();
+        this.auth.checkIfLoggedIn();
         this.snackBar
           .open('Login was successful!', 'Close', { duration: 5000 })
           .afterDismissed()

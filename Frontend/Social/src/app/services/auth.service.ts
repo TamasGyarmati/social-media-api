@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 @Injectable({
   providedIn: 'root',
 })
-export class ApiService {
+export class AuthService {
   public isLoggedIn = signal(false);
   public userName = signal<string>('');
 

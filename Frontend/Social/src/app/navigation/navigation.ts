@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ApiService } from '../services/api.service';
+import { AuthService } from '../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
@@ -10,9 +10,9 @@ import { RouterLink } from '@angular/router';
   styleUrl: './navigation.scss',
 })
 export class Navigation {
-  constructor(public apiService: ApiService) {}
+  constructor(public auth: AuthService) {}
 
   public logout(): void {
-    this.apiService.logout();
+    this.auth.logout();
   }
 }
