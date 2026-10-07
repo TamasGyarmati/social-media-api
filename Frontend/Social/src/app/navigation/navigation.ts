@@ -12,19 +12,10 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './navigation.html',
   styleUrl: './navigation.scss',
 })
-export class Navigation implements OnInit {
-  public activeUser = signal<string>('');
-
+export class Navigation {
   constructor(public auth: AuthService) {}
 
   public logout(): void {
     this.auth.logout();
-  }
-
-  ngOnInit(): void {
-    if (this.auth.isLoggedIn()) {
-      this.activeUser.set(localStorage.getItem('username') ?? '');
-      console.log(this.activeUser);
-    }
   }
 }

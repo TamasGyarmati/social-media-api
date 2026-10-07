@@ -1,0 +1,30 @@
+<div class="comment">
+  <div class="comment-header">
+    <strong>@{{ comment().userName }}</strong>
+  </div>
+
+  <div class="comment-content">
+    {{ comment().content }}
+  </div>
+
+  <div class="comment-actions">
+    <div>
+      <mat-icon>favorite</mat-icon>
+      <span>{{ comment().likes }}</span>
+    </div>
+
+    <div>
+      <mat-icon>reply</mat-icon>
+      <span>Reply</span>
+    </div>
+  </div>
+
+  <div class="replies" *ngIf="getReplies().length > 0">
+    <app-comment-item
+      *ngFor="let reply of getReplies()"
+      [comment]="reply"
+      [allComments]="allComments()"
+    >
+    </app-comment-item>
+  </div>
+</div>

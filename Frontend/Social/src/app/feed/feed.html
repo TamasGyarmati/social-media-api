@@ -16,10 +16,13 @@
         <mat-icon>favorite</mat-icon>
         <p>{{ post.likes }}</p>
       </div>
-      <div class="data">
+      <div class="data" (click)="getComments(post.id)">
         <mat-icon>comment</mat-icon>
         <p>{{ post.commentsCount }}</p>
       </div>
     </div>
+
+    <app-comments *ngIf="openedComments().has(post.id)" [comments]="comments().get(post.id) || []">
+    </app-comments>
   </div>
 </div>

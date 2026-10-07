@@ -1,0 +1,41 @@
+.comment {
+  padding: 15px 0;
+
+  .comment-header {
+    margin-bottom: 8px;
+  }
+
+  .comment-content {
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+
+  .comment-actions {
+    display: flex;
+    gap: 20px;
+
+    > div {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+
+      cursor: pointer;
+    }
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    span {
+      font-size: 14px;
+    }
+  }
+
+  .replies {
+    margin-left: 30px;
+    padding-left: 15px;
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+  }
+}

@@ -1,0 +1,10 @@
+<div class="comments">
+  <h3>Comments</h3>
+
+  <app-comment-item
+    *ngFor="let comment of getRootItems()"
+    [comment]="comment"
+    [allComments]="comments()"
+  >
+  </app-comment-item>
+</div>

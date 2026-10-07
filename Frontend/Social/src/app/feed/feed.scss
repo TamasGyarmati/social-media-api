@@ -1,7 +1,7 @@
 .my-container {
   display: flex;
   flex-direction: column;
-  gap: 50px;
+  gap: 150px;
   width: 50%;
   margin: 0 auto;
 
@@ -35,7 +35,7 @@
 
       .post {
         width: 100%;
-        max-width: 650px;
+        max-width: 700px;
         height: 500px;
         object-fit: cover;
       }
@@ -48,6 +48,10 @@
       .data {
         display: flex;
         gap: 10px;
+
+        &:hover {
+          cursor: pointer;
+        }
       }
     }
   }

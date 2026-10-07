@@ -8,9 +8,13 @@ import { Router } from '@angular/router';
 export class AuthService {
   public isLoggedIn = signal(false);
   public userName = signal<string>('');
+  public activeUser = signal<string>('');
 
   constructor(private router: Router) {
     this.checkIfLoggedIn();
+
+    this.activeUser.set(localStorage.getItem('username') ?? '');
+    console.log(this.activeUser);
   }
 
   public canActivate(): boolean {
