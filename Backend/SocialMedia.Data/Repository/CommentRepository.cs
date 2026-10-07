@@ -11,7 +11,7 @@ public interface ICommentRepository
     Task<Comment?> GetByIdAsync(Guid id, CancellationToken ct = default);
     Task<CommentLike?> GetLikeByIdAsync(Guid commentId, string userId, CancellationToken ct = default);
     Task<Comment> CreateAsync(Comment comment, CancellationToken ct = default);
-    Task<CommentLike> CreateLikeAsync(CommentLike like, CancellationToken ct = default);
+    Task<int> CreateLikeAsync(CommentLike like, CancellationToken ct = default);
     Task<int> UpdateAsync(Guid commentId, UpdateCommentRequestDto dto, CancellationToken ct = default);
     Task<int> UpdateForDeletionAsync(Guid commentId, CancellationToken ct = default);
     Task<int> DeleteAsync(Guid commentId, CancellationToken ct = default);
@@ -52,12 +52,15 @@ public class CommentRepository(SocialMediaDbContext _db) : ICommentRepository
         return comment;
     }
 
-    public async Task<CommentLike> CreateLikeAsync(CommentLike like, CancellationToken ct = default)
+    public async Task<int> CreateLikeAsync(CommentLike like, CancellationToken ct = default)
     {
         _db.CommentLikes.Add(like);
         await _db.SaveChangesAsync(ct);
-        
-        return like;
+
+        var likes = await _db.CommentLikes
+            .CountAsync(x => x.CommentId == like.CommentId, ct);
+
+        return likes;
     }
 
     public async Task<int> UpdateAsync(Guid commentId, UpdateCommentRequestDto dto, CancellationToken ct = default)

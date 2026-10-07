@@ -2,5 +2,6 @@ namespace SocialMedia.Logic.ReturnResults.CommentResults;
 
 public record CommentLikeToggleResult(
     bool IsLiked, 
-    string Message
+    string Message,
+    int? Likes = 0
 );

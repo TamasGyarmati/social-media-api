@@ -75,7 +75,7 @@ public class CommentController(ICommentLogic _logic) : ControllerBase
         
         return result is null 
             ? NotFound(new { Message = "The comment was not found."}) 
-            : Ok(new CreateCommentLikeResponseDto(result.IsLiked, result.Message));
+            : Ok(new CreateCommentLikeResponseDto(result.IsLiked, result.Message, result.Likes));
     }
 
     [HttpPut("{id:guid}")]

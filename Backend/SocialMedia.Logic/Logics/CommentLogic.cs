@@ -69,8 +69,8 @@ public class CommentLogic(ICommentRepository _repo) : ICommentLogic
 
         try
         {
-            await _repo.CreateLikeAsync(like, ct);
-            return new CommentLikeToggleResult(true, "Comment liked.");
+            var likes = await _repo.CreateLikeAsync(like, ct);
+            return new CommentLikeToggleResult(true, "Comment liked.", likes);
         }
         catch (DbUpdateException)
         {

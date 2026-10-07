@@ -43,7 +43,8 @@ public record UpdateCommentResponseDto(
 
 public record CreateCommentLikeResponseDto(
     bool IsLiked, 
-    string Message
+    string Message,
+    int? Likes
 );
 
 public static class CommentMappingExtensions
