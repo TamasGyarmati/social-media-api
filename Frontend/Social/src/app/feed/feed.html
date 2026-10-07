@@ -1,7 +1,25 @@
-<div *ngFor="let post of this.posts()">
-  <h1>{{ post.title }}</h1>
-  <h2>{{ post.creatorUserName }}</h2>
-  <img class="avatar" [src]="this.apiUri + '/' + post.creatorAvatarUrl" alt="" />
-  <p>{{ post.description }}</p>
-  <img class="post" [src]="this.apiUri + '/' + post.imageUrl" alt="" />
+<div class="my-container">
+  <div class="feed-card" *ngFor="let post of this.posts()">
+    <div class="feed-user-data">
+      <img class="avatar" [src]="this.apiUri + '/' + post.creatorAvatarUrl" alt="" />
+      <h2>@{{ post.creatorUserName }}</h2>
+    </div>
+    <div class="feed-image">
+      <img class="post" [src]="this.apiUri + '/' + post.imageUrl" alt="" />
+    </div>
+    <div class="feed-content">
+      <h1>{{ post.title }}</h1>
+      <p>{{ post.description }}</p>
+    </div>
+    <div class="feed-data">
+      <div class="data">
+        <mat-icon>favorite</mat-icon>
+        <p>{{ post.likes }}</p>
+      </div>
+      <div class="data">
+        <mat-icon>comment</mat-icon>
+        <p>{{ post.commentsCount }}</p>
+      </div>
+    </div>
+  </div>
 </div>

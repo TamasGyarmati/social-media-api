@@ -88,10 +88,10 @@ export class Login implements OnInit {
           .open('Login was successful!', 'Close', { duration: 5000 })
           .afterDismissed()
           .subscribe(() => {
-            this.router.navigate(['/home']);
+            this.router.navigate(['/feed']);
           });
         console.log('::SUCCESS::', success);
-        this.router.navigate(['/home']);
+        this.router.navigate(['/feed']);
       },
       (error) => {
         console.log('::ERROR::', error);

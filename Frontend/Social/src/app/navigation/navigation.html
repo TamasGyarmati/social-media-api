@@ -1,5 +1,10 @@
 <div class="nav">
-  <button matButton [routerLink]="['/feed']">Feed</button>
-  <button matButton [routerLink]="['/login']" *ngIf="!this.auth.isLoggedIn()">Login</button>
-  <button matButton (click)="logout()" *ngIf="this.auth.isLoggedIn()">Logout</button>
+  <div class="buttons">
+    <button matButton [routerLink]="['/feed']">Feed</button>
+    <button matButton [routerLink]="['/login']" *ngIf="!this.auth.isLoggedIn()">Login</button>
+    <button matButton (click)="logout()" *ngIf="this.auth.isLoggedIn()">Logout</button>
+  </div>
+  <div class="user-logged-in" *ngIf="this.auth.isLoggedIn()">
+    <h3 style="color: white">@{{ this.activeUser() }}</h3>
+  </div>
 </div>

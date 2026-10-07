@@ -9,7 +9,9 @@ export class AuthService {
   public isLoggedIn = signal(false);
   public userName = signal<string>('');
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) {
+    this.checkIfLoggedIn();
+  }
 
   public canActivate(): boolean {
     if (!this.isLoggedIn()) {
@@ -43,6 +45,6 @@ export class AuthService {
 
     this.checkIfLoggedIn();
 
-    this.router.navigate(['/home']);
+    this.router.navigate(['/feed']);
   }
 }

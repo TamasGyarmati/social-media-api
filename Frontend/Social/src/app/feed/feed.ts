@@ -5,10 +5,11 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MATERIAL_IMPORTS } from '../_shared/material';
 
 @Component({
   selector: 'app-feed',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MATERIAL_IMPORTS],
   templateUrl: './feed.html',
   styleUrl: './feed.scss',
 })
