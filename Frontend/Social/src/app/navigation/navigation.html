@@ -1,0 +1,4 @@
+<p>navigation works!</p>
+
+<button [routerLink]="['/login']" *ngIf="!this.apiService.isLoggedIn()">Login</button>
+<button (click)="logout()" *ngIf="this.apiService.isLoggedIn()">Logout</button>
