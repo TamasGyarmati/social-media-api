@@ -1,0 +1,13 @@
+@import '../_shared/variables.scss';
+
+button[matButton] {
+  color: $blue-btn-color;
+}
+
+.nav {
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+  margin-top: 1rem;
+  margin-left: 1rem;
+}
