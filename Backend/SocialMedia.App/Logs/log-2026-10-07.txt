@@ -1,0 +1,12 @@
+[2026-10-07 13:16:33.135] GET /swagger -> Status: 404 (0ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-10-07 13:16:38.292] GET /swagger/ -> Status: 404 (0ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-10-07 13:17:41.437] GET /swagger/ -> Status: 404 (0ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-10-07 13:17:45.035] GET / -> Status: 404 (0ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-10-07 13:17:49.583] GET / -> Status: 404 (0ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-10-07 13:17:53.397] GET /swagger -> Status: 404 (0ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-10-07 13:18:03.785] GET /swagger/index.html -> Status: 404 (0ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-10-07 13:22:19.703] GET /openapi/v1.json -> Status: 200 (215ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-10-07 13:22:58.065] GET /openapi/v1.json -> Status: 200 (282ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-10-07 13:23:15.373] POST /api/Auth/login -> Status: 401 (1401ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-10-07 13:23:21.341] POST /api/Auth/login -> Status: 401 (49ms) | User: Anonymous | UserName: Anonymous | IP: ::1
+[2026-10-07 13:23:29.409] POST /api/Auth/login -> Status: 200 (515ms) | User: Anonymous | UserName: Anonymous | IP: ::1
