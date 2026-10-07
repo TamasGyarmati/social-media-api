@@ -9,4 +9,5 @@ export interface getAllPost {
   commentsCount: number;
   creatorAvatarUrl: string;
   creatorUserName: string;
+  isLiked: boolean;
 }

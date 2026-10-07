@@ -14,8 +14,8 @@
       <p>{{ post.description }}</p>
     </div>
     <div class="feed-data">
-      <div class="data">
-        <mat-icon>favorite</mat-icon>
+      <div class="data" (click)="likePost(post.id)">
+        <mat-icon [class.liked]="post.isLiked">favorite</mat-icon>
         <p>{{ post.likes }}</p>
       </div>
       <div class="data" (click)="getComments(post.id)">

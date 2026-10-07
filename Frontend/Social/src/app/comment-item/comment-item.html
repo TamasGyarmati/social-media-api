@@ -9,7 +9,7 @@
 
   <div class="comment-actions">
     <div (click)="likeComment(comment().id)">
-      <mat-icon>favorite</mat-icon>
+      <mat-icon [class.liked]="isLiked()">favorite</mat-icon>
       <span>{{ likes() }}</span>
     </div>
 

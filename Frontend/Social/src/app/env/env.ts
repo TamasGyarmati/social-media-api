@@ -4,6 +4,7 @@ export const env = {
   postGetAllUri: 'http://localhost:5000/api/Post/all',
   commentGetByPostIdUri: 'http://localhost:5000/api/Comment/all',
   commentUri: 'http://localhost:5000/api/Comment',
+  postUri: 'http://localhost:5000/api/Post',
   authRegisterUri: 'http://localhost:5000/api/Auth/register',
   jwtAccessToken: 'social-access-token',
   jwtAccessTokenExp: 'social-access-token-expiration',

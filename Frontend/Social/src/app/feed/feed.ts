@@ -2,7 +2,7 @@ import { CommentToPost } from '../_models/commentToPost';
 import { env } from '../env/env';
 import { getAllPost } from '../_models/getAllPost';
 import { signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -35,6 +35,29 @@ export class Feed implements OnInit {
         );
 
         this.isLoading.set(false);
+      },
+      (error) => {
+        console.log('::ERROR::', error);
+      },
+    );
+  }
+
+  likePost(postId: string): void {
+    const uri = `${env.postUri}/${postId}/like`;
+
+    let headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + localStorage.getItem(env.jwtAccessToken),
+    });
+
+    this.httpClient.post<any>(uri, null, { headers: headers }).subscribe(
+      (success) => {
+        console.log('::SUCCESS::', success);
+        this.posts.update((posts) =>
+          posts.map((post) =>
+            post.id === postId ? { ...post, likes: success.likes, isLiked: success.isLiked } : post,
+          ),
+        );
       },
       (error) => {
         console.log('::ERROR::', error);

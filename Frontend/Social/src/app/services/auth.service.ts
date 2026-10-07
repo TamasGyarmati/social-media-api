@@ -7,14 +7,10 @@ import { Router } from '@angular/router';
 })
 export class AuthService {
   public isLoggedIn = signal(false);
-  public userName = signal<string>('');
   public activeUser = signal<string>('');
 
   constructor(private router: Router) {
     this.checkIfLoggedIn();
-
-    this.activeUser.set(localStorage.getItem('username') ?? '');
-    console.log(this.activeUser);
   }
 
   public canActivate(): boolean {
@@ -28,16 +24,23 @@ export class AuthService {
   public checkIfLoggedIn(): void {
     const token = localStorage.getItem(env.jwtAccessToken);
     const expiration = localStorage.getItem(env.jwtAccessTokenExp);
-    this.userName.set(localStorage.getItem('username') ?? 'NaN');
 
     if (!token || !expiration) {
       this.isLoggedIn.set(false);
+      this.activeUser.set('');
       return;
     }
 
     const expirationTime = new Date(expiration).getTime();
+    const loggedIn = expirationTime > Date.now();
 
-    this.isLoggedIn.set(expirationTime > Date.now());
+    this.isLoggedIn.set(loggedIn);
+
+    if (loggedIn) {
+      this.activeUser.set(localStorage.getItem('username') ?? '');
+    } else {
+      this.activeUser.set('');
+    }
   }
 
   public logout(): void {
@@ -45,9 +48,9 @@ export class AuthService {
     localStorage.removeItem(env.jwtAccessTokenExp);
     localStorage.removeItem(env.jwtRefreshToken);
     localStorage.removeItem(env.jwtRefreshTokenExp);
-    localStorage.clear();
 
-    this.checkIfLoggedIn();
+    this.activeUser.set('');
+    this.isLoggedIn.set(false);
 
     this.router.navigate(['/feed']);
   }

@@ -10,4 +10,5 @@ export interface CommentToPost {
   userName: string;
   likes: number;
   replyCount: number;
+  isLiked: boolean;
 }

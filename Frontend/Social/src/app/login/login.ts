@@ -84,6 +84,7 @@ export class Login implements OnInit {
         localStorage.setItem(env.jwtRefreshToken, success.refreshToken);
         localStorage.setItem(env.jwtRefreshTokenExp, success.refreshTokenExpireDate);
         this.auth.checkIfLoggedIn();
+        this.auth.activeUser.set(this.formattedEmail);
         this.snackBar
           .open('Login was successful!', 'Close', { duration: 5000 })
           .afterDismissed()

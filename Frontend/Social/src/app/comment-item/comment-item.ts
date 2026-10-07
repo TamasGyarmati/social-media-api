@@ -16,11 +16,13 @@ export class CommentItem implements OnInit {
   public comment = input.required<CommentToPost>();
   public allComments = input<CommentToPost[]>([]);
   public likes = signal<number>(0);
+  public isLiked = signal<boolean>(false);
 
   constructor(private httpClient: HttpClient) {}
 
   ngOnInit(): void {
     this.likes.set(this.comment().likes);
+    this.isLiked.set(this.comment().isLiked);
   }
 
   getReplies(): CommentToPost[] {
@@ -39,6 +41,7 @@ export class CommentItem implements OnInit {
       (success) => {
         console.log('::SUCCESS::', success);
         this.likes.set(success.likes);
+        this.isLiked.set(success.isLiked);
       },
       (error) => {
         console.log('::ERROR::', error);
