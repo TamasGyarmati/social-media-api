@@ -26,6 +26,7 @@ public class PostRepository(SocialMediaDbContext _db) : IPostRepository
             .AsSplitQuery()
             .Include(x => x.Comments)
             .Include(p => p.Likes)
+            .Include(x => x.Creator)
             .ToListAsync(ct);
     
     public async Task<Post?> GetByIdAsync(Guid id, CancellationToken ct = default)

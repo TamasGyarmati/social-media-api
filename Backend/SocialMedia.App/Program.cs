@@ -65,7 +65,7 @@ builder.Services.AddAuthentication(option =>
         ValidateAudience = true,
         ValidAudience = "socialmedia.com",
         ValidIssuer = "socialmedia.com",
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] 
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]
                                                                            ?? throw new Exception("jwt:key not found in appsettings")))
     };
 });
@@ -77,7 +77,7 @@ builder.Services.AddOpenApi(options =>
     {
         document.Components ??= new OpenApiComponents();
         document.Components.SecuritySchemes ??= new Dictionary<string, IOpenApiSecurityScheme>();
-        
+
         document.Components.SecuritySchemes["Bearer"] = new OpenApiSecurityScheme
         {
             Type = SecuritySchemeType.Http,
@@ -86,7 +86,7 @@ builder.Services.AddOpenApi(options =>
             In = ParameterLocation.Header,
             Description = "Copy JWT token here (without 'Bearer' prefix)."
         };
-        
+
         document.Security ??= new List<OpenApiSecurityRequirement>();
         document.Security.Add(new OpenApiSecurityRequirement
         {
@@ -115,6 +115,12 @@ builder.Services.AddCors(opt =>
 });
 
 var app = builder.Build();
+
+
+
+Console.WriteLine($"ContentRoot: {app.Environment.ContentRootPath}");
+
+Console.WriteLine($"WebRoot: {app.Environment.WebRootPath}");
 
 // For uploading static images
 app.UseStaticFiles();

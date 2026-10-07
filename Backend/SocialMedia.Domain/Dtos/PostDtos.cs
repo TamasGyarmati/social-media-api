@@ -11,9 +11,11 @@ public record GetAllPostsResponseDto(
     DateTime CreatedAtUtc,
     string CreatorById,
     int Likes,
-    int CommentsCount
+    int CommentsCount,
+    string? CreatorAvatarUrl,
+    string? CreatorUserName
 );
-    
+
 public record GetPostWithCommentsResponseDto(
     Guid Id,
     string Title,
@@ -24,7 +26,7 @@ public record GetPostWithCommentsResponseDto(
     int Likes,
     List<CommentShortDto> Comments
 );
-    
+
 public record CreatePostRequestDto(
     string Title,
     string Description,
@@ -42,7 +44,7 @@ public record GuidPostResponseDto(
 );
 
 public record CreatePostLikeResponseDto(
-    bool IsLiked, 
+    bool IsLiked,
     string Message
 );
 
@@ -51,17 +53,19 @@ public static class PostMappingExtensions
     public static GetAllPostsResponseDto FromDomainToResponsePostDto(this Post post)
     {
         return new GetAllPostsResponseDto(
-            post.Id, 
-            post.Title, 
-            post.Description, 
+            post.Id,
+            post.Title,
+            post.Description,
             post.ImageUrl,
             post.CreatedAtUtc,
             post.CreatedById,
             post.Likes.Count,
-            post.Comments.Count
+            post.Comments.Count,
+            post.Creator?.AvatarUrl,
+            post.Creator?.UserName
         );
     }
-    
+
     public static GetPostWithCommentsResponseDto FromDomainToPostWithCommentsDto(this Post post)
     {
         return new GetPostWithCommentsResponseDto(
@@ -75,7 +79,7 @@ public static class PostMappingExtensions
             post.Comments.Select(x => new CommentShortDto(x.Content, x.CreatedAtUtc, x.CreatedById, x.Replies.Count)).ToList()
         );
     }
-    
+
     public static Post FromCreatePostToDomain(this CreatePostRequestDto dto, string? relativePath, string creatorId)
     {
         return new Post
