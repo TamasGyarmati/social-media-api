@@ -104,6 +104,16 @@ builder.Services.AddOpenApi(options =>
 builder.Services.AddControllers();
 builder.Services.AddRouting();
 
+builder.Services.AddCors(opt =>
+{
+    opt.AddPolicy("Angular", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
 
 // For uploading static images
@@ -120,6 +130,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseRouting();
+app.UseCors("Angular");
 app.UseHttpsRedirection();
 
 app.UseAuthentication();

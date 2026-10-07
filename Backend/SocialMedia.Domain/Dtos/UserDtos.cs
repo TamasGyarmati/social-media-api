@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Http;
 using SocialMedia.Domain.Entities;
+using Microsoft.AspNetCore.Http;
 
 namespace SocialMedia.Domain.Dtos;
 
