@@ -21,7 +21,7 @@ public interface IAuthLogic
 }
 
 public class AuthLogic(
-    UserManager<AppUser> _userManager, 
+    UserManager<AppUser> _userManager,
     RoleManager<IdentityRole> _roleManager,
     ITokenGenerator _tokenGenerator,
     IEmailSender _emailSender) : IAuthLogic
@@ -29,7 +29,7 @@ public class AuthLogic(
     public async Task<RegisterResult> RegisterAsync(UserCreateRequestDto dto, CancellationToken ct = default)
     {
         ct.ThrowIfCancellationRequested();
-        
+
         var user = new AppUser
         {
             FirstName = dto.FirstName,
@@ -37,7 +37,8 @@ public class AuthLogic(
             UserName = dto.UserName,
             Email = dto.Email,
             IsDeleted = false,
-            EmailConfirmed = false
+            EmailConfirmed = false,
+            AvatarUrl = "/images/avatars/default_avatar.png"
         };
 
         var result = await _userManager.CreateAsync(user, dto.Password);
@@ -61,12 +62,12 @@ public class AuthLogic(
                 }
                 await _userManager.AddToRoleAsync(user, "User");
             }
-            
+
             ct.ThrowIfCancellationRequested();
-        
+
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
-            
+
             return new RegisterResult.Success(user, encodedToken);
         }
         catch (OperationCanceledException)
@@ -77,15 +78,15 @@ public class AuthLogic(
     }
 
     public async Task<bool> SendConfirmationEmailAsync(
-        string email, 
-        string confirmationLink, 
+        string email,
+        string confirmationLink,
         CancellationToken ct = default)
     {
         if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(confirmationLink))
         {
             return false;
         }
-        
+
         ct.ThrowIfCancellationRequested();
 
         try
@@ -114,7 +115,7 @@ public class AuthLogic(
                               """,
                 ct: ct
             );
-            
+
             return true;
         }
         catch (OperationCanceledException)
@@ -126,7 +127,7 @@ public class AuthLogic(
             return true;
         }
     }
-    
+
     public async Task<LoginResult> LoginAsync(UserLoginRequestDto dto, CancellationToken ct = default)
     {
         var user = await _userManager.FindByEmailAsync(dto.Email);
@@ -134,22 +135,22 @@ public class AuthLogic(
         {
             return new LoginResult.UserOrPasswordNotExist("The user or password doesn't exist.");
         }
-        
+
         ct.ThrowIfCancellationRequested();
-            
+
         var isPasswordValid = await _userManager.CheckPasswordAsync(user, dto.Password);
         if (!isPasswordValid)
         {
             return new LoginResult.UserOrPasswordNotExist("The user or password doesn't exist.");
         }
-        
+
         if (!await _userManager.IsEmailConfirmedAsync(user))
         {
             return new LoginResult.EmailUnconfirmed("Please confirm your email before logging in.");
         }
-        
+
         ct.ThrowIfCancellationRequested();
-                
+
         var claim = new List<Claim>
         {
             new(ClaimTypes.Name, user.UserName!),
@@ -171,25 +172,25 @@ public class AuthLogic(
         }
 
         var refreshToken = _tokenGenerator.GenerateRefreshToken(user, refreshTokenExpiryInMinutes);
-        
+
         ct.ThrowIfCancellationRequested();
-        
+
         await _userManager.UpdateAsync(user);
-                
+
         var tokenWithExpiryDate = new UserLoginResponseDto(
             AccessToken: new JwtSecurityTokenHandler().WriteToken(accessToken),
-            AccessTokenExpireDate: accessToken.ValidTo, 
+            AccessTokenExpireDate: accessToken.ValidTo,
             RefreshToken: refreshToken,
             RefreshTokenExpireDate: user.RefreshTokenExpiryTime!.Value);
-                
+
         return new LoginResult.Success(tokenWithExpiryDate);
     }
-    
+
     public async Task<RefreshResult> RefreshAsync(RefreshRequestDto tokenApiDto, CancellationToken ct = default)
     {
         string accessToken = tokenApiDto.AccessToken;
         string refreshToken = tokenApiDto.RefreshToken;
-        
+
         var principal = _tokenGenerator.GetPrincipalFromExpiredToken(accessToken);
 
         var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -197,23 +198,23 @@ public class AuthLogic(
         {
             return new RefreshResult.Invalid("Invalid client request");
         }
-        
+
         var user = await _userManager.GetUserAsync(principal);
         if (user is null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
         {
-            return new RefreshResult.Invalid("Invalid client request");   
+            return new RefreshResult.Invalid("Invalid client request");
         }
-        
+
         ct.ThrowIfCancellationRequested();
 
         const int accessTokenExpiryInMinutes = 24 * 60;
         const int refreshTokenExpiryInMinutes = 24 * 60 * 7;
-        
+
         var newAccessToken = _tokenGenerator.GenerateAccessToken(principal.Claims, accessTokenExpiryInMinutes);
         var newRefreshToken = _tokenGenerator.GenerateRefreshToken(user, refreshTokenExpiryInMinutes);
-        
+
         ct.ThrowIfCancellationRequested();
-        
+
         await _userManager.UpdateAsync(user);
 
         return new RefreshResult.Success(new RefreshResponseDto(
@@ -223,7 +224,7 @@ public class AuthLogic(
             RefreshTokenExpiration: user.RefreshTokenExpiryTime!.Value
         ));
     }
-    
+
     public async Task<ConfirmEmailResult> ConfirmEmailAsync(string userId, string token, CancellationToken ct = default)
     {
         if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(token))
@@ -236,7 +237,7 @@ public class AuthLogic(
         {
             return new ConfirmEmailResult.UserNotFound("User not found.");
         }
-        
+
         ct.ThrowIfCancellationRequested();
 
         string decodedToken;
@@ -248,13 +249,13 @@ public class AuthLogic(
         {
             return new ConfirmEmailResult.InvalidTokenFormat("Invalid token format.");
         }
-        
+
         var result = await _userManager.ConfirmEmailAsync(user, decodedToken);
         if (result.Succeeded)
         {
             return new ConfirmEmailResult.Success("Email confirmed successfully. You can now log in.");
         }
-        
+
         return new ConfirmEmailResult.InvalidTokenOrExpired("The confirmation token is invalid or has expired.");
     }
 }
