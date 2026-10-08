@@ -5,7 +5,7 @@
 
 .DS_Store
 node_modules/
-Help/
+Extra/
 Backend/SocialMedia.App/Logs/
 
 # Logs and wwwroot
