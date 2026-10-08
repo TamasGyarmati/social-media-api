@@ -9,6 +9,7 @@ import { FormsModule } from '@angular/forms';
 import { MATERIAL_IMPORTS } from '../_shared/material';
 import { Comments } from '../comments/comments';
 import { RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
@@ -28,6 +29,7 @@ export class Feed implements OnInit {
   constructor(
     private httpClient: HttpClient,
     private matBar: MatSnackBar,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -43,6 +45,8 @@ export class Feed implements OnInit {
         );
 
         this.isLoading.set(false);
+
+        console.log('::LOADED::', success);
       },
       (error) => {
         console.log('::ERROR::', error);
@@ -50,7 +54,26 @@ export class Feed implements OnInit {
     );
   }
 
+  getDayCount(post: getAllPost): string {
+    const now = new Date();
+    const created = new Date(post.createdAtUtc);
+    const difference = now.getTime() - created.getTime();
+    const result = Math.floor(difference / (1000 * 60 * 60 * 24));
+
+    if (result === 0) {
+      return 'Posted today';
+    } else {
+      return `Posted ${result.toString()} days ago`;
+    }
+  }
+
   likePost(postId: string): void {
+    const token = localStorage.getItem(env.jwtAccessToken);
+    if (!token) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
     const uri = `${env.postUri}/${postId}/like`;
 
     let headers = new HttpHeaders({
@@ -138,5 +161,12 @@ export class Feed implements OnInit {
       newComments.set(postId, [comment, ...(newComments.get(postId) ?? [])]);
       return newComments;
     });
+
+    // ideiglenesen a memoriában lévő frontend commentCount-ot növeljük
+    this.posts.update((posts) =>
+      posts.map((post) =>
+        post.id === postId ? { ...post, commentsCount: post.commentsCount + 1 } : post,
+      ),
+    );
   }
 }

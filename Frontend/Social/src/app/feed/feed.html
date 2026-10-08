@@ -9,6 +9,7 @@
     <div class="feed-user-data">
       <img class="avatar" [src]="this.apiUri + '/' + post.creatorAvatarUrl" alt="" />
       <h2>@{{ post.creatorUserName }}</h2>
+      <h3 style="font-size: 15px">{{ getDayCount(post) }}</h3>
       <button
         type="button"
         matButton

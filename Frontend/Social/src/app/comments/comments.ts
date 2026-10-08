@@ -7,6 +7,7 @@ import { CommentItem } from '../comment-item/comment-item';
 import { CommonModule } from '@angular/common';
 import { MATERIAL_IMPORTS } from '../_shared/material';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-comments',
@@ -20,9 +21,18 @@ export class Comments {
   public postId = input.required<string>();
   public commentContent: string = '';
 
-  constructor(private httpClient: HttpClient) {}
+  constructor(
+    private httpClient: HttpClient,
+    private router: Router,
+  ) {}
 
   createComment(): void {
+    const token = localStorage.getItem(env.jwtAccessToken);
+    if (!token) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
     const commentRequest: Comment = {
       content: this.commentContent,
       postId: this.postId(),
