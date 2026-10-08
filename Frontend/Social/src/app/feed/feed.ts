@@ -169,4 +169,21 @@ export class Feed implements OnInit {
       ),
     );
   }
+
+  onReplyCreated(reply: CommentToPost): void {
+    this.comments.update((comments) => {
+      const newComments = new Map(comments);
+      const postComments = newComments.get(reply.postId) ?? [];
+
+      newComments.set(reply.postId, [reply, ...postComments]);
+
+      return newComments;
+    });
+
+    this.posts.update((posts) =>
+      posts.map((post) =>
+        post.id === reply.postId ? { ...post, commentsCount: post.commentsCount + 1 } : post,
+      ),
+    );
+  }
 }

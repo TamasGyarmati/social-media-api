@@ -13,10 +13,27 @@
       <span>{{ likes() }}</span>
     </div>
 
-    <div>
+    <div class="reply" (click)="toggleReplyInput()">
       <mat-icon>reply</mat-icon>
-      <span>Reply</span>
+      <button type="button"><span>Reply</span></button>
     </div>
+  </div>
+
+  <div class="comment-input" *ngIf="showReplyInput()">
+    <mat-form-field appearance="outline">
+      <mat-label>Write a comment...</mat-label>
+      <mat-icon matPrefix>chat_bubble_outline</mat-icon>
+      <input matInput [(ngModel)]="this.reply" type="text" placeholder="Write a comment..." />
+      <button
+        mat-icon-button
+        matSuffix
+        (click)="createReply(comment())"
+        type="button"
+        aria-label="Post comment"
+      >
+        <mat-icon>send</mat-icon>
+      </button>
+    </mat-form-field>
   </div>
 
   <div class="replies" *ngIf="getReplies().length > 0">
@@ -24,6 +41,7 @@
       *ngFor="let reply of getReplies()"
       [comment]="reply"
       [allComments]="allComments()"
+      (replyCreated)="onReplyCreated($event)"
     >
     </app-comment-item>
   </div>

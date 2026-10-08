@@ -18,6 +18,7 @@ import { Router } from '@angular/router';
 export class Comments {
   public comments = input<CommentToPost[]>([]);
   public commentCreated = output<CommentToPost>();
+  public replyCreated = output<CommentToPost>();
   public postId = input.required<string>();
   public commentContent: string = '';
 
@@ -25,6 +26,10 @@ export class Comments {
     private httpClient: HttpClient,
     private router: Router,
   ) {}
+
+  onReplyCreated(reply: CommentToPost): void {
+    this.replyCreated.emit(reply);
+  }
 
   createComment(): void {
     const token = localStorage.getItem(env.jwtAccessToken);
