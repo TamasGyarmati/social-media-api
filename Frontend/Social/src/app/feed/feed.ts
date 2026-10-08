@@ -8,10 +8,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MATERIAL_IMPORTS } from '../_shared/material';
 import { Comments } from '../comments/comments';
+import { RouterLink } from '@angular/router';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-feed',
-  imports: [CommonModule, FormsModule, MATERIAL_IMPORTS, Comments],
+  imports: [CommonModule, FormsModule, MATERIAL_IMPORTS, Comments, RouterLink],
   templateUrl: './feed.html',
   styleUrl: './feed.scss',
 })
@@ -21,15 +23,21 @@ export class Feed implements OnInit {
   public openedComments = signal<Set<string>>(new Set());
   public comments = signal<Map<string, CommentToPost[]>>(new Map());
   public isLoading = signal<boolean>(true);
+  public currentUserName = localStorage.getItem('username');
 
-  constructor(private httpClient: HttpClient) {}
+  constructor(
+    private httpClient: HttpClient,
+    private matBar: MatSnackBar,
+  ) {}
 
   ngOnInit(): void {
     this.httpClient.get<getAllPost[]>(env.postGetAllUri).subscribe(
       (success) => {
-        console.log(success);
+        const sortedPosts = success.sort(
+          (a, b) => new Date(b.createdAtUtc).getTime() - new Date(a.createdAtUtc).getTime(),
+        );
         this.posts.set(
-          success.map((post) => ({
+          sortedPosts.map((post) => ({
             ...post,
           })),
         );
@@ -60,6 +68,27 @@ export class Feed implements OnInit {
         );
       },
       (error) => {
+        console.log('::ERROR::', error);
+      },
+    );
+  }
+
+  deletePost(post: getAllPost): void {
+    let headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + localStorage.getItem(env.jwtAccessToken),
+    });
+
+    this.httpClient.delete(`${env.postUri}/${post.id}`, { headers: headers }).subscribe(
+      (success) => {
+        this.posts.update((posts) => posts.filter((x) => x.id !== post.id));
+        this.matBar.open('Successfully deleted the post!', 'Close', { duration: 3000 });
+        console.log('::SUCCESS::', success);
+      },
+      (error) => {
+        if (error.status == '403') {
+          this.matBar.open('Cannot delete post!', 'Close', { duration: 3000 });
+        }
         console.log('::ERROR::', error);
       },
     );

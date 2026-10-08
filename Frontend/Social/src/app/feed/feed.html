@@ -1,10 +1,22 @@
 <mat-progress-spinner mode="indeterminate" *ngIf="this.isLoading()"></mat-progress-spinner>
 
+<div class="create-post-button">
+  <button matButton *ngIf="!this.isLoading()" [routerLink]="['/create-post']">Create post</button>
+</div>
+
 <div class="my-container" *ngIf="!this.isLoading()">
   <div class="feed-card" *ngFor="let post of this.posts()">
     <div class="feed-user-data">
       <img class="avatar" [src]="this.apiUri + '/' + post.creatorAvatarUrl" alt="" />
       <h2>@{{ post.creatorUserName }}</h2>
+      <button
+        type="button"
+        matButton
+        *ngIf="post.creatorUserName === this.currentUserName"
+        (click)="deletePost(post)"
+      >
+        Delete
+      </button>
     </div>
     <div class="feed-image">
       <img class="post" [src]="this.apiUri + '/' + post.imageUrl" alt="" />
