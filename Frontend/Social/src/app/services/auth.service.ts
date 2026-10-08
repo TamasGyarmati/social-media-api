@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 export class AuthService {
   public isLoggedIn = signal(false);
   public activeUser = signal<string>('');
+  public activeUserId = signal<string>('');
 
   constructor(private router: Router) {
     this.checkIfLoggedIn();
@@ -38,8 +39,10 @@ export class AuthService {
 
     if (loggedIn) {
       this.activeUser.set(localStorage.getItem('username') ?? '');
+      this.activeUserId.set(localStorage.getItem('userid') ?? '');
     } else {
       this.activeUser.set('');
+      this.activeUserId.set('');
     }
   }
 

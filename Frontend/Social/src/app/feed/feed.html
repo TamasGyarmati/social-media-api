@@ -13,7 +13,7 @@
       <button
         type="button"
         matButton
-        *ngIf="post.creatorUserName === this.currentUserName"
+        *ngIf="post.creatorById === this.currentUserId"
         (click)="deletePost(post)"
       >
         Delete

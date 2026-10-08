@@ -24,7 +24,7 @@ export class Feed implements OnInit {
   public openedComments = signal<Set<string>>(new Set());
   public comments = signal<Map<string, CommentToPost[]>>(new Map());
   public isLoading = signal<boolean>(true);
-  public currentUserName = localStorage.getItem('username');
+  public currentUserId = localStorage.getItem('userid');
 
   constructor(
     private httpClient: HttpClient,

@@ -181,7 +181,8 @@ public class AuthLogic(
             AccessToken: new JwtSecurityTokenHandler().WriteToken(accessToken),
             AccessTokenExpireDate: accessToken.ValidTo,
             RefreshToken: refreshToken,
-            RefreshTokenExpireDate: user.RefreshTokenExpiryTime!.Value);
+            RefreshTokenExpireDate: user.RefreshTokenExpiryTime!.Value,
+            UserId: user.Id);
 
         return new LoginResult.Success(tokenWithExpiryDate);
     }

@@ -79,6 +79,7 @@ export class Login implements OnInit {
     this.http.post<TokenModel>(`${env.authLoginUri}`, loginModel).subscribe(
       (success) => {
         localStorage.setItem('username', this.formattedEmail);
+        localStorage.setItem('userid', success.userId);
         localStorage.setItem(env.jwtAccessToken, success.accessToken);
         localStorage.setItem(env.jwtAccessTokenExp, success.accessTokenExpireDate);
         localStorage.setItem(env.jwtRefreshToken, success.refreshToken);

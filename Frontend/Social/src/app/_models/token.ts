@@ -3,4 +3,5 @@ export interface Token {
   accessTokenExpireDate: string;
   refreshToken: string;
   refreshTokenExpireDate: string;
+  userId: string;
 }

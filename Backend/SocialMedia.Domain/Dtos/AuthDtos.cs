@@ -30,7 +30,8 @@ public record UserLoginResponseDto(
     string AccessToken, 
     DateTime AccessTokenExpireDate,
     string RefreshToken,
-    DateTime RefreshTokenExpireDate
+    DateTime RefreshTokenExpireDate,
+    string UserId
 );
 
 public record AuthMessageResponseDto(
