@@ -1,8 +1,7 @@
-import { OnInit, signal } from '@angular/core';
 import { env } from '../env/env';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Comment } from '../_models/comment';
-import { Component, input } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { CommentToPost } from '../_models/commentToPost';
 import { CommentItem } from '../comment-item/comment-item';
 import { CommonModule } from '@angular/common';
@@ -15,17 +14,13 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './comments.html',
   styleUrl: './comments.scss',
 })
-export class Comments implements OnInit {
+export class Comments {
   public comments = input<CommentToPost[]>([]);
+  public commentCreated = output<CommentToPost>();
   public postId = input.required<string>();
   public commentContent: string = '';
-  public localComments = signal<CommentToPost[]>([]);
 
   constructor(private httpClient: HttpClient) {}
-
-  ngOnInit(): void {
-    this.localComments.set(this.comments());
-  }
 
   createComment(): void {
     const commentRequest: Comment = {
@@ -44,7 +39,7 @@ export class Comments implements OnInit {
       .subscribe(
         (success) => {
           console.log('::SUCCESS::', success);
-          this.localComments.update((comments) => [success.comment, ...comments]);
+          this.commentCreated.emit(success.comment);
           this.commentContent = '';
         },
         (error) => {
@@ -54,6 +49,6 @@ export class Comments implements OnInit {
   }
 
   getRootItems(): CommentToPost[] {
-    return this.localComments().filter((comment) => !comment.parentCommentId);
+    return this.comments().filter((comment) => !comment.parentCommentId);
   }
 }

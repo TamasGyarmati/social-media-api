@@ -131,4 +131,14 @@ export class Feed implements OnInit {
     opened.add(postId);
     this.openedComments.set(opened);
   }
+
+  addComment(postId: string, comment: CommentToPost): void {
+    this.comments.update((comments) => {
+      const newComments = new Map(comments);
+
+      newComments.set(postId, [comment, ...(newComments.get(postId) ?? [])]);
+
+      return newComments;
+    });
+  }
 }

@@ -40,6 +40,7 @@
       *ngIf="openedComments().has(post.id)"
       [postId]="post.id"
       [comments]="comments().get(post.id) || []"
+      (commentCreated)="addComment(post.id, $event)"
     >
     </app-comments>
   </div>
