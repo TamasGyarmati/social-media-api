@@ -6,7 +6,7 @@
 .DS_Store
 node_modules/
 Help/
-Backend/SocialMedia.App/Logs/log-2026-10-07.txt
+Backend/SocialMedia.App/Logs/
 
 # Logs and wwwroot
 SocialMedia.App/Logs/
