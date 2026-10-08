@@ -1,7 +1,7 @@
 import { env } from '../env/env';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Comment } from '../_models/comment';
-import { Component, input, output } from '@angular/core';
+import { Component, input, output, signal } from '@angular/core';
 import { CommentToPost } from '../_models/commentToPost';
 import { CommentItem } from '../comment-item/comment-item';
 import { CommonModule } from '@angular/common';
@@ -21,6 +21,7 @@ export class Comments {
   public replyCreated = output<CommentToPost>();
   public postId = input.required<string>();
   public commentContent: string = '';
+  public activeReplyCommentId = signal<string | null>(null);
 
   constructor(
     private httpClient: HttpClient,
@@ -29,6 +30,10 @@ export class Comments {
 
   onReplyCreated(reply: CommentToPost): void {
     this.replyCreated.emit(reply);
+  }
+
+  onReplyClicked(commentId: string | null): void {
+    this.activeReplyCommentId.set(commentId);
   }
 
   createComment(): void {

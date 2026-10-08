@@ -19,7 +19,7 @@
     </div>
   </div>
 
-  <div class="comment-input" *ngIf="showReplyInput()">
+  <div class="comment-input" *ngIf="activeReplyCommentId() === comment().id">
     <mat-form-field appearance="outline">
       <mat-label>Write a comment...</mat-label>
       <mat-icon matPrefix>chat_bubble_outline</mat-icon>
@@ -41,6 +41,8 @@
       *ngFor="let reply of getReplies()"
       [comment]="reply"
       [allComments]="allComments()"
+      [activeReplyCommentId]="activeReplyCommentId()"
+      (replyClicked)="replyClicked.emit($event)"
       (replyCreated)="onReplyCreated($event)"
     >
     </app-comment-item>

@@ -22,6 +22,8 @@ export class CommentItem implements OnInit {
   public showReplyInput = signal<boolean>(false);
   public reply: string = '';
   public replyCreated = output<CommentToPost>();
+  public activeReplyCommentId = input<string | null>(null);
+  public replyClicked = output<string | null>();
 
   constructor(private httpClient: HttpClient) {}
 
@@ -58,7 +60,11 @@ export class CommentItem implements OnInit {
   }
 
   toggleReplyInput(): void {
-    this.showReplyInput.update((value) => !value);
+    if (this.activeReplyCommentId() === this.comment().id) {
+      this.replyClicked.emit(null);
+    } else {
+      this.replyClicked.emit(this.comment().id);
+    }
   }
 
   getReplies(): CommentToPost[] {

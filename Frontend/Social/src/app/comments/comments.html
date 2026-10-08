@@ -27,7 +27,9 @@
     *ngFor="let comment of getRootItems()"
     [comment]="comment"
     [allComments]="comments()"
+    [activeReplyCommentId]="activeReplyCommentId()"
     (replyCreated)="onReplyCreated($event)"
+    (replyClicked)="onReplyClicked($event)"
   >
   </app-comment-item>
 </div>
