@@ -66,6 +66,9 @@ export class Feed implements OnInit {
             post.id === postId ? { ...post, likes: success.likes, isLiked: success.isLiked } : post,
           ),
         );
+
+        console.log('opened comments:', this.openedComments());
+        console.log('comments:', this.comments());
       },
       (error) => {
         console.log('::ERROR::', error);
