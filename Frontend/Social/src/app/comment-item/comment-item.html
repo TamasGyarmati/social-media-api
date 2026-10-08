@@ -44,6 +44,7 @@
       [activeReplyCommentId]="activeReplyCommentId()"
       (replyClicked)="replyClicked.emit($event)"
       (replyCreated)="onReplyCreated($event)"
+      (commentLiked)="onCommentLiked($event)"
     >
     </app-comment-item>
   </div>

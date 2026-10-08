@@ -1,3 +1,4 @@
+import { RegisterError } from '../_models/registerError';
 import { OnInit } from '@angular/core';
 import { signal } from '@angular/core';
 import { env } from '../env/env';
@@ -97,8 +98,11 @@ export class Register implements OnInit {
         console.log('::SUCCESS::', success);
       },
       (error) => {
-        console.log('::ERROR::');
-        this.snackBar.open(error.error.message, 'Close', { duration: 5000 });
+        console.log('::ERROR::', error);
+        const errors = error.error as RegisterError[];
+        let errorString = '';
+        errors.forEach((x) => (errorString += `${x.description}, `));
+        this.snackBar.open(errorString, 'Close', { duration: 5000 });
       },
     );
   }

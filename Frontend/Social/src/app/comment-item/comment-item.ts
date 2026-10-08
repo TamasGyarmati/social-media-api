@@ -1,3 +1,4 @@
+import { effect } from '@angular/core';
 import { OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { env } from '../env/env';
@@ -14,7 +15,7 @@ import { Comment } from '../_models/comment';
   templateUrl: './comment-item.html',
   styleUrl: './comment-item.scss',
 })
-export class CommentItem implements OnInit {
+export class CommentItem {
   public comment = input.required<CommentToPost>();
   public allComments = input<CommentToPost[]>([]);
   public likes = signal<number>(0);
@@ -25,11 +26,17 @@ export class CommentItem implements OnInit {
   public activeReplyCommentId = input<string | null>(null);
   public replyClicked = output<string | null>();
 
-  constructor(private httpClient: HttpClient) {}
+  public commentLiked = output<{
+    commentId: string;
+    likes: number;
+    isLiked: boolean;
+  }>();
 
-  ngOnInit(): void {
-    this.likes.set(this.comment().likes);
-    this.isLiked.set(this.comment().isLiked);
+  constructor(private httpClient: HttpClient) {
+    effect(() => {
+      this.likes.set(this.comment().likes);
+      this.isLiked.set(this.comment().isLiked);
+    });
   }
 
   createReply(comment: CommentToPost): void {
@@ -84,6 +91,12 @@ export class CommentItem implements OnInit {
         console.log('::SUCCESS::', success);
         this.likes.set(success.likes);
         this.isLiked.set(success.isLiked);
+
+        this.commentLiked.emit({
+          commentId: commentId,
+          likes: success.likes,
+          isLiked: success.isLiked,
+        });
       },
       (error) => {
         console.log('::ERROR::', error);
@@ -93,5 +106,9 @@ export class CommentItem implements OnInit {
 
   onReplyCreated(reply: CommentToPost): void {
     this.replyCreated.emit(reply);
+  }
+
+  onCommentLiked(event: { commentId: string; likes: number; isLiked: boolean }): void {
+    this.commentLiked.emit(event);
   }
 }

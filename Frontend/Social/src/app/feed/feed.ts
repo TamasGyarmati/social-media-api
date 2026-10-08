@@ -186,4 +186,26 @@ export class Feed implements OnInit {
       ),
     );
   }
+
+  onCommentLiked(event: { commentId: string; likes: number; isLiked: boolean }): void {
+    this.comments.update((comments) => {
+      const newComments = new Map(comments);
+
+      for (const [postId, postComments] of newComments) {
+        const updatedComments = postComments.map((comment) =>
+          comment.id === event.commentId
+            ? {
+                ...comment,
+                likes: event.likes,
+                isLiked: event.isLiked,
+              }
+            : comment,
+        );
+
+        newComments.set(postId, updatedComments);
+      }
+
+      return newComments;
+    });
+  }
 }

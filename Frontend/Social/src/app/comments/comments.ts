@@ -23,6 +23,12 @@ export class Comments {
   public commentContent: string = '';
   public activeReplyCommentId = signal<string | null>(null);
 
+  public commentLiked = output<{
+    commentId: string;
+    likes: number;
+    isLiked: boolean;
+  }>();
+
   constructor(
     private httpClient: HttpClient,
     private router: Router,
@@ -70,5 +76,9 @@ export class Comments {
 
   getRootItems(): CommentToPost[] {
     return this.comments().filter((comment) => !comment.parentCommentId);
+  }
+
+  onCommentLiked(event: { commentId: string; likes: number; isLiked: boolean }): void {
+    this.commentLiked.emit(event);
   }
 }
