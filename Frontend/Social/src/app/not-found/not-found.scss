@@ -1,0 +1,13 @@
+@import '../_shared/variables.scss';
+
+.my-container {
+  text-align: center;
+
+  #status-code {
+    margin-top: 10rem;
+  }
+
+  button[matButton] {
+    color: $blue-btn-color;
+  }
+}
