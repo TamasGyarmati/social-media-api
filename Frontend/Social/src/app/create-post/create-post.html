@@ -27,6 +27,10 @@
       </label>
 
       <input id="image" type="file" accept="image/*" (change)="onImageSelected($event)" />
+
+      <span class="selected-file" *ngIf="selectedFileName">
+        {{ selectedFileName }}
+      </span>
     </div>
   </form>
 

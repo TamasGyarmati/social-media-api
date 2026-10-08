@@ -21,6 +21,8 @@ export class CreatePost implements OnInit {
   private router: Router = inject(Router);
   private matBar: MatSnackBar = inject(MatSnackBar);
 
+  public selectedFileName: string = '';
+
   public isLoading = signal<boolean>(true);
 
   public postForm = new FormGroup({
@@ -83,6 +85,7 @@ export class CreatePost implements OnInit {
     const input = event.target as HTMLInputElement;
 
     if (input.files && input.files.length > 0) {
+      this.selectedFileName = input.files[0].name;
       this.postForm.patchValue({
         image: input.files[0],
       });

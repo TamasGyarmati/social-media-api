@@ -21,6 +21,14 @@ h1 {
     .file-input {
       margin-top: 15px;
 
+      .selected-file {
+        display: block;
+        text-align: center;
+        color: #4caf50;
+        font-size: 14px;
+        word-break: break-word;
+      }
+
       label {
         display: flex;
         align-items: center;
