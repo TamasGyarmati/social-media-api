@@ -1,4 +1,4 @@
-# Social Media API
+# Social Web Application
 
 A RESTful backend API for a social media platform built with **ASP.NET Core** and **.NET 10**.
 
