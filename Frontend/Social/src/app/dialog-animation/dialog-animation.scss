@@ -1,0 +1,22 @@
+@import '../_shared/variables.scss';
+
+button {
+  margin-right: 8px;
+}
+
+.dialog {
+  padding: 25px;
+
+  mat-dialog-content {
+    padding: 0;
+    margin: 0;
+  }
+
+  #no-button {
+    color: white;
+  }
+
+  #yes-button {
+    color: $delete-btn-color;
+  }
+}

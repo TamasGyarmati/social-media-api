@@ -1,11 +1,82 @@
+@import '../_shared/variables.scss';
+
+$post-max-width: 1200px;
+
+$feed-bg: #0c1014;
+$card-bg: #131a22;
+$card-border: #26313d;
+$card-border-hover: #39495b;
+$text-primary: #e8edf3;
+$text-secondary: #8d9bab;
+$accent-color: #60a5fa;
+$danger-color: #f87171;
+
+.header {
+  text-align: center;
+  margin-top: 5rem;
+  margin-bottom: 2rem;
+
+  h1 {
+    font-size: 50px;
+    color: white;
+
+    i {
+      color: $accent-color;
+      font-weight: 200;
+    }
+  }
+
+  h4 {
+    font-size: 20px;
+  }
+}
+
+#delete-button {
+  color: $danger-color;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #fca5a5;
+  }
+}
+
 .create-post-button {
   display: flex;
   justify-content: center;
-  margin: 20px 0;
+  margin: 24px 0 32px;
+
+  button {
+    border-radius: 12px;
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+  }
+}
+
+.filter-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 32px;
+
+  button {
+    border-radius: 10px;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease,
+      border-color 0.2s ease;
+  }
 }
 
 .liked {
-  color: red;
+  color: #fb7185;
 }
 
 mat-progress-spinner {
@@ -15,58 +86,194 @@ mat-progress-spinner {
 .my-container {
   display: flex;
   flex-direction: column;
-  gap: 150px;
-  width: 50%;
+  gap: 28px;
+  width: 60%;
+  max-width: $post-max-width;
   margin: 0 auto;
+  padding-bottom: 48px;
 
   .feed-card {
+    background: $card-bg;
     display: flex;
     flex-direction: column;
     gap: 20px;
-    border: 1px solid white;
-    border-radius: 20px;
-    padding: 20px;
+    border: 1px solid $card-border;
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease,
+      transform 0.2s ease;
+
+    &:hover {
+      border-color: $card-border-hover;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+    }
 
     .feed-user-data {
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 14px;
+      min-width: 0;
+
+      h2 {
+        color: $text-primary;
+        font-size: 1.1rem;
+        font-weight: 600;
+        line-height: 1.4;
+        margin: 0;
+        overflow-wrap: anywhere;
+      }
 
       .avatar {
-        width: 50px;
-        height: 50px;
-        border-radius: 50px;
+        width: 48px;
+        height: 48px;
+        flex-shrink: 0;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 2px solid $card-border;
       }
     }
 
     .feed-image {
       display: flex;
       justify-content: center;
+      overflow: hidden;
+      border-radius: 14px;
 
       img {
-        border-radius: 20px;
+        display: block;
+        border-radius: 14px;
       }
 
       .post {
+        display: block;
         width: 100%;
-        max-width: 700px;
-        height: 500px;
-        object-fit: cover;
+        max-width: 750px;
+        height: auto;
+        max-height: 700px;
+        object-fit: contain;
       }
     }
 
     .feed-data {
       display: flex;
+      align-items: center;
       gap: 20px;
+      padding-top: 4px;
 
       .data {
-        display: flex;
-        gap: 10px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: $text-secondary;
+        cursor: pointer;
+        transition: color 0.2s ease;
 
         &:hover {
-          cursor: pointer;
+          color: $text-primary;
+        }
+
+        mat-icon {
+          display: block;
+          flex-shrink: 0;
+          width: 20px;
+          height: 20px;
+          font-size: 20px;
+          line-height: 20px;
+        }
+
+        p {
+          margin: 0;
+          padding: 0;
+          font-size: 14px;
+          line-height: 20px;
+        }
+
+        .liked {
+          color: #fb7185;
+
+          &:hover {
+            color: #fda4af;
+          }
         }
       }
     }
+  }
+}
+
+@media (max-width: 1024px) {
+  .my-container {
+    width: 80%;
+
+    .feed-card {
+      padding: 20px;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .my-container {
+    width: 94%;
+    gap: 20px;
+
+    .feed-card {
+      gap: 16px;
+      padding: 16px;
+      border-radius: 14px;
+
+      .feed-user-data {
+        gap: 12px;
+
+        .avatar {
+          width: 42px;
+          height: 42px;
+        }
+
+        h2 {
+          font-size: 1rem;
+        }
+      }
+
+      .feed-image {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+
+        .post {
+          display: block;
+          width: 100%;
+          max-width: 750px;
+          height: 500px;
+          object-fit: cover;
+          border-radius: 14px;
+        }
+      }
+
+      .feed-data {
+        gap: 16px;
+      }
+    }
+  }
+
+  .filter-buttons {
+    gap: 8px;
+    margin: 0 12px 24px;
+  }
+
+  .create-post-button {
+    margin: 20px 0 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #delete-button,
+  .create-post-button button,
+  .filter-buttons button,
+  .feed-card,
+  .feed-image .post,
+  .feed-data .data {
+    transition: none;
   }
 }

@@ -1,7 +1,7 @@
 import { CommentToPost } from '../_models/commentToPost';
 import { env } from '../env/env';
 import { getAllPost } from '../_models/getAllPost';
-import { signal } from '@angular/core';
+import { inject, signal } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -11,6 +11,16 @@ import { Comments } from '../comments/comments';
 import { RouterLink } from '@angular/router';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import {
+  MatDialog,
+  MatDialogActions,
+  MatDialogClose,
+  MatDialogContent,
+  MatDialogRef,
+  MatDialogTitle,
+  MatDialogModule,
+} from '@angular/material/dialog';
+import { DialogAnimation } from '../dialog-animation/dialog-animation';
 
 @Component({
   selector: 'app-feed',
@@ -21,10 +31,12 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 export class Feed implements OnInit {
   public apiUri = env.apiUri;
   public posts = signal<getAllPost[]>([]);
+  public currentPosts = signal<getAllPost[]>([]);
   public openedComments = signal<Set<string>>(new Set());
   public comments = signal<Map<string, CommentToPost[]>>(new Map());
   public isLoading = signal<boolean>(true);
   public currentUserId = localStorage.getItem('userid');
+  readonly dialog = inject(MatDialog);
 
   constructor(
     private httpClient: HttpClient,
@@ -39,6 +51,11 @@ export class Feed implements OnInit {
           (a, b) => new Date(b.createdAtUtc).getTime() - new Date(a.createdAtUtc).getTime(),
         );
         this.posts.set(
+          sortedPosts.map((post) => ({
+            ...post,
+          })),
+        );
+        this.currentPosts.set(
           sortedPosts.map((post) => ({
             ...post,
           })),
@@ -89,6 +106,11 @@ export class Feed implements OnInit {
             post.id === postId ? { ...post, likes: success.likes, isLiked: success.isLiked } : post,
           ),
         );
+        this.currentPosts.update((posts) =>
+          posts.map((post) =>
+            post.id === postId ? { ...post, likes: success.likes, isLiked: success.isLiked } : post,
+          ),
+        );
 
         console.log('opened comments:', this.openedComments());
         console.log('comments:', this.comments());
@@ -108,6 +130,7 @@ export class Feed implements OnInit {
     this.httpClient.delete(`${env.postUri}/${post.id}`, { headers: headers }).subscribe(
       (success) => {
         this.posts.update((posts) => posts.filter((x) => x.id !== post.id));
+        this.currentPosts.update((posts) => posts.filter((x) => x.id !== post.id));
         this.matBar.open('Successfully deleted the post!', 'Close', { duration: 3000 });
         console.log('::SUCCESS::', success);
       },
@@ -168,6 +191,12 @@ export class Feed implements OnInit {
         post.id === postId ? { ...post, commentsCount: post.commentsCount + 1 } : post,
       ),
     );
+
+    this.currentPosts.update((posts) =>
+      posts.map((post) =>
+        post.id === postId ? { ...post, commentsCount: post.commentsCount + 1 } : post,
+      ),
+    );
   }
 
   onReplyCreated(reply: CommentToPost): void {
@@ -181,6 +210,12 @@ export class Feed implements OnInit {
     });
 
     this.posts.update((posts) =>
+      posts.map((post) =>
+        post.id === reply.postId ? { ...post, commentsCount: post.commentsCount + 1 } : post,
+      ),
+    );
+
+    this.currentPosts.update((posts) =>
       posts.map((post) =>
         post.id === reply.postId ? { ...post, commentsCount: post.commentsCount + 1 } : post,
       ),
@@ -206,6 +241,37 @@ export class Feed implements OnInit {
       }
 
       return newComments;
+    });
+  }
+
+  filterByMe(): void {
+    var postsById = this.posts().filter((item) => item.creatorById === this.currentUserId);
+    this.currentPosts.set(postsById);
+  }
+
+  filterByAll(): void {
+    this.currentPosts.set(this.posts());
+  }
+
+  filterByDate(): void {
+    this.currentPosts.set(this.posts().reverse());
+  }
+
+  openDialog(
+    enterAnimationDuration: string,
+    exitAnimationDuration: string,
+    post: getAllPost,
+  ): void {
+    const dialogRef = this.dialog.open(DialogAnimation, {
+      width: '250px',
+      enterAnimationDuration,
+      exitAnimationDuration,
+    });
+
+    dialogRef.afterClosed().subscribe((result: boolean) => {
+      if (result === true) {
+        this.deletePost(post);
+      }
     });
   }
 }

@@ -1,20 +1,37 @@
 <mat-progress-spinner mode="indeterminate" *ngIf="this.isLoading()"></mat-progress-spinner>
 
+<div class="header">
+  <h1>Welcome to <i>Social</i></h1>
+  <h4>Create your own post down below</h4>
+</div>
+
 <div class="create-post-button">
   <button matButton *ngIf="!this.isLoading()" [routerLink]="['/create-post']">Create post</button>
 </div>
 
+<div class="filter-buttons">
+  <div class="filter-button">
+    <button matButton (click)="filterByMe()" *ngIf="!this.isLoading()">Filter by me</button>
+  </div>
+  <div class="filter-button">
+    <button matButton (click)="filterByAll()" *ngIf="!this.isLoading()">Filter by all</button>
+  </div>
+  <div class="filter-button">
+    <button matButton (click)="filterByDate()" *ngIf="!this.isLoading()">Filter by date</button>
+  </div>
+</div>
+
 <div class="my-container" *ngIf="!this.isLoading()">
-  <div class="feed-card" *ngFor="let post of this.posts()">
+  <div class="feed-card" *ngFor="let post of this.currentPosts()">
     <div class="feed-user-data">
       <img class="avatar" [src]="this.apiUri + '/' + post.creatorAvatarUrl" alt="" />
       <h2>@{{ post.creatorUserName }}</h2>
       <h3 style="font-size: 15px">{{ getDayCount(post) }}</h3>
       <button
-        type="button"
-        matButton
+        id="delete-button"
+        matButton="elevated"
         *ngIf="post.creatorById === this.currentUserId"
-        (click)="deletePost(post)"
+        (click)="openDialog('300ms', '150ms', post)"
       >
         Delete
       </button>
