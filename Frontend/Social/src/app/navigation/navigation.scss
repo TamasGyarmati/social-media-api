@@ -138,9 +138,29 @@ $nav-muted: #9aa9ba;
   .nav {
     min-height: 64px;
     margin: 12px;
-    padding: 0 16px;
+    padding: 16px 16px;
     flex-wrap: wrap;
     gap: 0;
+
+    #x-button {
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      padding: 0;
+      border-radius: 10px;
+      box-sizing: border-box;
+      overflow: hidden;
+      margin-bottom: 10px;
+
+      mat-icon {
+        position: relative;
+        left: 6px;
+      }
+    }
+  }
+
+  .brand {
+    margin-bottom: 10px;
   }
 
   .nav-left {

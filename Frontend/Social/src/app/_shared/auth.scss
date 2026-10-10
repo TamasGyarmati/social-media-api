@@ -1,5 +1,7 @@
 @import '../_shared/variables.scss';
 
+$accent-color: #60a5fa;
+
 .my-container {
   display: flex;
   flex-direction: column;
@@ -45,7 +47,7 @@
     h3 {
       a {
         display: inline-block;
-        color: $blue-btn-color;
+        color: $accent-color;
         text-decoration: none;
         transition: transform 0.3s ease-out;
 
@@ -58,9 +60,11 @@
 
   .actions {
     button {
-      border-radius: 5px;
-      background-color: $blue-btn-color;
-      color: white;
+      border-radius: 10px;
+      transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease;
 
       &:disabled {
         background: $disabled-btn-background-color;

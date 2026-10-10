@@ -117,15 +117,6 @@ mat-progress-spinner {
       gap: 14px;
       min-width: 0;
 
-      h2 {
-        color: $text-primary;
-        font-size: 1.1rem;
-        font-weight: 600;
-        line-height: 1.4;
-        margin: 0;
-        overflow-wrap: anywhere;
-      }
-
       .avatar {
         width: 48px;
         height: 48px;
@@ -133,6 +124,37 @@ mat-progress-spinner {
         object-fit: cover;
         border-radius: 50%;
         border: 2px solid $card-border;
+      }
+
+      .feed-user-info {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 3px;
+        min-width: 0;
+
+        h2 {
+          color: $text-primary;
+          font-size: 1.1rem;
+          font-weight: 600;
+          line-height: 1.4;
+          margin: 0;
+          overflow-wrap: anywhere;
+        }
+
+        h3 {
+          color: $text-secondary;
+          font-size: 0.85rem;
+          font-weight: 400;
+          line-height: 1.4;
+          margin: 0;
+        }
+      }
+
+      #delete-button {
+        flex-shrink: 0;
+        margin-left: auto;
+        align-self: center;
       }
     }
 
