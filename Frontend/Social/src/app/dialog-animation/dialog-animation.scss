@@ -1,22 +1,154 @@
 @import '../_shared/variables.scss';
 
-button {
-  margin-right: 8px;
-}
+$dialog-bg: #131a22;
+$dialog-border: #26313d;
+$text-primary: #e8edf3;
+$text-secondary: #8d9bab;
+$danger-color: #f87171;
+$danger-bg: rgba(248, 113, 113, 0.1);
 
 .dialog {
-  padding: 25px;
+  width: 100%;
+  min-width: 380px;
+  max-width: 460px;
+  padding: 32px;
+  box-sizing: border-box;
+  background: $dialog-bg;
+  color: $text-primary;
+  border: 1px solid $dialog-border;
+  border-radius: 20px;
+
+  .dialog-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+
+    .delete-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      flex-shrink: 0;
+      color: $danger-color;
+      background: $danger-bg;
+      border: 1px solid rgba(248, 113, 113, 0.18);
+      border-radius: 14px;
+
+      mat-icon {
+        width: 24px;
+        height: 24px;
+        font-size: 24px;
+      }
+    }
+
+    h2 {
+      margin: 0;
+      padding: 0;
+      color: $text-primary;
+      font-size: 1.4rem;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+  }
 
   mat-dialog-content {
     padding: 0;
+    margin: 0 0 28px;
+    color: $text-secondary;
+    font-size: 0.95rem;
+    line-height: 1.6;
+
+    p {
+      margin: 0 0 8px;
+      color: $text-primary;
+      font-size: 1rem;
+    }
+
+    span {
+      font-size: 0.875rem;
+      color: $text-secondary;
+    }
+  }
+
+  mat-dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 0;
     margin: 0;
-  }
 
-  #no-button {
-    color: white;
-  }
+    button {
+      min-width: 100px;
+      min-height: 42px;
+      margin: 0;
+      padding: 0 18px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
 
-  #yes-button {
-    color: $delete-btn-color;
+      &:hover {
+        transform: translateY(-1px);
+      }
+    }
+
+    #no-button {
+      color: $text-primary;
+      background: #202a35;
+
+      &:hover {
+        background: #2a3644;
+      }
+    }
+
+    #yes-button {
+      color: #fff;
+      background: #dc4545;
+
+      &:hover {
+        background: #ef5350;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .dialog {
+    min-width: 0;
+    padding: 24px;
+
+    .dialog-header {
+      gap: 12px;
+
+      .delete-icon {
+        width: 42px;
+        height: 42px;
+      }
+
+      h2 {
+        font-size: 1.2rem;
+      }
+    }
+
+    mat-dialog-actions {
+      gap: 8px;
+
+      button {
+        min-width: 0;
+        flex: 1;
+        padding: 0 12px;
+      }
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dialog mat-dialog-actions button {
+    transition: none;
   }
 }

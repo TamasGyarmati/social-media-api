@@ -1,8 +1,19 @@
 <div class="dialog">
-  <h2 mat-dialog-title>Delete post</h2>
-  <mat-dialog-content> Are you sure? </mat-dialog-content>
-  <mat-dialog-actions>
-    <button id="no-button" matButton [mat-dialog-close]="false">No</button>
-    <button id="yes-button" matButton [mat-dialog-close]="true" cdkFocusInitial>Yes</button>
+  <div class="dialog-header">
+    <div class="delete-icon">
+      <mat-icon>delete_outline</mat-icon>
+    </div>
+
+    <h2 mat-dialog-title>Delete post</h2>
+  </div>
+
+  <mat-dialog-content>
+    <p>Are you sure you want to delete this post?</p>
+    <span>This action cannot be undone.</span>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button id="no-button" matButton [mat-dialog-close]="false">Cancel</button>
+    <button id="yes-button" matButton [mat-dialog-close]="true" cdkFocusInitial>Delete post</button>
   </mat-dialog-actions>
 </div>

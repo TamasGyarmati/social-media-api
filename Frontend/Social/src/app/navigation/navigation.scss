@@ -1,19 +1,238 @@
 @import '../_shared/variables.scss';
 
-button[matButton] {
-  color: $blue-btn-color;
-}
+$nav-bg: #131a22;
+$nav-border: #26313d;
+$nav-hover: #1d2937;
+$nav-accent: #7db4ff;
+$nav-text: #e8edf3;
+$nav-muted: #9aa9ba;
 
 .nav {
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 15px;
-  margin-top: 1rem;
-  margin-left: 1rem;
+  gap: 20px;
+
+  min-height: 72px;
+  margin: 16px 24px;
+  padding: 0 24px;
+
+  background: $nav-bg;
+  border: 1px solid $nav-border;
+  border-radius: 16px;
+
+  box-sizing: border-box;
 }
 
-h3 {
-  margin-right: 20px;
-  font-size: 20px;
+.nav-left,
+.nav-right,
+.nav-links {
+  display: flex;
+  align-items: center;
+}
+
+.nav-left {
+  gap: 36px;
+}
+
+.nav-links {
+  gap: 8px;
+}
+
+.brand {
+  color: $nav-text;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.7px;
+  text-decoration: none;
+  white-space: nowrap;
+
+  span {
+    color: $nav-accent;
+  }
+}
+
+.nav-links button,
+.mobile-menu button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+
+  min-height: 42px;
+  padding: 0 14px;
+
+  color: $nav-muted;
+  border-radius: 10px;
+
+  transition:
+    color 180ms ease,
+    background-color 180ms ease,
+    transform 180ms ease;
+
+  mat-icon {
+    width: 20px;
+    height: 20px;
+    font-size: 20px;
+    line-height: 20px;
+  }
+
+  &:hover {
+    color: $nav-text;
+    background-color: $nav-hover;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.nav-right {
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+
+  padding: 9px 13px;
+
+  color: $nav-text;
+  background-color: #1a2430;
+  border: 1px solid $nav-border;
+  border-radius: 10px;
+
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+
+  mat-icon {
+    color: $nav-accent;
+  }
+}
+
+.hamburger {
+  display: none;
+  color: $nav-text;
+  border-radius: 10px;
+
+  transition:
+    color 180ms ease,
+    background-color 180ms ease;
+
+  &:hover {
+    color: $nav-accent;
+    background-color: $nav-hover;
+  }
+}
+
+.mobile-menu {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .nav {
+    min-height: 64px;
+    margin: 12px;
+    padding: 0 16px;
+    flex-wrap: wrap;
+    gap: 0;
+  }
+
+  .nav-left {
+    flex: 1;
+    gap: 0;
+  }
+
+  .nav-links,
+  .nav-right > .user-info {
+    display: none;
+  }
+
+  .nav-right {
+    gap: 0;
+  }
+
+  .hamburger {
+    display: inline-flex;
+  }
+
+  .mobile-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    width: 100%;
+    max-height: 0;
+    padding: 0;
+    overflow: hidden;
+    visibility: hidden;
+    opacity: 0;
+
+    border-top: 1px solid transparent;
+
+    transition:
+      max-height 280ms ease,
+      opacity 200ms ease,
+      padding 280ms ease,
+      border-color 200ms ease,
+      visibility 280ms;
+
+    &.open {
+      max-height: 300px;
+      padding: 12px 0 16px;
+      visibility: visible;
+      opacity: 1;
+      border-top-color: $nav-border;
+    }
+
+    button {
+      width: 100%;
+      justify-content: flex-start;
+    }
+  }
+
+  .mobile-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    margin-bottom: 8px;
+    padding: 12px 14px;
+
+    color: $nav-text;
+    background-color: #1a2430;
+    border-radius: 10px;
+
+    font-size: 14px;
+    overflow-wrap: anywhere;
+
+    mat-icon {
+      flex-shrink: 0;
+      color: $nav-accent;
+    }
+  }
+}
+
+@media (max-width: 400px) {
+  .nav {
+    margin: 8px;
+    padding: 0 12px;
+  }
+
+  .brand {
+    font-size: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
 }

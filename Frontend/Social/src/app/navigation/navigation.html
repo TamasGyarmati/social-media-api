@@ -1,10 +1,70 @@
-<div class="nav">
-  <div class="buttons">
-    <button matButton [routerLink]="['/feed']">Feed</button>
-    <button matButton [routerLink]="['/login']" *ngIf="!this.auth.isLoggedIn()">Login</button>
-    <button matButton (click)="logout()" *ngIf="this.auth.isLoggedIn()">Logout</button>
+<nav class="nav">
+  <div class="nav-left">
+    <a class="brand" [routerLink]="['/feed']" (click)="closeMobileMenu()">
+      Social<span>App</span>
+    </a>
+
+    <div class="nav-links">
+      <button matButton [routerLink]="['/feed']">
+        <mat-icon>dynamic_feed</mat-icon>
+        <span>Feed</span>
+      </button>
+
+      <button matButton [routerLink]="['/login']" *ngIf="!this.auth.isLoggedIn()">
+        <mat-icon>login</mat-icon>
+        <span>Login</span>
+      </button>
+
+      <button matButton (click)="logout()" *ngIf="this.auth.isLoggedIn()">
+        <mat-icon>logout</mat-icon>
+        <span>Logout</span>
+      </button>
+    </div>
   </div>
-  <div class="user-logged-in" *ngIf="this.auth.isLoggedIn()">
-    <h3 style="color: white">@{{ this.auth.activeUser() }}</h3>
+
+  <div class="nav-right">
+    <div class="user-info" *ngIf="this.auth.isLoggedIn()">
+      <mat-icon>account_circle</mat-icon>
+      <span>@{{ this.auth.activeUser() }}</span>
+    </div>
+
+    <button
+      class="hamburger"
+      mat-icon-button
+      (click)="toggleMobileMenu()"
+      [attr.aria-label]="isMobileMenuOpen() ? 'Close menu' : 'Open menu'"
+      [attr.aria-expanded]="isMobileMenuOpen()"
+    >
+      <mat-icon>
+        {{ isMobileMenuOpen() ? 'close' : 'menu' }}
+      </mat-icon>
+    </button>
   </div>
-</div>
+
+  <div class="mobile-menu" [class.open]="isMobileMenuOpen()">
+    <div class="mobile-user" *ngIf="this.auth.isLoggedIn()">
+      <mat-icon>account_circle</mat-icon>
+      <span>@{{ this.auth.activeUser() }}</span>
+    </div>
+
+    <button matButton [routerLink]="['/feed']" (click)="closeMobileMenu()">
+      <mat-icon>dynamic_feed</mat-icon>
+      <span>Feed</span>
+    </button>
+
+    <button
+      matButton
+      [routerLink]="['/login']"
+      *ngIf="!this.auth.isLoggedIn()"
+      (click)="closeMobileMenu()"
+    >
+      <mat-icon>login</mat-icon>
+      <span>Login</span>
+    </button>
+
+    <button matButton *ngIf="this.auth.isLoggedIn()" (click)="logout(); closeMobileMenu()">
+      <mat-icon>logout</mat-icon>
+      <span>Logout</span>
+    </button>
+  </div>
+</nav>

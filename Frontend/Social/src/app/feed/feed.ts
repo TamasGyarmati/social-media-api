@@ -263,7 +263,7 @@ export class Feed implements OnInit {
     post: getAllPost,
   ): void {
     const dialogRef = this.dialog.open(DialogAnimation, {
-      width: '250px',
+      width: '460px',
       enterAnimationDuration,
       exitAnimationDuration,
     });
