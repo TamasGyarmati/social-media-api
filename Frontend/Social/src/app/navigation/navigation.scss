@@ -1,12 +1,5 @@
 @import '../_shared/variables.scss';
 
-$nav-bg: #131a22;
-$nav-border: #26313d;
-$nav-hover: #1d2937;
-$nav-accent: #7db4ff;
-$nav-text: #e8edf3;
-$nav-muted: #9aa9ba;
-
 .nav {
   position: relative;
   display: flex;
@@ -142,7 +135,7 @@ $nav-muted: #9aa9ba;
     flex-wrap: wrap;
     gap: 0;
 
-    #x-button {
+    #hamburger-btn {
       width: 40px;
       height: 40px;
       min-width: 40px;

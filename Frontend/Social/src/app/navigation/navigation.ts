@@ -16,7 +16,7 @@ import { MATERIAL_IMPORTS } from '../_shared/material';
 export class Navigation {
   constructor(public auth: AuthService) {}
 
-  isMobileMenuOpen = signal(false);
+  public readonly isMobileMenuOpen = signal<boolean>(false);
 
   public logout(): void {
     this.auth.logout();

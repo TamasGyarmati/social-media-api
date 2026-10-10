@@ -28,15 +28,7 @@
       <span>@{{ this.auth.activeUser() }}</span>
     </div>
 
-    <button
-      id="x-button"
-      matButton
-      class="hamburger"
-      mat-icon-button
-      (click)="toggleMobileMenu()"
-      [attr.aria-label]="isMobileMenuOpen() ? 'Close menu' : 'Open menu'"
-      [attr.aria-expanded]="isMobileMenuOpen()"
-    >
+    <button id="hamburger-btn" matButton class="hamburger" (click)="toggleMobileMenu()">
       <mat-icon>
         {{ isMobileMenuOpen() ? 'close' : 'menu' }}
       </mat-icon>

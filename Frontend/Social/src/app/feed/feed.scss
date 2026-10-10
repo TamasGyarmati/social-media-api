@@ -1,23 +1,12 @@
 @import '../_shared/variables.scss';
 
-$post-max-width: 1200px;
-
-$feed-bg: #0c1014;
-$card-bg: #131a22;
-$card-border: #26313d;
-$card-border-hover: #39495b;
-$text-primary: #e8edf3;
-$text-secondary: #8d9bab;
-$accent-color: #60a5fa;
-$danger-color: #f87171;
-
 .header {
   text-align: center;
-  margin-top: 5rem;
-  margin-bottom: 2rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
 
   h1 {
-    font-size: 50px;
+    font-size: 70px;
     color: white;
 
     i {
@@ -43,7 +32,7 @@ $danger-color: #f87171;
 .create-post-button {
   display: flex;
   justify-content: center;
-  margin: 24px 0 32px;
+  margin-bottom: 10px;
 
   button {
     border-radius: 12px;
